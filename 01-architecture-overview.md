@@ -11,47 +11,56 @@ All other fields (principal info, coordinator info, etc.) exist in the form but 
 ## System Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                      RAILWAY HOSTING                            │
-│                                                                 │
-│  ┌──────────────────────┐      ┌──────────────────────────────┐ │
-│  │  FRONTEND SERVICE    │      │  BACKEND SERVICE             │ │
-│  │  React 18 + Vite     │      │  FastAPI (Python 3.11)       │ │
-│  │  Tailwind CSS v3     │ HTTP │                              │ │
-│  │  Framer Motion       │─────▶│  /api/register    (public)   │ │
-│  │                      │      │  /api/onspot      (staff)    │ │
-│  │  PAGES:              │      │  /api/scan        (volunteer)│ │
-│  │  /register  (public) │      │  /api/admin/*     (JWT auth) │ │
-│  │  /onspot    (staff)  │      │                              │ │
-│  │  /scan      (volun.) │      │  MODULES:                    │ │
-│  │  /admin     (admin)  │      │  ├─ pass_generator.py (PIL)  │ │
-│  │                      │      │  ├─ email_service.py (Brevo) │ │
-│  │  vite preview (prod) │      │  ├─ qr_utils.py             │ │
-│  │  Port: $PORT         │      │  └─ auth.py (JWT)            │ │
-│  └──────────────────────┘      │  Port: $PORT (uvicorn)       │ │
-│                                └──────────┬───────────────────┘ │
-└────────────────────────────────────────────┼─────────────────────┘
-                                             │
-                          ┌──────────────────┼──────────────────┐
-                          │                  ▼                  │
-                          │         SUPABASE (PostgreSQL)       │
-                          │                                     │
-                          │  Tables:                            │
-                          │  ├─ attendees (all registrations)   │
-                          │  └─ admin_users (login credentials) │
-                          │                                     │
-                          │  RLS Policies:                      │
-                          │  ├─ Public: INSERT only (attendees) │
-                          │  ├─ Auth: Full CRUD (admin JWT)     │
-                          │  └─ Service Role: scan endpoint     │
-                          └─────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────────┐
+│                          RAILWAY HOSTING                                │
+│                                                                         │
+│  ┌───────────────────────────┐      ┌──────────────────────────────────┐│
+│  │  FRONTEND SERVICE         │      │  BACKEND SERVICE                 ││
+│  │  React 19 + Vite 6        │      │  FastAPI (Python 3.11)           ││
+│  │  Tailwind CSS v3          │ HTTP │                                  ││
+│  │  Framer Motion            │─────▶│  PUBLIC:                         ││
+│  │                           │      │  /api/register     (pre-reg)     ││
+│  │  PAGES:                   │      │  /api/onspot       (instant reg) ││
+│  │  /           (landing)    │      │  /api/volunteer/*  (reg/login/   ││
+│  │  /register   (pre-reg)    │      │                     validate)    ││
+│  │  /onspot     (public)     │      │                                  ││
+│  │  /volunteer/* (validate)  │      │  ADMIN (JWT):                    ││
+│  │  /admin      (dashboard)  │      │  /api/admin/login, setup, stats  ││
+│  │                           │      │  /api/admin/registrations        ││
+│  │  vite preview (prod)      │      │  /api/admin/approve, reject      ││
+│  │  Port: $PORT              │      │  /api/admin/resend, resend-all   ││
+│  └───────────────────────────┘      │  /api/admin/export, import       ││
+│                                     │                                  ││
+│                                     │  MODULES:                        ││
+│                                     │  ├─ pass_generator.py (Pillow)   ││
+│                                     │  ├─ email_service.py (Brevo)     ││
+│                                     │  ├─ qr_utils.py                  ││
+│                                     │  └─ auth.py (JWT RBAC)           ││
+│                                     │  Port: $PORT (uvicorn)           ││
+│                                     └──────────┬───────────────────────┘│
+└──────────────────────────────────────────────────┼──────────────────────┘
+                                                   │
+                            ┌──────────────────────┼──────────────────┐
+                            │                      ▼                  │
+                            │         SUPABASE (PostgreSQL)           │
+                            │                                         │
+                            │  Tables:                                │
+                            │  ├─ attendees (all registrations)       │
+                            │  ├─ admin_users (login credentials)     │
+                            │  └─ volunteers (event day helpers)      │
+                            │                                         │
+                            │  RLS Policies:                          │
+                            │  ├─ Public: INSERT only (attendees)     │
+                            │  ├─ Auth: Full CRUD (service_role)      │
+                            │  └─ Volunteer: INSERT (volunteers)      │
+                            └─────────────────────────────────────────┘
 
-                          ┌─────────────────────────────────────┐
-                          │     BREVO HTTP API (v3/smtp/email)  │
-                          │  Free tier: 300 emails/day          │
-                          │  Pass image attached as base64 JPG  │
-                          │  Uses httpx POST, NOT SMTP/SDK      │
-                          └─────────────────────────────────────┘
+                            ┌─────────────────────────────────────────┐
+                            │     BREVO HTTP API (v3/smtp/email)      │
+                            │  Free tier: 300 emails/day              │
+                            │  Pass image attached as base64 JPG      │
+                            │  Uses httpx POST, NOT SMTP/SDK          │
+                            └─────────────────────────────────────────┘
 ```
 
 ## Feature Flow
