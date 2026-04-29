@@ -53,7 +53,7 @@
 4. In VS Code → Kilo Code → Settings:
    - Provider: `OpenAI Compatible`
    - Base URL: `https://integrate.api.nvidia.com/v1`
-   - Model: `qwen/qwen2.5-coder-32b-instruct`
+   - Model: `deepseek-ai/deepseek-v4-pro` (best for code generation)
    - API Key: your `nvapi-...` key
 
 ### 6. GitHub Repository (already done)
@@ -75,7 +75,6 @@ BREVO_API_KEY=xkeysib-xxxx
 BREVO_SENDER_EMAIL=noreply@izeebschool.com
 BREVO_SENDER_NAME=IZEE Job Fair 2026
 FRONTEND_URL=<filled after frontend deploy>
-STAFF_PASSWORD=<choose one for admin direct on-spot access>
 ```
 
 ---
@@ -86,16 +85,16 @@ STAFF_PASSWORD=<choose one for admin direct on-spot access>
 
 | Situation | Use |
 |-----------|-----|
-| AI Studio (Gemini 2.5 Pro) has credits | Use AI Studio |
-| AI Studio rate-limited or down | Use Kilo Code + NVIDIA (`qwen/qwen2.5-coder-32b-instruct`) |
-| Debugging complex errors | Use `meta/llama-3.3-70b-instruct` in Kilo Code |
+| AI Studio (Gemini 2.5 Pro) has credits | Use AI Studio (best quality) |
+| AI Studio rate-limited or down | Use Kilo Code + NVIDIA NIM (`deepseek-ai/deepseek-v4-pro`) |
+| Need fast iteration / debugging | Use Kilo Code + `deepseek-ai/deepseek-v4-flash` |
 
 ---
 
 ### SESSION 1 — Backend Foundation
 
 **Estimated time:** 45 minutes  
-**Model:** `qwen/qwen2.5-coder-32b-instruct` (or Gemini 2.5 Pro)
+**Model:** `deepseek-ai/deepseek-v4-pro` (or Gemini 2.5 Pro in AI Studio)
 
 **PROMPT (copy-paste into AI Studio or Kilo Code):**
 
@@ -230,7 +229,7 @@ AFTER COMPLETING ALL FILES:
 ### SESSION 2 — Pass Generator + Email Service
 
 **Estimated time:** 30 minutes  
-**Model:** `qwen/qwen2.5-coder-32b-instruct`
+**Model:** `deepseek-ai/deepseek-v4-flash` (fast, handles utils well)
 
 **PROMPT:**
 
@@ -305,7 +304,7 @@ AFTER COMPLETING ALL FILES:
 ### SESSION 3 — Frontend Foundation + Forms
 
 **Estimated time:** 60 minutes  
-**Model:** `qwen/qwen2.5-coder-32b-instruct`
+**Model:** `deepseek-ai/deepseek-v4-pro` (large frontend generation needs best model)
 
 **PROMPT:**
 
@@ -429,7 +428,7 @@ AFTER COMPLETING ALL FILES:
 ### SESSION 4 — Admin Panel
 
 **Estimated time:** 45 minutes  
-**Model:** `qwen/qwen2.5-coder-32b-instruct`
+**Model:** `deepseek-ai/deepseek-v4-pro` (complex admin panel, many components)
 
 **PROMPT:**
 
@@ -601,12 +600,15 @@ AFTER COMPLETING ALL FILES:
 
 ## MODEL RECOMMENDATIONS
 
-| Task | Model | Why |
+| Task | NVIDIA NIM Model | Why |
 |------|-------|-----|
-| All coding (90% of work) | `qwen/qwen2.5-coder-32b-instruct` | Best free code model |
-| Complex debugging | `meta/llama-3.3-70b-instruct` | Better reasoning |
-| AI Studio available | `Gemini 2.5 Pro` | Use this first (best quality) |
-| Quick file edits | `qwen/qwen2.5-coder-32b-instruct` | Fast, precise |
+| Backend foundation (Session 1) | `deepseek-ai/deepseek-v4-pro` | Best code quality, 90%+ SWE-bench, handles multi-file projects |
+| Pass gen + utilities (Session 2) | `deepseek-ai/deepseek-v4-flash` | Fast, efficient for utility files — 284B MoE, great throughput |
+| Frontend + Landing (Session 3) | `deepseek-ai/deepseek-v4-pro` | Large JSX generation needs best model, 1M context window |
+| Admin panel (Session 4) | `deepseek-ai/deepseek-v4-pro` | Complex component hierarchy, many files |
+| Quick debugging | `deepseek-ai/deepseek-v4-flash` | Fast turnaround, 13B active params, low latency |
+| Alternative (if DeepSeek down) | `mistralai/mistral-small-4-119b-2603` | Strong code gen, efficient output, 119B MoE |
+| AI Studio available | Gemini 2.5 Pro | Use FIRST if credits available (best overall quality) |
 
 ---
 
