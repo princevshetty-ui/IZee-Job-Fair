@@ -406,6 +406,54 @@ Response (200):
 }
 ```
 
+### POST `/api/admin/resend/{id}` — Resend Pass Email
+```
+Auth: Bearer <JWT>
+Path: id = attendee UUID (must be status="approved" and have a SID)
+
+Backend Logic:
+  1. Fetch attendee by ID
+  2. Verify status == "approved" and sid is not null
+  3. Re-generate pass image (Pillow — in memory)
+  4. Re-send email with pass attachment via Brevo HTTP API (async)
+
+Response (200):
+{
+    "success": true,
+    "message": "Pass re-sent to rahul@example.com"
+}
+
+Error (400):
+{ "detail": "Cannot resend — attendee is not approved or has no SID." }
+```
+
+### POST `/api/admin/resend-all` — Bulk Resend All Approved Passes
+```
+Auth: Bearer <JWT>
+
+Backend Logic:
+  1. Query all attendees WHERE status='approved' AND sid IS NOT NULL
+  2. For each: regenerate pass image, queue email (BackgroundTasks)
+  3. Respect Brevo daily limit (280/batch, queue remainder for next day)
+  4. Return count of queued emails
+
+Response (200):
+{
+    "success": true,
+    "message": "980 passes queued for resend.",
+    "data": {
+        "total_queued": 980,
+        "sending_today": 280,
+        "queued_tomorrow": 700
+    }
+}
+```
+
+> [!IMPORTANT]
+> The "Resend All Passes" button in the admin dashboard MUST show a confirmation
+> modal before executing. Text: "This will re-email passes to ALL {count} approved
+> registrations. Are you sure?" with Cancel and Confirm buttons.
+
 ### GET `/api/admin/attendance` — Attended Records
 ```
 Auth: Bearer <JWT>

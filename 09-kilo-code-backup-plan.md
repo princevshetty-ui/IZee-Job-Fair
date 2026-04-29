@@ -157,6 +157,8 @@ CREATE THESE FILES:
    - GET /api/admin/registrations → paginated, searchable, filterable
    - PUT /api/admin/approve/{id} → generate SID, generate pass (Pillow), queue email (BackgroundTasks)
    - PUT /api/admin/reject/{id} → update status='rejected'
+   - POST /api/admin/resend/{id} → re-generate pass + re-send email (approved rows only)
+   - POST /api/admin/resend-all → bulk re-email all approved passes (respect 280/day Brevo limit)
    - GET /api/admin/attendance → attended records with timestamps
    - GET /api/admin/export/all → CSV download
    - GET /api/admin/export/attended → CSV download
@@ -173,28 +175,24 @@ CREATE THESE FILES:
       * Validate roll_number: exactly 12 alphanumeric chars, UNIQUE
       * Fields: full_name, roll_number, phone, email, course, year (all required)
     - POST /api/volunteer/login → look up by roll_number, verify email matches, return volunteer JWT
-    - POST /api/volunteer/onspot → same as /api/onspot but uses volunteer JWT auth
-      * If attendee_type == 'professional': auto-set academic_level='Professional', stream='N/A'
     - POST /api/volunteer/validate → accept {sid}, validate attendee
-      * Same logic as /api/scan: check SID exists, check if already attended
-      * Set attended=true, attended_at=NOW(), validated_by=volunteer.id
-      * Return IST-formatted time for duplicates:
-        from datetime import timezone, timedelta
+      * Check SID exists, check if already attended
+      * If NOT attended: set attended=true, attended_at=NOW(), validated_by=volunteer.id
+        Return attendee details instantly (name, academic_level, stream, reg_type)
+      * If ALREADY attended: return duplicate warning with IST time
         IST = timezone(timedelta(hours=5, minutes=30))
         ist_time = attended_at.astimezone(IST).strftime("%I:%M %p IST")
+      * Response is INSTANT — no waiting, no polling
 
 11. routes/onspot.py — POST /api/onspot:
     - PUBLIC — no auth required (anyone with the link can register)
-    - Same logic as /api/register BUT:
-      * If attendee_type == 'professional': auto-set academic_level='Professional', stream='N/A'
-      * Insert with status='approved', reg_type='onspot' (auto-approved, no admin step)
-      * Generate SID immediately
-      * Generate pass image (Pillow) in memory — NOT stored in DB
-      * Send email via Brevo HTTP API (async, BackgroundTasks)
-      * Return pass_image base64 for on-screen display
-
-12. routes/scan.py — POST /api/scan (legacy):
-    - Same as volunteer/validate but without volunteer auth tracking
+    - Same fields as /api/register
+    - If attendee_type == 'professional': auto-set academic_level='Professional', stream='N/A'
+    - Insert with status='approved', reg_type='onspot' (auto-approved, no admin step)
+    - Generate SID immediately
+    - Generate pass image (Pillow) in memory — NOT stored in DB
+    - Send email via Brevo HTTP API (async, BackgroundTasks)
+    - Return pass_image base64 for on-screen display
 
 13. railway.toml:
     [build] builder = "nixpacks"
@@ -320,18 +318,21 @@ npm create vite@latest frontend -- --template react
 cd frontend
 npm install tailwindcss @tailwindcss/vite framer-motion react-router-dom html5-qrcode
 
+IMPORTANT: In index.html, add Google Fonts link for Inter (400-700) and Outfit (700-900).
+
 CREATE THESE FILES:
 
-1. vite.config.js — React plugin + API proxy for /api/* to localhost:8000
-2. src/index.css — Tailwind directives, dark theme base, Inter font from Google Fonts
+1. vite.config.js — React plugin + Tailwind plugin + API proxy /api/* to localhost:8000
+2. src/index.css — Tailwind directives + dark theme (#0a0e1a base), glassmorphism utilities,
+   Inter for body, Outfit for hero headings, gradient accent classes
 3. src/App.jsx — React Router v6:
+   / → LandingPage (public hero page with company carousel)
    /register → RegisterPage (public pre-registration)
-   /onspot → OnSpotPage (public — instant registration, no login needed)
+   /onspot → OnSpotPage (public instant registration, NO auth)
    /volunteer/register → VolunteerRegisterPage (public, hidden link)
-   /volunteer/validate → VolunteerValidatePage (volunteer auth required)
+   /volunteer/validate → VolunteerValidatePage (volunteer JWT required)
    /admin → AdminLoginPage
-   /admin/dashboard → AdminDashboard (admin auth required)
-   / → redirect to /register
+   /admin/dashboard → AdminDashboard (admin JWT required)
 
 4. src/utils/api.js:
    const API_URL = import.meta.env.VITE_API_URL || ''
@@ -351,43 +352,51 @@ CREATE THESE FILES:
 7. src/components/shared/AnimatedPage.jsx — Framer Motion wrapper
 8. src/components/shared/Toast.jsx — notification with auto-dismiss
 9. src/components/shared/LoadingSpinner.jsx
+10. src/components/shared/Navbar.jsx — transparent on landing, solid elsewhere
 
-10. src/components/forms/FormField.jsx — reusable input/select with label and error
-11. src/components/forms/RegistrationForm.jsx:
-    Multi-step form with AnimatePresence slide transitions:
-    Step 1: PersonalInfoStep — name*, phone*, email*, college*, attendee_type* (radio)
-    Step 2a (student): AcademicDetailsStep — academic_level*, stream*, conditionals
-    Step 2b (professional): ProfessionalStep — company, designation, experience (all optional)
-    Step 3: CollegeInfoStep — principal/coordinator info (all optional)
-    Progress dots, Next/Back/Submit buttons, loading state
+11. src/pages/LandingPage.jsx — THE HERO PAGE (first thing anyone sees):
+    Full-viewport hero with animated gradient heading "IZEE JOB FAIR 2026" (Outfit font),
+    subtitle "8th May 2026 · IZEE Business School, Bangalore",
+    glowing badge "80+ Companies Hiring" with pulse animation,
+    two CTA buttons: "Register Now" (gradient bg → /register) and "On-Spot Registration" (outline → /onspot),
+    animated floating shapes background using Framer Motion.
 
-12. src/pages/RegisterPage.jsx — wraps RegistrationForm, POST /api/register
-13. src/pages/VolunteerRegisterPage.jsx:
-    - Fields: full_name*, roll_number* (12 alphanumeric, validate live), phone*, email*, course*, year*
-    - POST /api/volunteer/register
-    - Success screen: "You're registered as a volunteer!"
+    Stats section (scroll-triggered): 3 cards "4,000+ Registrations" | "80+ Companies" | "1,500+ Attendees"
+    with animated count-up on scroll into view.
 
-14. src/pages/VolunteerValidatePage.jsx:
-    - FIRST: Login form (roll_number + email) → POST /api/volunteer/login → store JWT
-    - AFTER LOGIN: Two-tab interface:
-      Tab 1: QR Scanner (html5-qrcode camera) → extract SID → POST /api/volunteer/validate
-      Tab 2: Manual SID Input (text field + Validate button) → POST /api/volunteer/validate
-    - Show results: green card (valid) / red card (duplicate with IST time) / error
+    Company Carousel: Two rows of company names/logos auto-scrolling in opposite directions.
+    CSS marquee animation (@keyframes marquee, translateX, infinite linear). Hover pauses.
+    Company list in constants.js: COMPANIES = ["TCS", "Infosys", "Wipro", "HCL", ...]
+
+    Event Details section: Date/venue card, "Who Should Attend", "What to Expect".
+    Footer: IZEE branding, contact, copyright.
+
+12. Form components: FormField, RegistrationForm, PersonalInfoStep, AcademicDetailsStep,
+    ProfessionalStep, CollegeInfoStep (same specs as before)
+
+13. src/pages/RegisterPage.jsx — wraps RegistrationForm, POST /api/register
+14. src/pages/OnSpotPage.jsx:
+    - PUBLIC — same RegistrationForm as RegisterPage, NO auth needed
+    - POST to /api/onspot
+    - On success: show pass image (base64) on screen + "Pass emailed!" toast
+    - Header: "On-Spot Registration"
+
+15. src/pages/VolunteerRegisterPage.jsx — volunteer sign-up form
+16. src/pages/VolunteerValidatePage.jsx:
+    - Login → QR scanner + manual SID input
+    - Validation response is INSTANT — no loading delay
+    - Green card (valid + attendee details) / Red card (duplicate + IST time)
     - Auto-reset after 3 seconds
 
-12. src/pages/OnSpotPage.jsx:
-    - PUBLIC — same RegistrationForm component as RegisterPage
-    - No login required — anyone with the link /onspot can fill the form
-    - POST to /api/onspot (NOT /api/register)
-    - On success: show the pass image (base64) on screen + "Pass emailed!" message
-    - Different header text: "On-Spot Registration" instead of "Pre-Registration"
-
-DESIGN:
-- Dark theme (#0f172a background), slate-700 cards, blue-500 accents
-- Inter font from Google Fonts
-- Framer Motion: page transitions, step slide animations, spring scale for results
-- Mobile-first responsive (volunteers use phones)
-- All buttons have loading spinner state
+DESIGN (CRITICAL — must look premium):
+- Dark theme: #0a0e1a background, NOT plain black
+- Glassmorphism cards: backdrop-blur-xl, bg-white/5, border border-white/10
+- Gradient accents: blue-500 → purple-500 (primary), emerald-400 (success), rose-500 (error)
+- Fonts: Inter for body text, Outfit for hero headings
+- Framer Motion on EVERYTHING: page transitions, card hover lift, button press scale
+- Mobile-first (volunteers use phones at gate)
+- All buttons: loading spinner + scale-95 on press
+- Form focus: ring glow animation (ring-blue-500/50)
 
 AFTER COMPLETING ALL FILES:
 
@@ -453,39 +462,39 @@ CREATE THESE FILES:
    - Color coded: pending=yellow, approved=green, rejected=red, onspot=blue
 
 7. src/components/admin/RegistrationsTable.jsx:
-   - Used in Tab 1 (Pre-Register) — filtered to reg_type='pre' only
+   - Tab 1 (Pre-Register) — reg_type='pre' only
    - GET /api/admin/registrations?reg_type=pre with pagination
-   - Search bar (name, phone, SID)
-   - Filter dropdowns (status, academic_level, stream)
-   - Approve/Reject buttons ONLY on pending rows
+   - Search bar (name, phone, SID), filter dropdowns (status, academic_level, stream)
+   - Approve/Reject buttons on PENDING rows
+   - "Resend" button on APPROVED rows → POST /api/admin/resend/{id}
    - Click row → ProfileModal
 
 8. src/components/admin/OnSpotTable.jsx:
-   - Used in Tab 2 (On-Spot Register) — filtered to reg_type='onspot' only
+   - Tab 2 (On-Spot) — reg_type='onspot' only
    - GET /api/admin/registrations?reg_type=onspot with pagination
-   - Search bar (name, phone, SID)
-   - NO approve/reject buttons (on-spot entries are auto-approved)
+   - Search, NO approve/reject buttons (auto-approved)
+   - "Resend" button per row → re-email the pass
    - Shows: name, phone, SID, academic_level, stream, created_at
-   - Click row → ProfileModal
 
-   IMPORTANT: On-spot registrations flow:
-   - Volunteer submits form at /volunteer/onspot
-   - Backend INSTANTLY: generates SID → creates pass image → emails pass → returns 201
-   - No admin approval step. The entry appears in this table immediately.
-   - Pass image has "ON-SPOT" badge in red.
+   On-spot flow: user visits /onspot → fills form → backend INSTANTLY generates SID,
+   creates pass, emails it → entry appears in this table. No admin approval needed.
 
 9. src/components/admin/ProfileModal.jsx — full attendee detail view
-10. src/components/admin/ExportButtons.jsx — trigger CSV downloads
-11. src/components/admin/CSVImportModal.jsx — file upload + results display
-12. src/components/admin/AttendanceTable.jsx — validated records with IST timestamps, volunteer name
-13. src/components/shared/Navbar.jsx — context-aware nav bar
+10. src/components/admin/ExportButtons.jsx — CSV downloads + "Resend All Passes" button
+11. src/components/admin/ResendConfirmModal.jsx:
+    - Triggered by "Resend All Passes" button
+    - Shows: "This will re-email passes to ALL {count} approved registrations. Are you sure?"
+    - Cancel / Confirm buttons
+    - On confirm: POST /api/admin/resend-all → progress toast
+12. src/components/admin/CSVImportModal.jsx — file upload + results display
+13. src/components/admin/AttendanceTable.jsx — validated records with IST timestamps
 
-13. frontend/railway.toml:
+14. frontend/railway.toml:
     [build] builder = "nixpacks", buildCommand = "npm install && npm run build"
     [build.nixpacksPlan.phases.setup] nixPkgs = ["nodejs_22", "npm-10_x"]
     [deploy] startCommand = "npx vite preview --host 0.0.0.0 --port $PORT"
 
-DESIGN: Dark glassmorphism cards, smooth transitions, mobile-responsive tables.
+DESIGN: Same dark glassmorphism as Session 3. Mobile-responsive tables.
 
 AFTER COMPLETING ALL FILES:
 
@@ -561,14 +570,19 @@ AFTER COMPLETING ALL FILES:
    - Verify imported records appear in registrations table
 
 7. **Test all flows:**
-   - [ ] Register as student → check pending in admin
-   - [ ] Register as professional → verify academic_level auto-set
-   - [ ] Admin approve → check email received with pass
-   - [ ] Register as volunteer → login → scan QR → validate
-   - [ ] Volunteer manual SID input → validate
-   - [ ] Duplicate scan → shows IST time
-   - [ ] On-spot registration via volunteer
+   - [ ] Landing page loads → hero, stats, company carousel visible
+   - [ ] Register as student → check pending in admin Pre-Register tab
+   - [ ] Register as professional → verify academic_level auto-set to 'Professional'
+   - [ ] Admin approve → check email received with pass (PRE-REGISTERED badge)
+   - [ ] Admin resend → re-emails pass to approved attendee
+   - [ ] On-spot registration at /onspot → instant pass + email (ON-SPOT badge)
+   - [ ] On-spot entry shows in admin On-Spot tab
+   - [ ] Register as volunteer → login → scan QR → validate (instant response)
+   - [ ] Volunteer manual SID input → validate (instant response)
+   - [ ] Duplicate scan → shows "Already validated at X:XX PM IST"
+   - [ ] CSV import → records appear in Pre-Register tab
    - [ ] CSV export → download and verify
+   - [ ] Resend All Passes → confirmation modal → queues emails
    - [ ] Mobile responsiveness → test scanner on phone
 
 ---
@@ -593,3 +607,183 @@ AFTER COMPLETING ALL FILES:
 | Complex debugging | `meta/llama-3.3-70b-instruct` | Better reasoning |
 | AI Studio available | `Gemini 2.5 Pro` | Use this first (best quality) |
 | Quick file edits | `qwen/qwen2.5-coder-32b-instruct` | Fast, precise |
+
+---
+
+### SESSION 6 — Full Feature Test (Copy-Paste Prompt)
+
+**Use this AFTER all sessions are complete. Paste into AI Studio or Kilo Code.**
+
+```
+ROLE: You are a QA engineer testing the Job Fair 2026 system end-to-end.
+Run every test below. For each, report PASS or FAIL with details.
+If FAIL, fix the issue and re-test before moving on.
+
+SETUP:
+- Backend running: cd backend && uvicorn main:app --reload --port 8000
+- Frontend running: cd frontend && npm run dev (port 5173)
+- Supabase tables must be empty (or use fresh project)
+
+═══════════════════════════════════════════
+TEST 1: HEALTH CHECK
+═══════════════════════════════════════════
+curl http://localhost:8000/health
+Expected: {"status": "ok"}
+
+═══════════════════════════════════════════
+TEST 2: ADMIN SETUP
+═══════════════════════════════════════════
+curl -X POST http://localhost:8000/api/admin/setup \
+  -H "Content-Type: application/json" \
+  -d '{"email": "admin@test.com", "password": "Test1234"}'
+Expected: 201, "Admin account created"
+
+Try again:
+Expected: 403, "Admin already configured"
+
+═══════════════════════════════════════════
+TEST 3: ADMIN LOGIN
+═══════════════════════════════════════════
+curl -X POST http://localhost:8000/api/admin/login \
+  -H "Content-Type: application/json" \
+  -d '{"email": "admin@test.com", "password": "Test1234"}'
+Expected: 200, returns access_token
+Save token as ADMIN_TOKEN
+
+Wrong password:
+Expected: 401, "Invalid credentials"
+
+═══════════════════════════════════════════
+TEST 4: PRE-REGISTRATION (Student)
+═══════════════════════════════════════════
+curl -X POST http://localhost:8000/api/register \
+  -H "Content-Type: application/json" \
+  -d '{"full_name":"Test Student","phone":"9999900001","email":"student@test.com","college_name":"Test College","academic_level":"UG","stream":"BCA","attendee_type":"student"}'
+Expected: 201, status="pending", reg_type="pre"
+
+Duplicate phone:
+Expected: 409, "Phone number already registered"
+
+═══════════════════════════════════════════
+TEST 5: PRE-REGISTRATION (Professional)
+═══════════════════════════════════════════
+curl -X POST http://localhost:8000/api/register \
+  -H "Content-Type: application/json" \
+  -d '{"full_name":"Test Pro","phone":"9999900002","email":"pro@test.com","college_name":"N/A","attendee_type":"professional"}'
+Expected: 201, academic_level auto-set to "Professional", stream auto-set to "N/A"
+
+═══════════════════════════════════════════
+TEST 6: ADMIN APPROVE
+═══════════════════════════════════════════
+GET /api/admin/registrations → find the student's UUID
+PUT /api/admin/approve/{id} with ADMIN_TOKEN
+Expected: 200, SID generated (e.g., UGR12345), email queued
+
+Verify in DB: status=approved, sid is not null
+
+═══════════════════════════════════════════
+TEST 7: ADMIN RESEND
+═══════════════════════════════════════════
+POST /api/admin/resend/{id} with ADMIN_TOKEN (same approved student)
+Expected: 200, "Pass re-sent to student@test.com"
+
+Try on a pending attendee:
+Expected: 400, "Cannot resend"
+
+═══════════════════════════════════════════
+TEST 8: ON-SPOT REGISTRATION (Public)
+═══════════════════════════════════════════
+curl -X POST http://localhost:8000/api/onspot \
+  -H "Content-Type: application/json" \
+  -d '{"full_name":"Walk-In Person","phone":"9999900003","email":"walkin@test.com","college_name":"Walk-In College","academic_level":"PG","stream":"MBA","attendee_type":"student","mba_specialization":"HR"}'
+Expected: 201, status="approved", reg_type="onspot", SID generated, pass_image returned as base64
+
+═══════════════════════════════════════════
+TEST 9: VOLUNTEER REGISTRATION
+═══════════════════════════════════════════
+curl -X POST http://localhost:8000/api/volunteer/register \
+  -H "Content-Type: application/json" \
+  -d '{"full_name":"Volunteer One","roll_number":"IZEE2024BC01","phone":"9999900004","email":"vol@izee.com","course":"BCA","year":"2nd Year"}'
+Expected: 201
+
+Duplicate roll number:
+Expected: 409
+
+Invalid roll number (not 12 chars):
+Expected: 422
+
+═══════════════════════════════════════════
+TEST 10: VOLUNTEER LOGIN
+═══════════════════════════════════════════
+curl -X POST http://localhost:8000/api/volunteer/login \
+  -H "Content-Type: application/json" \
+  -d '{"roll_number":"IZEE2024BC01","email":"vol@izee.com"}'
+Expected: 200, returns access_token
+Save as VOL_TOKEN
+
+Wrong email:
+Expected: 401
+
+═══════════════════════════════════════════
+TEST 11: VOLUNTEER VALIDATE (First Scan)
+═══════════════════════════════════════════
+POST /api/volunteer/validate with VOL_TOKEN
+Body: {"sid": "<SID from test 6>"}
+Expected: 200, status="valid", attendee details returned INSTANTLY
+Verify in DB: attended=true, attended_at is set, validated_by is volunteer UUID
+
+═══════════════════════════════════════════
+TEST 12: VOLUNTEER VALIDATE (Duplicate Scan)
+═══════════════════════════════════════════
+POST /api/volunteer/validate with VOL_TOKEN (same SID)
+Expected: 200, status="duplicate", message contains IST time (e.g., "3:30 PM IST")
+
+═══════════════════════════════════════════
+TEST 13: ADMIN DASHBOARD STATS
+═══════════════════════════════════════════
+GET /api/admin/stats with ADMIN_TOKEN
+Expected: total_pre_registered >= 2, total_onspot >= 1, total_attended >= 1, pending >= 1
+
+═══════════════════════════════════════════
+TEST 14: ADMIN REGISTRATIONS (Filtered)
+═══════════════════════════════════════════
+GET /api/admin/registrations?reg_type=pre → shows only pre-registered
+GET /api/admin/registrations?reg_type=onspot → shows only on-spot
+GET /api/admin/registrations?status=pending → shows only pending
+GET /api/admin/registrations?search=Walk-In → finds the on-spot entry
+
+═══════════════════════════════════════════
+TEST 15: CSV EXPORT
+═══════════════════════════════════════════
+GET /api/admin/export/all → downloads CSV with all records
+GET /api/admin/export/attended → downloads CSV with attended records only
+Verify: CSV has correct columns and data
+
+═══════════════════════════════════════════
+TEST 16: FRONTEND VISUAL CHECKS
+═══════════════════════════════════════════
+Open http://localhost:5173/ → Landing page: hero, stats, company carousel
+Open /register → Multi-step form works, dropdowns conditional
+Open /onspot → Same form, "On-Spot Registration" header
+Open /admin → Login form, login with admin@test.com
+Open /admin/dashboard → 4 tabs visible, metrics correct
+  Pre-Register tab: resend button on approved rows
+  On-Spot tab: walk-in entry visible
+  Attendance tab: scanned record visible
+Open /volunteer/register → Volunteer form with roll number validation
+Open /volunteer/validate → Login → QR scanner + manual SID tab
+
+═══════════════════════════════════════════
+TEST 17: MOBILE RESPONSIVENESS
+═══════════════════════════════════════════
+Open Chrome DevTools → toggle device toolbar → iPhone 14 Pro
+Check: /volunteer/validate → scanner fills screen, buttons reachable
+Check: /onspot → form fields usable, no horizontal scroll
+Check: / → landing page scales, carousel works
+
+AFTER ALL TESTS PASS:
+cd "c:\Users\hp\Desktop\IZee Job Fair"
+git add -A
+git commit -m "test: all 17 end-to-end tests passed — system verified"
+git push origin main
+```

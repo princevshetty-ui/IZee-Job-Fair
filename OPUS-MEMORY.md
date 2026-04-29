@@ -77,12 +77,20 @@
 - **Analysis**: Supabase egress spike caused by 1MB images stored in DB
 - **Projection**: Job Fair without images = 41MB egress (0.8% of free tier)
 
-### Session 4 — 29 April 2026 (Morning) — CURRENT
-- **Pending**: Add volunteer system (registration, auth, QR/SID validation)
-- **Pending**: Fix CSV import mapping for Google Forms fields
-- **Pending**: Rewrite implementation guide (start-to-finish)
-- **Pending**: Rewrite management proposal with new features
-- **Pending**: Create this OPUS-MEMORY.md file
+### Session 4 — 29 April 2026 (Full Day) — COMPLETED
+- **Added**: Volunteer system — DB table, register, login, validate routes
+- **Added**: On-spot registration is now FULLY PUBLIC (no auth, /onspot link)
+- **Added**: Admin dashboard has 4 tabs: Pre-Register | On-Spot | Attendance | Import
+- **Added**: Resend pass email per row + "Resend All Passes" bulk button with confirmation modal
+- **Added**: Landing page spec — hero with gradient text, company carousel (80+ logos), stats counter
+- **Added**: Session 6 — full 17-test QA prompt for end-to-end verification
+- **Fixed**: Removed legacy scan.py and VolunteerOnSpotPage (merged into public /onspot)
+- **Fixed**: Route map updated across all files (04, 09)
+- **Fixed**: Design spec upgraded — dark #0a0e1a, Inter+Outfit fonts, glassmorphism, Framer Motion
+- **Updated**: 03-api-routes.md — added resend/{id} and resend-all endpoints
+- **Updated**: 04-project-structure.md — complete rewrite with LandingPage, OnSpotTable, ResendConfirmModal
+- **Updated**: 09-kilo-code-backup-plan.md — all session prompts rewritten with new features
+- **Files changed**: 03, 04, 09, OPUS-MEMORY.md
 
 ---
 

@@ -15,7 +15,11 @@ frontend/
 ├── vite.config.js
 ├── railway.toml
 ├── public/
-│   └── favicon.ico
+│   ├── favicon.ico
+│   └── companies/              # Company logos for landing page carousel
+│       ├── company1.png
+│       ├── company2.png
+│       └── ...                 # 80+ logos
 └── src/
     ├── main.jsx
     ├── App.jsx                 # React Router setup
@@ -23,16 +27,22 @@ frontend/
     ├── index.css               # Tailwind directives + custom styles
     │
     ├── pages/
+    │   ├── LandingPage.jsx     # / — hero, stats, company carousel, CTA
     │   ├── RegisterPage.jsx    # /register — public pre-registration
-    │   ├── OnSpotPage.jsx      # /onspot — staff-only registration
-    │   ├── ScanPage.jsx        # /scan — volunteer QR scanner
+    │   ├── OnSpotPage.jsx      # /onspot — public instant registration (no auth)
     │   ├── AdminLoginPage.jsx  # /admin — login form
-    │   ├── AdminDashboard.jsx  # /admin/dashboard — main panel
+    │   ├── AdminDashboard.jsx  # /admin/dashboard — 4-tab panel
     │   ├── VolunteerRegisterPage.jsx  # /volunteer/register — volunteer sign-up
-    │   ├── VolunteerValidatePage.jsx  # /volunteer/validate — QR scan + SID input
-    │   └── VolunteerOnSpotPage.jsx    # /volunteer/onspot — on-spot registration
+    │   └── VolunteerValidatePage.jsx  # /volunteer/validate — QR scan + SID input
     │
     ├── components/
+    │   ├── landing/
+    │   │   ├── HeroSection.jsx         # Animated hero with gradient text + CTA
+    │   │   ├── StatsCounter.jsx        # Live registration count cards
+    │   │   ├── CompanyCarousel.jsx      # Auto-scrolling company logos (80+)
+    │   │   ├── EventDetails.jsx        # Date, venue, what to expect
+    │   │   └── Footer.jsx              # Links, social, copyright
+    │   │
     │   ├── forms/
     │   │   ├── RegistrationForm.jsx      # Multi-step form (shared by Register & OnSpot)
     │   │   ├── PersonalInfoStep.jsx      # Step 1: name, phone, email, college
@@ -42,14 +52,15 @@ frontend/
     │   │   └── FormField.jsx             # Reusable input/select wrapper
     │   │
     │   ├── admin/
-    │   │   ├── MetricCards.jsx           # Animated count-up stat cards
-    │   │   ├── RegistrationsTable.jsx    # Searchable/filterable data table
-    │   │   ├── OnSpotTable.jsx             # On-spot tab: read-only, auto-approved entries
-    │   │   ├── AttendanceTable.jsx       # Scanned attendees list
-    │   │   ├── ProfileModal.jsx          # Full attendee detail modal
-    │   │   ├── CSVImportModal.jsx        # Google Forms CSV upload
-    │   │   ├── ApproveRejectButtons.jsx  # Action buttons per row
-    │   │   └── ExportButtons.jsx         # CSV download buttons
+    │   │   ├── MetricCards.jsx            # 6 animated count-up stat cards
+    │   │   ├── RegistrationsTable.jsx     # Pre-register tab: paginated, approve/reject/resend
+    │   │   ├── OnSpotTable.jsx            # On-spot tab: read-only, auto-approved
+    │   │   ├── AttendanceTable.jsx        # Validated records with IST timestamps
+    │   │   ├── ProfileModal.jsx           # Full attendee detail modal
+    │   │   ├── CSVImportModal.jsx         # Google Forms CSV upload
+    │   │   ├── ResendConfirmModal.jsx     # "Resend All Passes" confirmation modal
+    │   │   ├── ApproveRejectButtons.jsx   # Action buttons per row
+    │   │   └── ExportButtons.jsx          # CSV download + Resend All button
     │   │
     │   ├── scanner/
     │   │   ├── QRScanner.jsx             # html5-qrcode wrapper
@@ -60,8 +71,7 @@ frontend/
     │       ├── Navbar.jsx                # Top nav (minimal, context-aware)
     │       ├── LoadingSpinner.jsx        # Animated spinner
     │       ├── AnimatedPage.jsx          # Framer Motion page wrapper
-    │       ├── Toast.jsx                 # Success/error notifications
-    │       └── VolunteerAuthGuard.jsx    # Redirects to login if no volunteer JWT
+    │       └── Toast.jsx                 # Success/error notifications
     │
     ├── hooks/
     │   ├── useAuth.js                    # JWT token management
@@ -71,7 +81,7 @@ frontend/
     └── utils/
         ├── api.js                        # Base API URL + fetch helpers
         ├── validators.js                 # Phone, email validation
-        └── constants.js                  # Dropdown options, academic levels
+        └── constants.js                  # Dropdown options, academic levels, company list
 ```
 
 ## Backend File Tree
@@ -93,11 +103,11 @@ backend/
 │
 ├── routes/
 │   ├── __init__.py
-│   ├── register.py             # POST /api/register
-│   ├── onspot.py               # POST /api/onspot (admin/staff)
-│   ├── scan.py                 # POST /api/scan (legacy)
-│   ├── admin.py                # All /api/admin/* routes (incl. /admin/setup)
-│   └── volunteer.py            # /api/volunteer/* (register, login, onspot, validate)
+│   ├── register.py             # POST /api/register (public pre-registration)
+│   ├── onspot.py               # POST /api/onspot (public instant registration)
+│   ├── admin.py                # All /api/admin/* (login, setup, stats, approve, reject,
+│   │                           #   resend, resend-all, registrations, attendance, export, import)
+│   └── volunteer.py            # /api/volunteer/* (register, login, validate)
 │
 ├── utils/
 │   ├── __init__.py
@@ -115,28 +125,53 @@ backend/
     └── schema.sql              # Complete DB schema (reference copy)
 ```
 
-## Frontend Page Map
+## Frontend Route Map
 
 ### Route Configuration (App.jsx)
-```jsx
-<BrowserRouter>
-  <Routes>
-    /register → RegisterPage (public)
-    /volunteer/register → VolunteerRegisterPage (public, hidden link)
-    /volunteer/validate → VolunteerValidatePage (volunteer JWT required)
-    /volunteer/onspot → VolunteerOnSpotPage (volunteer JWT required)
-    /admin → AdminLoginPage
-    /admin/dashboard → AdminDashboard (admin JWT required)
-    / → redirect to /register
-  </Routes>
-</BrowserRouter>
+```
+/                        → LandingPage (public — hero, companies, CTA)
+/register                → RegisterPage (public pre-registration form)
+/onspot                  → OnSpotPage (public — instant registration, no auth)
+/volunteer/register      → VolunteerRegisterPage (public, hidden link)
+/volunteer/validate      → VolunteerValidatePage (volunteer JWT required)
+/admin                   → AdminLoginPage
+/admin/dashboard         → AdminDashboard (admin JWT required)
 ```
 
 ## Component Hierarchy
 
+### LandingPage (/)
+```
+LandingPage
+├── Navbar (transparent, fixed, scrolls to solid)
+├── HeroSection
+│   ├── Animated gradient heading: "IZEE Job Fair 2026"
+│   ├── Subheading: "8th May 2026 · Bangalore"
+│   ├── "80+ Companies" badge with glow animation
+│   ├── CTA button: "Register Now" → /register
+│   └── Animated background particles / mesh gradient
+├── StatsCounter (scroll-triggered)
+│   ├── "4,000+" Pre-Registered (animated count-up)
+│   ├── "80+" Companies (animated count-up)
+│   └── "1,500+" Expected Attendees (animated count-up)
+├── CompanyCarousel
+│   ├── Infinite auto-scroll marquee (left to right)
+│   ├── Row 1: logos 1-40 scrolling left
+│   ├── Row 2: logos 41-80 scrolling right
+│   └── Hover: pauses scroll, logo scales up
+├── EventDetails
+│   ├── Date & Venue card
+│   ├── What to Expect (bullet points)
+│   └── "For Students & Professionals" badges
+└── Footer
+    ├── IZEE Business School branding
+    ├── Contact info
+    └── Social links
+```
+
 ### RegisterPage / OnSpotPage
 ```
-RegisterPage
+RegisterPage (or OnSpotPage — same form, different API endpoint)
 ├── AnimatedPage (Framer Motion wrapper)
 ├── Navbar
 └── RegistrationForm
@@ -174,58 +209,93 @@ RegisterPage
         ├── FormField (coordinator_name)
         ├── FormField (coordinator_phone)
         └── FormField (coordinator_email)
+
+OnSpotPage differences from RegisterPage:
+  - Header says "On-Spot Registration" (not "Pre-Registration")
+  - POSTs to /api/onspot (not /api/register)
+  - On success: shows pass image on screen + "Pass emailed!" message
+  - No "Awaiting approval" message — instant approval
 ```
 
 ### AdminDashboard
 ```
 AdminDashboard
-├── Navbar (with logout)
-├── MetricCards (6 cards, animated count-up)
-│   ├── Total Pre-Registered
-│   ├── Total On-Spot
-│   ├── Total Approved
-│   ├── Total Attended
-│   ├── Pending Approvals
-│   └── Total Rejected
+├── Navbar (with logout + "Resend All Passes" button)
+├── MetricCards (6 cards, animated count-up — always visible)
+│   ├── Total Pre-Registered (blue)
+│   ├── Total On-Spot (cyan)
+│   ├── Total Approved (green)
+│   ├── Total Attended (emerald)
+│   ├── Pending Approvals (yellow)
+│   └── Total Rejected (red)
 │
-├── Tab Navigation (Registrations | Attendance | Import)
+├── Tab Navigation: Pre-Register | On-Spot | Attendance | Import
 │
-├── [Tab: Registrations]
+├── [Tab 1: Pre-Register]
 │   ├── Search bar (name, phone, SID)
-│   ├── Filter dropdowns (type, status, academic_level, stream)
+│   ├── Filter dropdowns (status, academic_level, stream)
 │   ├── ExportButtons (Export All | Export Attended)
-│   ├── RegistrationsTable
+│   ├── RegistrationsTable (reg_type='pre' only)
 │   │   ├── Table row (per attendee)
-│   │   │   ├── Name, Phone, Email, SID, Status, Type
-│   │   │   ├── ApproveRejectButtons (on pending rows)
+│   │   │   ├── Name, Phone, Email, SID, Status, Academic Level
+│   │   │   ├── ApproveRejectButtons (on pending rows only)
+│   │   │   ├── Resend button (on approved rows — POST /api/admin/resend/{id})
 │   │   │   └── View button → opens ProfileModal
 │   │   └── Pagination controls
 │   └── ProfileModal (full attendee details)
 │
-├── [Tab: Attendance]
-│   └── AttendanceTable (scanned records with timestamps)
+├── [Tab 2: On-Spot]
+│   ├── Search bar (name, phone, SID)
+│   ├── OnSpotTable (reg_type='onspot' only)
+│   │   ├── Table row: Name, Phone, SID, Academic Level, Stream, Created At
+│   │   ├── Resend button (per row — re-email the pass)
+│   │   ├── View button → ProfileModal
+│   │   └── NO approve/reject (already auto-approved)
+│   └── Pagination controls
 │
-└── [Tab: Import]
-    └── CSVImportModal (file upload + mapping preview)
+├── [Tab 3: Attendance]
+│   └── AttendanceTable (attended=true records)
+│       ├── Name, SID, Academic Level, Reg Type, Attended At (IST)
+│       └── Pagination
+│
+└── [Tab 4: Import]
+    └── CSVImportModal (file upload + mapping preview + results)
+
+Resend All Passes (in dashboard header):
+  1. Button: "Resend All Passes" (behind ResendConfirmModal)
+  2. Modal: "This will re-email passes to ALL {count} approved registrations. Are you sure?"
+  3. Cancel / Confirm buttons
+  4. On confirm: POST /api/admin/resend-all → show progress toast
 ```
 
-### ScanPage
+### VolunteerValidatePage
 ```
-ScanPage
-├── AnimatedPage
-├── QRScanner (html5-qrcode camera feed)
-│   ├── Camera viewfinder
-│   └── onScanSuccess callback → POST /api/scan
-├── AnimatePresence
-│   ├── ScanSuccess (spring scale animation)
-│   │   ├── Green checkmark icon
-│   │   ├── Attendee name
-│   │   ├── Academic level / category
-│   │   └── Auto-reset countdown (3s)
-│   └── ScanError (shake animation)
-│       ├── Warning icon
-│       ├── Error message
-│       └── "Already scanned at {time}"
+VolunteerValidatePage
+├── [IF NOT LOGGED IN] VolunteerLoginForm
+│   ├── FormField (roll_number — 12 alphanumeric)
+│   ├── FormField (email)
+│   └── Login button → POST /api/volunteer/login → store JWT
+│
+├── [IF LOGGED IN] ValidationInterface
+│   ├── Two-tab toggle: QR Scanner | Manual Input
+│   │
+│   ├── [Tab: QR Scanner]
+│   │   └── QRScanner (html5-qrcode camera) → extract SID → POST /api/volunteer/validate
+│   │
+│   ├── [Tab: Manual Input]
+│   │   ├── FormField (sid — text input, e.g., "UGR59134")
+│   │   └── Validate button → POST /api/volunteer/validate
+│   │
+│   └── AnimatePresence (result display)
+│       ├── ScanSuccess (spring scale animation)
+│       │   ├── ✅ Green card
+│       │   ├── Attendee name, academic level, stream
+│       │   ├── SID displayed
+│       │   └── Auto-reset after 3 seconds
+│       └── ScanError (shake animation)
+│           ├── ❌ Red card
+│           ├── "Already validated at 3:30 PM IST"
+│           └── Auto-reset after 3 seconds
 └── Toast (for network errors)
 ```
 
