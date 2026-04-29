@@ -56,6 +56,13 @@
    - Model: `qwen/qwen2.5-coder-32b-instruct`
    - API Key: your `nvapi-...` key
 
+### 6. GitHub Repository (already done)
+
+Repo: `https://github.com/princevshetty-ui/izee-job-fair-2026.git`
+
+Already initialized and first commit pushed with all blueprint files.
+Every session below will commit and push on success.
+
 ---
 
 ## ENV VARS YOU NEED (Save These in a Notepad)
@@ -191,7 +198,27 @@ CREATE THESE FILES:
     Usage: python create_admin.py admin@izeebschool.com MyPassword
     Uses passlib to hash, inserts into admin_users via supabase client
 
-AFTER COMPLETING: Create MEMORY.md with what was created and any issues.
+AFTER COMPLETING ALL FILES:
+
+1. Create MEMORY.md with what was created and any issues.
+
+2. TEST: Run these commands and verify no errors:
+   cd backend
+   pip install -r requirements.txt
+   python -c "from main import app; print('✅ FastAPI app imports OK')"
+   python -c "from auth import create_token, hash_password; print('✅ Auth module OK')"
+   python -c "from sid_generator import generate_sid; print('✅ SID generator OK')"
+   python -c "from routes.register import router; print('✅ Register route OK')"
+   python -c "from routes.admin import router; print('✅ Admin route OK')"
+   python -c "from routes.volunteer import router; print('✅ Volunteer route OK')"
+
+3. If ALL tests pass, run:
+   cd "c:\Users\hp\Desktop\IZee Job Fair"
+   git add backend/
+   git commit -m "feat(backend): add FastAPI foundation — routes, auth, DB client, SID generator"
+   git push origin main
+
+4. If any test fails, fix the error first, then commit.
 ```
 
 ---
@@ -248,7 +275,25 @@ CREATE THESE FILES:
 
 REMEMBER: Pass images are generated in-memory only. NEVER stored in DB.
 
-UPDATE MEMORY.md with Session 2 details.
+AFTER COMPLETING ALL FILES:
+
+1. UPDATE MEMORY.md with Session 2 details.
+
+2. TEST: Run these commands:
+   cd backend
+   python -c "from pass_generator import generate_pass; print('✅ Pass generator OK')"
+   python -c "from email_service import send_pass_email; print('✅ Email service OK')"
+   python -c "from qr_utils import generate_qr_image; print('✅ QR utils OK')"
+   python -c "from utils.csv_import import map_gforms_row; print('✅ CSV import OK')"
+   python -c "from utils.csv_export import export_attendees_csv; print('✅ CSV export OK')"
+
+3. If ALL tests pass, run:
+   cd "c:\Users\hp\Desktop\IZee Job Fair"
+   git add backend/
+   git commit -m "feat(backend): add pass generator, email service, QR utils, CSV import/export"
+   git push origin main
+
+4. If any test fails, fix the error first, then commit.
 ```
 
 ---
@@ -335,7 +380,30 @@ DESIGN:
 - Mobile-first responsive (volunteers use phones)
 - All buttons have loading spinner state
 
-CREATE frontend/MEMORY.md with Session 3 details.
+AFTER COMPLETING ALL FILES:
+
+1. CREATE frontend/MEMORY.md with Session 3 details.
+
+2. TEST: Run these commands:
+   cd frontend
+   npm run build
+   (If build succeeds with 0 errors → all imports and JSX are valid)
+
+3. Quick visual test:
+   npm run dev
+   Open http://localhost:5173/register in browser
+   Verify: form loads, steps work, dropdowns appear
+   Open http://localhost:5173/volunteer/register
+   Verify: volunteer form loads, roll number field validates
+   Press Ctrl+C to stop dev server
+
+4. If ALL tests pass, run:
+   cd "c:\Users\hp\Desktop\IZee Job Fair"
+   git add frontend/
+   git commit -m "feat(frontend): add registration form, volunteer pages, router, shared components"
+   git push origin main
+
+5. If build fails, fix errors first, then commit.
 ```
 
 ---
@@ -390,7 +458,30 @@ CREATE THESE FILES:
 
 DESIGN: Dark glassmorphism cards, smooth transitions, mobile-responsive tables.
 
-UPDATE frontend/MEMORY.md with Session 4 details.
+AFTER COMPLETING ALL FILES:
+
+1. UPDATE frontend/MEMORY.md with Session 4 details.
+
+2. TEST: Run these commands:
+   cd frontend
+   npm run build
+   (Must succeed with 0 errors)
+
+3. Visual test:
+   npm run dev
+   Open http://localhost:5173/admin in browser
+   Verify: login page loads
+   Open http://localhost:5173/volunteer/validate
+   Verify: volunteer login form loads
+   Press Ctrl+C to stop dev server
+
+4. If ALL tests pass, run:
+   cd "c:\Users\hp\Desktop\IZee Job Fair"
+   git add frontend/
+   git commit -m "feat(frontend): add admin dashboard, tables, metrics, CSV import/export"
+   git push origin main
+
+5. If build fails, fix errors first, then commit.
 ```
 
 ---
