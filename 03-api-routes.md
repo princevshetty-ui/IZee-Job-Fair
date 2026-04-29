@@ -232,23 +232,28 @@ Not Found (404):
 
 ---
 
-## STAFF-ONLY ROUTE (LEGACY — kept for admin direct access)
+## PUBLIC ON-SPOT REGISTRATION
 
-### POST `/api/onspot` — On-Spot Registration (Admin)
+### POST `/api/onspot` — On-Spot Registration (Public Link)
 ```
-Auth: Basic route guard (staff password header)
-Header: X-Staff-Key: <STAFF_PASSWORD>
+Auth: None (public — anyone with the link can register)
 Content-Type: application/json
 
 Request Body: Same fields as /api/register
 
 Backend Logic:
   1. Validate mandatory fields
-  2. Check phone/email uniqueness
-  3. Insert with status="approved", reg_type="onspot"
-  4. Generate SID immediately
-  5. Generate pass image (Pillow)
-  6. Send email via Brevo HTTP API (async, non-blocking)
+  2. If attendee_type == 'professional': auto-set academic_level='Professional', stream='N/A'
+  3. Check phone/email uniqueness
+  4. Insert with status="approved", reg_type="onspot"
+  5. Generate SID immediately
+  6. Generate pass image (Pillow) — in memory, NOT stored in DB
+  7. Send email via Brevo HTTP API (async, non-blocking)
+  8. Return pass_image base64 for optional on-screen display
+
+NOTE: This route requires NO login, NO password, NO volunteer auth.
+The link is shared only with people at the event venue. On submit,
+the candidate instantly receives their pass via email.
 
 Success Response (201):
 {
@@ -258,7 +263,7 @@ Success Response (201):
         "id": "uuid",
         "sid": "UGR59134",
         "full_name": "Rahul Sharma",
-        "pass_image": "<base64_jpg_string>"   // for optional print
+        "pass_image": "<base64_jpg_string>"   // for optional on-screen display
     }
 }
 ```

@@ -183,9 +183,15 @@ CREATE THESE FILES:
         IST = timezone(timedelta(hours=5, minutes=30))
         ist_time = attended_at.astimezone(IST).strftime("%I:%M %p IST")
 
-11. routes/onspot.py — POST /api/onspot (legacy admin route):
-    - Requires X-Staff-Key header matching STAFF_PASSWORD env var
-    - Same logic as volunteer/onspot but with staff auth
+11. routes/onspot.py — POST /api/onspot:
+    - PUBLIC — no auth required (anyone with the link can register)
+    - Same logic as /api/register BUT:
+      * If attendee_type == 'professional': auto-set academic_level='Professional', stream='N/A'
+      * Insert with status='approved', reg_type='onspot' (auto-approved, no admin step)
+      * Generate SID immediately
+      * Generate pass image (Pillow) in memory — NOT stored in DB
+      * Send email via Brevo HTTP API (async, BackgroundTasks)
+      * Return pass_image base64 for on-screen display
 
 12. routes/scan.py — POST /api/scan (legacy):
     - Same as volunteer/validate but without volunteer auth tracking
@@ -319,10 +325,10 @@ CREATE THESE FILES:
 1. vite.config.js — React plugin + API proxy for /api/* to localhost:8000
 2. src/index.css — Tailwind directives, dark theme base, Inter font from Google Fonts
 3. src/App.jsx — React Router v6:
-   /register → RegisterPage (public)
+   /register → RegisterPage (public pre-registration)
+   /onspot → OnSpotPage (public — instant registration, no login needed)
    /volunteer/register → VolunteerRegisterPage (public, hidden link)
    /volunteer/validate → VolunteerValidatePage (volunteer auth required)
-   /volunteer/onspot → VolunteerOnSpotPage (volunteer auth required)
    /admin → AdminLoginPage
    /admin/dashboard → AdminDashboard (admin auth required)
    / → redirect to /register
@@ -369,9 +375,12 @@ CREATE THESE FILES:
     - Show results: green card (valid) / red card (duplicate with IST time) / error
     - Auto-reset after 3 seconds
 
-15. src/pages/VolunteerOnSpotPage.jsx:
-    - Same RegistrationForm but POST to /api/volunteer/onspot
-    - Requires volunteer JWT (redirect to login if missing)
+12. src/pages/OnSpotPage.jsx:
+    - PUBLIC — same RegistrationForm component as RegisterPage
+    - No login required — anyone with the link /onspot can fill the form
+    - POST to /api/onspot (NOT /api/register)
+    - On success: show the pass image (base64) on screen + "Pass emailed!" message
+    - Different header text: "On-Spot Registration" instead of "Pre-Registration"
 
 DESIGN:
 - Dark theme (#0f172a background), slate-700 cards, blue-500 accents

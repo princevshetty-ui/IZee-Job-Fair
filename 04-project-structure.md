@@ -44,6 +44,7 @@ frontend/
     │   ├── admin/
     │   │   ├── MetricCards.jsx           # Animated count-up stat cards
     │   │   ├── RegistrationsTable.jsx    # Searchable/filterable data table
+    │   │   ├── OnSpotTable.jsx             # On-spot tab: read-only, auto-approved entries
     │   │   ├── AttendanceTable.jsx       # Scanned attendees list
     │   │   ├── ProfileModal.jsx          # Full attendee detail modal
     │   │   ├── CSVImportModal.jsx        # Google Forms CSV upload
