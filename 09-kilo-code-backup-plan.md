@@ -430,26 +430,46 @@ CREATE THESE FILES:
    - Redirect to /admin/dashboard on success
 
 5. src/pages/AdminDashboard.jsx:
-   - Tab layout: Registrations | Attendance | Import
-   - MetricCards row at top
+   - 4 TABS: Pre-Register | On-Spot Register | Attendance | Import
+   - MetricCards row at top (always visible above tabs)
+   - Tab 1 (Pre-Register): Shows ONLY reg_type='pre' records. Admin can approve/reject pending ones.
+   - Tab 2 (On-Spot Register): Shows ONLY reg_type='onspot' records. These are already approved
+     (no approve button needed — on-spot entries are auto-approved on submit).
+   - Tab 3 (Attendance): Shows validated/scanned records with IST timestamps.
+   - Tab 4 (Import): CSV upload for Google Forms migration.
 
 6. src/components/admin/MetricCards.jsx:
    - 6 cards: Pre-Registered, On-Spot, Approved, Attended, Pending, Rejected
    - Animated count-up, Framer Motion fade-in
-   - Color coded: pending=yellow, approved=green, rejected=red
+   - Color coded: pending=yellow, approved=green, rejected=red, onspot=blue
 
 7. src/components/admin/RegistrationsTable.jsx:
-   - GET /api/admin/registrations with pagination
+   - Used in Tab 1 (Pre-Register) — filtered to reg_type='pre' only
+   - GET /api/admin/registrations?reg_type=pre with pagination
    - Search bar (name, phone, SID)
-   - Filter dropdowns (status, reg_type, academic_level, stream)
-   - Approve/Reject buttons on pending rows
+   - Filter dropdowns (status, academic_level, stream)
+   - Approve/Reject buttons ONLY on pending rows
    - Click row → ProfileModal
 
-8. src/components/admin/ProfileModal.jsx — full attendee detail view
-9. src/components/admin/ExportButtons.jsx — trigger CSV downloads
-10. src/components/admin/CSVImportModal.jsx — file upload + results display
-11. src/components/admin/AttendanceTable.jsx — scanned records with IST timestamps
-12. src/components/shared/Navbar.jsx — context-aware nav bar
+8. src/components/admin/OnSpotTable.jsx:
+   - Used in Tab 2 (On-Spot Register) — filtered to reg_type='onspot' only
+   - GET /api/admin/registrations?reg_type=onspot with pagination
+   - Search bar (name, phone, SID)
+   - NO approve/reject buttons (on-spot entries are auto-approved)
+   - Shows: name, phone, SID, academic_level, stream, created_at
+   - Click row → ProfileModal
+
+   IMPORTANT: On-spot registrations flow:
+   - Volunteer submits form at /volunteer/onspot
+   - Backend INSTANTLY: generates SID → creates pass image → emails pass → returns 201
+   - No admin approval step. The entry appears in this table immediately.
+   - Pass image has "ON-SPOT" badge in red.
+
+9. src/components/admin/ProfileModal.jsx — full attendee detail view
+10. src/components/admin/ExportButtons.jsx — trigger CSV downloads
+11. src/components/admin/CSVImportModal.jsx — file upload + results display
+12. src/components/admin/AttendanceTable.jsx — validated records with IST timestamps, volunteer name
+13. src/components/shared/Navbar.jsx — context-aware nav bar
 
 13. frontend/railway.toml:
     [build] builder = "nixpacks", buildCommand = "npm install && npm run build"
