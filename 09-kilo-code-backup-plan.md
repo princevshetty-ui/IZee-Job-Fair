@@ -56,12 +56,39 @@
    - Model: `deepseek-ai/deepseek-v4-pro` (best for code generation)
    - API Key: your `nvapi-...` key
 
-### 6. GitHub Repository (already done)
+### 6. GitHub Repository
 
-Repo: `https://github.com/princevshetty-ui/izee-job-fair-2026.git`
+Repo: `https://github.com/princevshetty-ui/IZee-Job-Fair.git`
 
-Already initialized and first commit pushed with all blueprint files.
-Every session below will commit and push on success.
+Every session prompt tells the agent to commit and push on success.
+If the remote isn't added yet, run:
+```bash
+cd "c:\Users\hp\Desktop\IZee Job Fair"
+git remote add origin https://github.com/princevshetty-ui/IZee-Job-Fair.git
+git push -u origin main
+```
+
+### 7. Local Prerequisites (Before Running Any Code)
+
+**Backend (Python):**
+```bash
+cd "c:\Users\hp\Desktop\IZee Job Fair\backend"
+python -m venv venv
+venv\Scripts\activate
+pip install -r requirements.txt
+# Create .env file with your env vars (see ENV VARS section below)
+uvicorn main:app --reload --port 8000
+```
+
+**Frontend (Node.js):**
+```bash
+cd "c:\Users\hp\Desktop\IZee Job Fair\frontend"
+npm install
+# Create .env with: VITE_API_URL=http://localhost:8000
+npm run dev
+```
+
+**Requires:** Python 3.11+, Node.js 22+, npm 10+
 
 ---
 
@@ -220,9 +247,28 @@ AFTER COMPLETING ALL FILES:
    git add backend/
    git commit -m "feat(backend): add FastAPI foundation — routes, auth, DB client, SID generator"
    git push origin main
+   (Remote: https://github.com/princevshetty-ui/IZee-Job-Fair.git)
 
 4. If any test fails, fix the error first, then commit.
 ```
+
+**✅ YOUR MANUAL TESTS (do these yourself before moving to Session 2):**
+
+1. Open a terminal in `backend/` folder
+2. Activate venv: `venv\Scripts\activate`
+3. Run: `pip install -r requirements.txt`
+4. Run: `uvicorn main:app --reload --port 8000`
+5. Open browser: `http://localhost:8000/docs` — FastAPI Swagger docs should load
+6. Check these endpoints exist in Swagger:
+   - `POST /api/register`
+   - `POST /api/onspot`
+   - `POST /api/admin/setup`
+   - `POST /api/admin/login`
+   - `POST /api/volunteer/register`
+   - `POST /api/volunteer/login`
+   - `POST /api/volunteer/validate`
+7. Try: `GET http://localhost:8000/health` → should return `{"status": "ok"}`
+8. Stop server with Ctrl+C
 
 ---
 
@@ -295,9 +341,21 @@ AFTER COMPLETING ALL FILES:
    git add backend/
    git commit -m "feat(backend): add pass generator, email service, QR utils, CSV import/export"
    git push origin main
+   (Remote: https://github.com/princevshetty-ui/IZee-Job-Fair.git)
 
 4. If any test fails, fix the error first, then commit.
 ```
+
+**✅ YOUR MANUAL TESTS (do these yourself before moving to Session 3):**
+
+1. Make sure backend is running: `cd backend && venv\Scripts\activate && uvicorn main:app --reload --port 8000`
+2. Open `http://localhost:8000/docs` in browser
+3. Try `POST /api/admin/setup` with `{"email": "test@test.com", "password": "Test1234"}` → should return 201
+4. Try `POST /api/register` with test student data → should return 201 (status=pending)
+5. Try `POST /api/admin/login` with your admin creds → should return JWT token
+6. Use that JWT as Bearer token to `PUT /api/admin/approve/{id}` → check terminal for pass generation log
+7. If Brevo API key is in `.env`, check your email inbox for the pass image
+8. Try `POST /api/onspot` with test data → should return 201 + base64 pass image in response
 
 ---
 
@@ -408,8 +466,12 @@ AFTER COMPLETING ALL FILES:
 
 3. Quick visual test:
    npm run dev
-   Open http://localhost:5173/register in browser
+   Open http://localhost:5173/ in browser
+   Verify: landing page loads with hero, company carousel, stats
+   Open http://localhost:5173/register
    Verify: form loads, steps work, dropdowns appear
+   Open http://localhost:5173/onspot
+   Verify: same form, header says "On-Spot Registration"
    Open http://localhost:5173/volunteer/register
    Verify: volunteer form loads, roll number field validates
    Press Ctrl+C to stop dev server
@@ -417,11 +479,32 @@ AFTER COMPLETING ALL FILES:
 4. If ALL tests pass, run:
    cd "c:\Users\hp\Desktop\IZee Job Fair"
    git add frontend/
-   git commit -m "feat(frontend): add registration form, volunteer pages, router, shared components"
+   git commit -m "feat(frontend): add landing page, registration forms, volunteer pages"
    git push origin main
+   (Remote: https://github.com/princevshetty-ui/IZee-Job-Fair.git)
 
 5. If build fails, fix errors first, then commit.
 ```
+
+**✅ YOUR MANUAL TESTS (do these yourself before moving to Session 4):**
+
+Prerequisite: Backend must be running on port 8000!
+
+1. Open `http://localhost:5173/` → Landing page:
+   - [ ] Hero heading "IZEE JOB FAIR 2026" with gradient text visible?
+   - [ ] "80+ Companies Hiring" badge pulsing/glowing?
+   - [ ] Two CTA buttons: "Register Now" and "On-Spot Registration"?
+   - [ ] Company names scrolling in 2 rows (opposite directions)?
+   - [ ] Stats counter animates when you scroll down to it?
+2. Click "Register Now" → goes to `/register`
+   - [ ] Multi-step form works? Steps slide left/right?
+   - [ ] Selecting "Professional" auto-hides academic fields?
+   - [ ] Selecting academic level shows correct stream dropdown?
+3. Open `/onspot` → same form but header says "On-Spot Registration"
+4. Open `/volunteer/register` → roll number field rejects <12 chars?
+5. Test mobile: Chrome DevTools → toggle device toolbar → iPhone 14
+   - [ ] Landing page readable on mobile?
+   - [ ] Forms usable without horizontal scroll?
 
 ---
 
@@ -508,6 +591,9 @@ AFTER COMPLETING ALL FILES:
    npm run dev
    Open http://localhost:5173/admin in browser
    Verify: login page loads
+   Open http://localhost:5173/admin/dashboard (after login)
+   Verify: 4 tabs visible (Pre-Register, On-Spot, Attendance, Import)
+   Verify: Resend All Passes button visible in header
    Open http://localhost:5173/volunteer/validate
    Verify: volunteer login form loads
    Press Ctrl+C to stop dev server
@@ -515,11 +601,32 @@ AFTER COMPLETING ALL FILES:
 4. If ALL tests pass, run:
    cd "c:\Users\hp\Desktop\IZee Job Fair"
    git add frontend/
-   git commit -m "feat(frontend): add admin dashboard, tables, metrics, CSV import/export"
+   git commit -m "feat(frontend): add admin dashboard with 4 tabs, resend, metrics"
    git push origin main
+   (Remote: https://github.com/princevshetty-ui/IZee-Job-Fair.git)
 
 5. If build fails, fix errors first, then commit.
 ```
+
+**✅ YOUR MANUAL TESTS (do these yourself before moving to Session 5):**
+
+Prerequisite: Both backend (port 8000) AND frontend (port 5173) running!
+
+1. Go to `/admin` → Login with admin credentials
+2. Dashboard should show:
+   - [ ] 4 tabs: Pre-Register, On-Spot, Attendance, Import?
+   - [ ] Metric cards at top with animated count-up?
+3. Pre-Register tab:
+   - [ ] Shows only pre-registered entries?
+   - [ ] Search bar works (by name, phone, SID)?
+   - [ ] Approve/Reject buttons visible on pending rows?
+   - [ ] "Resend" button visible on approved rows?
+4. On-Spot tab:
+   - [ ] Shows only on-spot entries (auto-approved)?
+   - [ ] No approve/reject buttons?
+5. Click "Resend All Passes" button → confirmation modal appears?
+6. Try Import tab → upload a test CSV file
+7. Try Export buttons → downloads CSV with correct data?
 
 ---
 
