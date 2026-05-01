@@ -21,8 +21,8 @@
 
 body {
   font-family: 'Montserrat', sans-serif;
-  background-color: #f8f9fa;
-  color: #1f2937;
+  background-color: #0a0e1a;
+  color: #f0f0f0;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -82,11 +82,11 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .animate-marquee {
-  animation: marquee 80s linear infinite;
+  animation: marquee 200s linear infinite;
 }
 
 .animate-marquee2 {
-  animation: marquee 80s linear infinite reverse;
+  animation: marquee 200s linear infinite reverse;
 }
 
 .marquee-container:hover .animate-marquee,
