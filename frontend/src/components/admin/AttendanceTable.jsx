@@ -38,13 +38,13 @@ const AttendanceTable = ({ attendances }) => {
             ) : (
               attendances.map((record, index) => (
                 <tr key={record.id || index} className="hover:bg-gray-700 transition-colors">
-                  <td className="px-4 py-3 text-white font-medium">{record.name || '-'}</td>
+                  <td className="px-4 py-3 text-white font-medium">{record.full_name || '-'}</td>
                   <td className="px-4 py-3 text-gray-300">{record.phone || '-'}</td>
                   <td className="px-4 py-3 text-gray-300 font-mono text-sm">{record.sid || '-'}</td>
                   <td className="px-4 py-3 text-gray-300">{record.academic_level || '-'}</td>
                   <td className="px-4 py-3 text-gray-300">{record.stream || '-'}</td>
                   <td className="px-4 py-3 text-gray-300 text-sm">
-                    {record.validated_at ? formatISTTime(record.validated_at) : '-'}
+                    {record.attended_at ? formatISTTime(record.attended_at) : '-'}
                   </td>
                 </tr>
               ))

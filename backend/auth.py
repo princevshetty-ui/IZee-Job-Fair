@@ -1,10 +1,8 @@
 from passlib.context import CryptContext
-from typing import Optional
 from datetime import datetime, timedelta
 from fastapi.security import OAuth2PasswordBearer
 from fastapi import Depends, HTTPException, status
-import jwt
-from jwt.exceptions import PyJWTError
+from jose import jwt, JWTError
 import os
 from dotenv import load_dotenv
 
@@ -15,7 +13,7 @@ load_dotenv()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # JWT secret key from environment variables
-JWT_SECRET_KEY = os.getenv("SUPABASE_JWT_SECRET")
+JWT_SECRET_KEY = os.getenv("JWT_SECRET") or os.getenv("SUPABASE_JWT_SECRET")
 
 # Create OAuth2 password bearer
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/admin/login")
@@ -36,8 +34,7 @@ def create_token(email: str, role: str = "admin") -> str:
         "role": role,
         "exp": expire
     }
-    encoded_jwt = jwt.encode(to_encode, JWT_SECRET_KEY, algorithm="HS256")
-    return encoded_jwt
+    return jwt.encode(to_encode, JWT_SECRET_KEY, algorithm="HS256")
 
 def create_volunteer_token(roll_number: str, volunteer_id: str) -> str:
     """Create JWT token for volunteer user"""
@@ -46,39 +43,38 @@ def create_volunteer_token(roll_number: str, volunteer_id: str) -> str:
         "sub": roll_number,
         "role": "volunteer",
         "volunteer_id": volunteer_id,
-        "exp": datetime.utcnow() + timedelta(hours=12)  # 12-hour tokens for volunteers
+        "exp": expire
     }
-    encoded_jwt = jwt.encode(to_encode, JWT_SECRET_KEY, algorithm="HS256")
-    return encoded_jwt
+    return jwt.encode(to_encode, JWT_SECRET_KEY, algorithm="HS256")
 
 # Admin authentication functions
-def get_current_admin(token: str):
+def get_current_admin(token: str = Depends(oauth2_scheme)):
     """Get current admin from token"""
     try:
-        payload = jwt.decode(token, os.getenv("SUPABASE_JWT_SECRET"), algorithms=["HS256"])
+        payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=["HS256"])
         if payload.get("role") != "admin":
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Could not validate credentials or insufficient permissions"
             )
         return payload
-    except PyJWTError:
+    except JWTError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate credentials"
         )
 
-def get_current_volunteer(token: str):
+def get_current_volunteer(token: str = Depends(oauth2_scheme)):
     """Get current volunteer from token"""
     try:
-        payload = jwt.decode(token, os.getenv("SUPABASE_JWT_SECRET"), algorithms=["HS256"])
+        payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=["HS256"])
         if payload.get("role") != "volunteer":
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Could not validate credentials or insufficient permissions"
             )
         return payload
-    except PyJWTError:
+    except JWTError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate credentials"

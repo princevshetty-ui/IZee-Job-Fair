@@ -3,16 +3,8 @@ from pydantic import BaseModel
 from typing import Optional
 from db import supabase
 from sid_generator import generate_sid
-from PIL import Image
-import io
-import qrcode
-import httpx
-import os
-from dotenv import load_dotenv
-import asyncio
-
-# Load environment variables
-load_dotenv()
+from pass_generator import generate_pass
+from email_service import send_pass_email
 
 router = APIRouter()
 
@@ -25,17 +17,93 @@ class OnSpotRegistrationRequest(BaseModel):
     stream: str
     attendee_type: str
     # Optional fields
-    year_of_passing: Optional[int] = None
-    course: Optional[str] = None
-    specialization: Optional[str] = None
-    current_year: Optional[int] = None
+    principal_name: Optional[str] = None
+    principal_email: Optional[str] = None
+    coordinator_name: Optional[str] = None
+    coordinator_phone: Optional[str] = None
+    coordinator_email: Optional[str] = None
+    mba_specialization: Optional[str] = None
+    stream_other: Optional[str] = None
     company_name: Optional[str] = None
     designation: Optional[str] = None
-    years_of_experience: Optional[int] = None
-    company_address: Optional[str] = None
-    company_phone: Optional[str] = None
+    experience_years: Optional[float] = None
+    graduation_college: Optional[str] = None
+    graduation_stream: Optional[str] = None
+    graduation_year: Optional[int] = None
 
-@router.post("/onspot")
+@router.post("/onspot", status_code=status.HTTP_201_CREATED)
 async def register_onspot(background_tasks: BackgroundTasks, registration: OnSpotRegistrationRequest):
-    # This is a public endpoint - no auth required
-    return {"message": "On-spot registration successful"}
+    if registration.attendee_type == "professional":
+        registration.academic_level = "Professional"
+        registration.stream = "N/A"
+
+    phone_check = supabase.table("attendees").select("id").eq("phone", registration.phone).execute()
+    if phone_check.data:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Phone number already registered"
+        )
+
+    email_check = supabase.table("attendees").select("id").eq("email", registration.email).execute()
+    if email_check.data:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Email already registered"
+        )
+
+    sid = generate_sid(registration.academic_level)
+    registration_data = {
+        "full_name": registration.full_name,
+        "phone": registration.phone,
+        "email": registration.email,
+        "college_name": registration.college_name,
+        "academic_level": registration.academic_level,
+        "stream": registration.stream,
+        "attendee_type": registration.attendee_type,
+        "status": "approved",
+        "reg_type": "onspot",
+        "sid": sid,
+        "principal_name": registration.principal_name,
+        "principal_email": registration.principal_email,
+        "coordinator_name": registration.coordinator_name,
+        "coordinator_phone": registration.coordinator_phone,
+        "coordinator_email": registration.coordinator_email,
+        "mba_specialization": registration.mba_specialization,
+        "stream_other": registration.stream_other,
+        "company_name": registration.company_name,
+        "designation": registration.designation,
+        "experience_years": registration.experience_years,
+        "graduation_college": registration.graduation_college,
+        "graduation_stream": registration.graduation_stream,
+        "graduation_year": registration.graduation_year
+    }
+
+    response = supabase.table("attendees").insert(registration_data).execute()
+    if not response.data:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to register attendee"
+        )
+
+    pass_image = generate_pass(
+        academic_level=registration.academic_level,
+        full_name=registration.full_name,
+        stream=registration.stream,
+        sid=sid,
+        reg_type="ON-SPOT"
+    )
+
+    background_tasks.add_task(
+        send_pass_email,
+        registration.email,
+        registration.full_name,
+        sid,
+        pass_image,
+        "ON-SPOT"
+    )
+
+    return {
+        "message": "On-spot registration successful",
+        "sid": sid,
+        "pass_image": pass_image
+    }

@@ -1,5 +1,3 @@
-import { validatePhone, validateEmail, validateRollNumber } from './validators'
-
 export const validatePhone = (phone) => {
   // Basic phone validation (10 digits)
   if (!phone) return false

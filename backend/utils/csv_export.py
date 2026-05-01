@@ -15,13 +15,20 @@ def export_attendees_csv(attendees: List[Dict], export_type: str = "all"):
     """
     # Define CSV headers
     headers = [
-        "SID", "Name", "Email", "Phone", "Academic Level", 
-        "Stream", "College", "Department", "Registration Type", 
-        "Payment Status", "Payment ID"
+        "SID",
+        "Full Name",
+        "Email",
+        "Phone",
+        "College Name",
+        "Academic Level",
+        "Stream",
+        "Attendee Type",
+        "Registration Type",
+        "Status",
+        "Attended",
+        "Attended At",
+        "Created At"
     ]
-    
-    if export_type == "attended":
-        headers.append("Attendance Time")
     
     # Create CSV content in memory
     output = StringIO()
@@ -32,20 +39,19 @@ def export_attendees_csv(attendees: List[Dict], export_type: str = "all"):
     for attendee in attendees:
         row = {
             "SID": attendee.get("sid", ""),
-            "Name": attendee.get("name", ""),
+            "Full Name": attendee.get("full_name", ""),
             "Email": attendee.get("email", ""),
             "Phone": attendee.get("phone", ""),
+            "College Name": attendee.get("college_name", ""),
             "Academic Level": attendee.get("academic_level", ""),
             "Stream": attendee.get("stream", ""),
-            "College": attendee.get("college", ""),
-            "Department": attendee.get("department", ""),
+            "Attendee Type": attendee.get("attendee_type", ""),
             "Registration Type": attendee.get("reg_type", ""),
-            "Payment Status": attendee.get("payment_status", ""),
-            "Payment ID": attendee.get("payment_id", "")
+            "Status": attendee.get("status", ""),
+            "Attended": attendee.get("attended", False),
+            "Attended At": attendee.get("attended_at", ""),
+            "Created At": attendee.get("created_at", "")
         }
-        
-        if export_type == "attended":
-            row["Attendance Time"] = attendee.get("attendance_time", "")
             
         writer.writerow(row)
     
@@ -59,17 +65,18 @@ if __name__ == "__main__":
     # Test the function
     test_attendees = [
         {
-            "sid": "JF26-UG24-00001",
-            "name": "John Doe",
+            "sid": "UGR12345",
+            "full_name": "John Doe",
             "email": "john@example.com",
             "phone": "1234567890",
+            "college_name": "Test College",
             "academic_level": "UG",
-            "stream": "Computer Science",
-            "college": "Test College",
-            "department": "CS",
-            "reg_type": "PRE-REGISTERED",
-            "payment_status": "PAID",
-            "payment_id": "PAY123"
+            "stream": "BCA",
+            "attendee_type": "student",
+            "reg_type": "pre",
+            "status": "approved",
+            "attended": False,
+            "created_at": "2026-05-01T10:00:00Z"
         }
     ]
     

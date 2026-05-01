@@ -1,6 +1,8 @@
+import FormField from '../FormField'
+
 const ProfessionalStep = ({ formData, setFormData, errors }) => {
-  const handleChange = (e) => {
-    const { name, value } = e.target
+  const handleChange = (event) => {
+    const { name, value } = event.target
     setFormData({ ...formData, [name]: value })
   }
 
@@ -8,7 +10,49 @@ const ProfessionalStep = ({ formData, setFormData, errors }) => {
     <div>
       <h2 className="text-2xl font-bold mb-6">Professional Information</h2>
       <p className="text-gray-400 mb-6">Please provide your professional details</p>
-      {/* Form fields would be implemented here */}
+
+      <FormField
+        label="Company Name"
+        name="company_name"
+        value={formData.company_name}
+        onChange={handleChange}
+        error={errors.company_name}
+        required
+      />
+      <FormField
+        label="Designation"
+        name="designation"
+        value={formData.designation}
+        onChange={handleChange}
+        error={errors.designation}
+        required
+      />
+      <FormField
+        label="Years of Experience"
+        name="experience_years"
+        type="number"
+        value={formData.experience_years}
+        onChange={handleChange}
+      />
+      <FormField
+        label="Graduation College"
+        name="graduation_college"
+        value={formData.graduation_college}
+        onChange={handleChange}
+      />
+      <FormField
+        label="Graduation Stream"
+        name="graduation_stream"
+        value={formData.graduation_stream}
+        onChange={handleChange}
+      />
+      <FormField
+        label="Graduation Year"
+        name="graduation_year"
+        type="number"
+        value={formData.graduation_year}
+        onChange={handleChange}
+      />
     </div>
   )
 }

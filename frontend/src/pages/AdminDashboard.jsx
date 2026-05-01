@@ -16,8 +16,8 @@ const AdminDashboard = () => {
   const [onSpotRegistrations, setOnSpotRegistrations] = useState([]);
   const [attendance, setAttendance] = useState([]);
   const [metrics, setMetrics] = useState({
-    pre: 0,
-    onspot: 0,
+    total_pre_registered: 0,
+    total_onspot: 0,
     approved: 0,
     attended: 0,
     pending: 0,
@@ -28,7 +28,7 @@ const AdminDashboard = () => {
     const fetchData = async () => {
       try {
         // Fetch metrics
-        const metricsRes = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/metrics`, {
+        const metricsRes = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/stats`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const metricsData = await metricsRes.json();
@@ -39,14 +39,14 @@ const AdminDashboard = () => {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const preData = await preRes.json();
-        setRegistrations(preData);
+        setRegistrations(preData.data || []);
         
         // Fetch on-spot registrations
         const onspotRes = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/registrations?reg_type=onspot`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const onspotData = await onspotRes.json();
-        setOnSpotRegistrations(onspotData);
+        setOnSpotRegistrations(onspotData.data || []);
         
         // Fetch attendance
         const attendanceRes = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/attendance`, {
@@ -109,17 +109,24 @@ const AdminDashboard = () => {
             <RegistrationsTable 
               registrations={registrations} 
               onApproveReject={async (id, action) => {
-                // Handle approve/reject logic
-                await fetch(`${import.meta.env.VITE_API_URL}/api/admin/registrations/${id}/${action}`, {
-                  method: 'POST',
+                const endpoint = action === 'approve'
+                  ? `/api/admin/approve/${id}`
+                  : `/api/admin/reject/${id}`
+                await fetch(`${import.meta.env.VITE_API_URL}${endpoint}`, {
+                  method: 'PUT',
                   headers: { 'Authorization': `Bearer ${token}` }
-                });
-                // Refetch data
+                })
                 const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/registrations?reg_type=pre`, {
                   headers: { 'Authorization': `Bearer ${token}` }
-                });
-                const data = await res.json();
-                setRegistrations(data);
+                })
+                const data = await res.json()
+                setRegistrations(data.data || [])
+              }}
+              onResend={async (id) => {
+                await fetch(`${import.meta.env.VITE_API_URL}/api/admin/resend/${id}`, {
+                  method: 'POST',
+                  headers: { 'Authorization': `Bearer ${token}` }
+                })
               }}
             />
           )}
@@ -128,7 +135,6 @@ const AdminDashboard = () => {
             <OnSpotTable 
               registrations={onSpotRegistrations} 
               onResend={async (id) => {
-                // Handle resend logic
                 await fetch(`${import.meta.env.VITE_API_URL}/api/admin/resend/${id}`, {
                   method: 'POST',
                   headers: { 'Authorization': `Bearer ${token}` }
@@ -149,19 +155,18 @@ const AdminDashboard = () => {
               >
                 Import CSV
               </button>
-              <CSVImportModal 
+                <CSVImportModal 
                 show={showImportModal} 
                 onClose={() => setShowImportModal(false)}
                 onImportSuccess={() => {
-                  // Refetch data after import
-                  const fetchData = async () => {
-                    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/registrations?reg_type=pre`, {
-                      headers: { 'Authorization': `Bearer ${token}` }
-                    });
-                    const data = await res.json();
-                    setRegistrations(data);
-                  };
-                  fetchData();
+                    const fetchData = async () => {
+                      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/registrations?reg_type=pre`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                      });
+                      const data = await res.json();
+                      setRegistrations(data.data || []);
+                    };
+                    fetchData();
                 }}
               />
             </>

@@ -4,25 +4,32 @@ import ResendConfirmModal from './ResendConfirmModal';
 const ExportButtons = () => {
   const [showResendConfirm, setShowResendConfirm] = useState(false);
 
+  const downloadFile = async (endpoint, filename) => {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}${endpoint}`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    })
+    const blob = await response.blob()
+    const url = window.URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = filename
+    link.click()
+    window.URL.revokeObjectURL(url)
+  }
+
   return (
-    <div className="flex space-x-4">
+    <div className="flex flex-wrap gap-3">
       <button 
-        onClick={() => {}}
+        onClick={() => downloadFile('/api/admin/export/all', 'registrations.csv')}
+        className="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg hover:opacity-90"
+      >
+        Export All
+      </button>
+      <button 
+        onClick={() => downloadFile('/api/admin/export/attended', 'attended.csv')}
         className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-lg hover:opacity-90"
       >
-        Export Pre-Registered
-      </button>
-      <button 
-        onClick={() => {}}
-        className="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg hover:opacity-90"
-      >
-        Export On-Spot
-      </button>
-      <button 
-        onClick={() => {}}
-        className="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg hover:opacity-90"
-      >
-        Export Attendance
+        Export Attended
       </button>
       <button 
         onClick={() => setShowResendConfirm(true)}
@@ -33,9 +40,12 @@ const ExportButtons = () => {
       <ResendConfirmModal 
         show={showResendConfirm} 
         onClose={() => setShowResendConfirm(false)}
-        onConfirm={() => {
-          // Handle resend all logic
-          setShowResendConfirm(false);
+        onConfirm={async () => {
+          await fetch(`${import.meta.env.VITE_API_URL}/api/admin/resend-all`, {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+          })
+          setShowResendConfirm(false)
         }}
       />
     </div>

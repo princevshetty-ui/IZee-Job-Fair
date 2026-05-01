@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { apiCall } from '../utils/api';
 
 const AdminLoginPage = () => {
   const [email, setEmail] = useState('');
@@ -24,7 +23,7 @@ const AdminLoginPage = () => {
       
       if (response.ok) {
         const data = await response.json();
-        setAuth(data.token);
+        setAuth(data.access_token);
         navigate('/admin/dashboard');
       } else {
         const errorData = await response.json();

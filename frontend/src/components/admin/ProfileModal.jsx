@@ -6,7 +6,7 @@ const ProfileModal = ({ registration, onClose }) => {
       <div className="bg-gray-800 rounded-lg p-6 w-full max-w-md">
         <h2 className="text-2xl font-bold mb-4">Attendee Details</h2>
         <div className="space-y-4">
-          <p><strong className="text-gray-300">Name:</strong> <span className="text-white">{registration.name}</span></p>
+          <p><strong className="text-gray-300">Name:</strong> <span className="text-white">{registration.full_name}</span></p>
           <p><strong className="text-gray-300">Email:</strong> <span className="text-white">{registration.email}</span></p>
           <p><strong className="text-gray-300">Phone:</strong> <span className="text-white">{registration.phone}</span></p>
           <p><strong className="text-gray-300">SID:</strong> <span className="text-white">{registration.sid}</span></p>

@@ -1,6 +1,7 @@
 import { useState } from 'react';
+import ProfileModal from './ProfileModal';
 
-const RegistrationsTable = ({ registrations, onApproveReject }) => {
+const RegistrationsTable = ({ registrations, onApproveReject, onResend }) => {
   const [search, setSearch] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterLevel, setFilterLevel] = useState('all');
@@ -8,14 +9,16 @@ const RegistrationsTable = ({ registrations, onApproveReject }) => {
 
   const filtered = registrations.filter(reg => {
     const matchesSearch = 
-      reg.name.toLowerCase().includes(search.toLowerCase()) ||
-      reg.phone.includes(search) ||
-      reg.sid.includes(search);
+      (reg.full_name || '').toLowerCase().includes(search.toLowerCase()) ||
+      (reg.phone || '').includes(search) ||
+      (reg.sid || '').includes(search);
     const matchesStatus = filterStatus === 'all' || reg.status === filterStatus;
     const matchesLevel = filterLevel === 'all' || reg.academic_level === filterLevel;
     const matchesStream = filterStream === 'all' || reg.stream === filterStream;
     return matchesSearch && matchesStatus && matchesLevel && matchesStream;
   });
+
+  const [selected, setSelected] = useState(null)
 
   return (
     <div className="space-y-4">
@@ -87,12 +90,16 @@ const RegistrationsTable = ({ registrations, onApproveReject }) => {
               </tr>
             ) : (
               filtered.map((reg, index) => (
-                <tr key={index} className="border-t border-gray-700">
-                  <td className="px-4 py-2 text-white">{reg.name}</td>
+                <tr
+                  key={index}
+                  className="border-t border-gray-700 cursor-pointer hover:bg-gray-700"
+                  onClick={() => setSelected(reg)}
+                >
+                  <td className="px-4 py-2 text-white">{reg.full_name}</td>
                   <td className="px-4 py-2 text-white">{reg.phone}</td>
-                  <td className="px-4 py-2 text-white">{reg.sid}</td>
+                  <td className="px-4 py-2 text-white">{reg.sid || '-'}</td>
                   <td className="px-4 py-2 text-white">{reg.academic_level}</td>
-                  <td className="px-4 py-2 text-white">{reg.stream}</td>
+                  <td className="px-4 py-2 text-white">{reg.stream || '-'}</td>
                   <td className="px-4 py-2">
                     <span className={`px-2 py-1 rounded text-xs font-medium 
                       ${reg.status === 'pending' ? 'bg-yellow-500' : 
@@ -105,13 +112,19 @@ const RegistrationsTable = ({ registrations, onApproveReject }) => {
                     {reg.status === 'pending' && (
                       <>
                         <button 
-                          onClick={() => onApproveReject(reg.id, 'approve')}
+                          onClick={(event) => {
+                            event.stopPropagation()
+                            onApproveReject(reg.id, 'approve')
+                          }}
                           className="px-3 py-1 bg-green-500 text-white text-sm rounded hover:bg-green-600"
                         >
                           Approve
                         </button>
                         <button 
-                          onClick={() => onApproveReject(reg.id, 'reject')}
+                          onClick={(event) => {
+                            event.stopPropagation()
+                            onApproveReject(reg.id, 'reject')
+                          }}
                           className="px-3 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-600 ml-2"
                         >
                           Reject
@@ -119,8 +132,11 @@ const RegistrationsTable = ({ registrations, onApproveReject }) => {
                       </>
                     )}
                     {reg.status === 'approved' && (
-                      <button 
-                        onClick={() => {}}
+                        <button 
+                        onClick={(event) => {
+                          event.stopPropagation()
+                          onResend?.(reg.id)
+                        }}
                         className="px-3 py-1 bg-blue-500 text-white text-sm rounded hover:bg-blue-600"
                       >
                         Resend
@@ -133,6 +149,9 @@ const RegistrationsTable = ({ registrations, onApproveReject }) => {
           </tbody>
         </table>
       </div>
+      {selected && (
+        <ProfileModal registration={selected} onClose={() => setSelected(null)} />
+      )}
     </div>
   );
 };

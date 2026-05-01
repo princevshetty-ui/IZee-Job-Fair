@@ -1,24 +1,38 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react'
 
-export const useApi = (url, options = {}) => {
-  const [data, setData] = useState(null);
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(true);
+export const useApi = (endpoint, options = {}) => {
+  const [data, setData] = useState(null)
+  const [error, setError] = useState(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    let isMounted = true
     const fetchData = async () => {
       try {
-        const response = await fetch(url, options);
-        const result = await response.json();
-        setData(result);
-      } catch (err) {
-        setError(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, [url]);
+        const token = localStorage.getItem('token')
+        const response = await fetch(endpoint, {
+          ...options,
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            ...(options.headers || {})
+          }
+        })
 
-  return { data, error, loading };
-};
+        const result = await response.json()
+        if (isMounted) setData(result)
+      } catch (err) {
+        if (isMounted) setError(err)
+      } finally {
+        if (isMounted) setLoading(false)
+      }
+    }
+
+    fetchData()
+    return () => {
+      isMounted = false
+    }
+  }, [endpoint])
+
+  return { data, error, loading }
+}

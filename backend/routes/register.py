@@ -14,21 +14,22 @@ class RegistrationRequest(BaseModel):
     stream: str
     attendee_type: str
     # Optional fields
-    reg_type: Optional[str] = "pre"
-    status: Optional[str] = "pending"
-    # Additional optional fields
-    year_of_passing: Optional[int] = None
-    course: Optional[str] = None
-    specialization: Optional[str] = None
-    current_year: Optional[int] = None
+    principal_name: Optional[str] = None
+    principal_email: Optional[str] = None
+    coordinator_name: Optional[str] = None
+    coordinator_phone: Optional[str] = None
+    coordinator_email: Optional[str] = None
+    mba_specialization: Optional[str] = None
+    stream_other: Optional[str] = None
+    # Professional fields
     company_name: Optional[str] = None
     designation: Optional[str] = None
-    years_of_experience: Optional[int] = None
-    # Professional fields
-    company_address: Optional[str] = None
-    company_phone: Optional[str] = None
+    experience_years: Optional[float] = None
+    graduation_college: Optional[str] = None
+    graduation_stream: Optional[str] = None
+    graduation_year: Optional[int] = None
 
-@router.post("/register")
+@router.post("/register", status_code=status.HTTP_201_CREATED)
 async def register_attendee(registration: RegistrationRequest):
     # If attendee_type is professional, auto-set academic_level and stream
     if registration.attendee_type == 'professional':
@@ -60,17 +61,21 @@ async def register_attendee(registration: RegistrationRequest):
         "academic_level": registration.academic_level,
         "stream": registration.stream,
         "attendee_type": registration.attendee_type,
-        "status": registration.status,
-        "reg_type": registration.reg_type,
-        "year_of_passing": registration.year_of_passing,
-        "course": registration.course,
-        "specialization": registration.specialization,
-        "current_year": registration.current_year,
+        "status": "pending",
+        "reg_type": "pre",
+        "principal_name": registration.principal_name,
+        "principal_email": registration.principal_email,
+        "coordinator_name": registration.coordinator_name,
+        "coordinator_phone": registration.coordinator_phone,
+        "coordinator_email": registration.coordinator_email,
+        "mba_specialization": registration.mba_specialization,
+        "stream_other": registration.stream_other,
         "company_name": registration.company_name,
         "designation": registration.designation,
-        "years_of_experience": registration.years_of_experience,
-        "company_address": registration.company_address,
-        "company_phone": registration.company_phone
+        "experience_years": registration.experience_years,
+        "graduation_college": registration.graduation_college,
+        "graduation_stream": registration.graduation_stream,
+        "graduation_year": registration.graduation_year
     }
     
     response = supabase.table("attendees").insert(registration_data).execute()

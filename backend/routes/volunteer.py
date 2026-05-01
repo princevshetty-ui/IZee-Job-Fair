@@ -1,6 +1,5 @@
-from fastapi import APIRouter, HTTPException, status, BackgroundTasks
+from fastapi import APIRouter, HTTPException, status, Depends
 from pydantic import BaseModel
-from typing import Optional
 import re
 from datetime import datetime, timezone, timedelta
 from db import supabase
@@ -15,7 +14,7 @@ class VolunteerRegistrationRequest(BaseModel):
     phone: str
     email: str
     course: str
-    year: int
+    year: str
 
 class VolunteerLoginRequest(BaseModel):
     roll_number: str
@@ -24,12 +23,12 @@ class VolunteerLoginRequest(BaseModel):
 class ValidateRequest(BaseModel):
     sid: str
 
-@router.post("/volunteer/register")
+@router.post("/volunteer/register", status_code=status.HTTP_201_CREATED)
 async def register_volunteer(request: VolunteerRegistrationRequest):
     # Validate roll_number: exactly 12 alphanumeric chars
     if not re.match(r'^[a-zA-Z0-9]{12}$', request.roll_number):
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="Roll number must be exactly 12 alphanumeric characters"
         )
     
@@ -87,7 +86,7 @@ async def login_volunteer(request: VolunteerLoginRequest):
     return {"access_token": token, "token_type": "bearer"}
 
 @router.post("/volunteer/validate")
-async def validate_attendee(request: ValidateRequest):
+async def validate_attendee(request: ValidateRequest, current_volunteer: dict = Depends(get_current_volunteer)):
     # Check if SID exists
     attendee_check = supabase.table("attendees").select("*").eq("sid", request.sid).execute()
     
@@ -125,7 +124,7 @@ async def validate_attendee(request: ValidateRequest):
     response = supabase.table("attendees").update({
         "attended": True,
         "attended_at": datetime.utcnow().isoformat(),
-        "validated_by": "volunteer_id"  # This would be replaced with actual volunteer ID in real implementation
+        "validated_by": current_volunteer.get("volunteer_id")
     }).eq("sid", request.sid).execute()
     
     if not response.data:

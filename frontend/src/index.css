@@ -1,19 +1,47 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: 'Montage';
+  src: url('/src/assets/fonts/Montage.woff2') format('woff2'),
+       url('/src/assets/fonts/Montage.woff') format('woff'),
+       url('/src/assets/fonts/Montage.ttf') format('truetype'),
+       url('/src/assets/fonts/Montage.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Nevara';
+  src: url('/src/assets/fonts/Nevarademo-6YXEY.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 body {
-  font-family: 'Inter', sans-serif;
-  background-color: #0a0e1a;
-  color: #f0f0f0;
+  font-family: 'Montserrat', sans-serif;
+  background-color: #f8f9fa;
+  color: #1f2937;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Montserrat', sans-serif;
+  letter-spacing: 0.05em;
+}
+
+.font-heading-art {
+  font-family: 'Montserrat', sans-serif;
+}
+
+.font-nevara {
+  font-family: 'Nevara', serif;
 }
 
 .glass {
   backdrop-filter: blur(16px);
-  background-color: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .gradient-primary {
@@ -54,11 +82,16 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .animate-marquee {
-  animation: marquee 20s linear infinite;
+  animation: marquee 80s linear infinite;
 }
 
 .animate-marquee2 {
-  animation: marquee 20s linear infinite reverse;
+  animation: marquee 80s linear infinite reverse;
+}
+
+.marquee-container:hover .animate-marquee,
+.marquee-container:hover .animate-marquee2 {
+  animation-play-state: paused;
 }
 
 @keyframes pulse {

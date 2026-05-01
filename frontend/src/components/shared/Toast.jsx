@@ -1,6 +1,15 @@
 import { motion } from 'framer-motion'
 import { useEffect } from 'react'
 
+const normalizeMessage = (value) => {
+  if (typeof value === 'string') return value
+  try {
+    return JSON.stringify(value)
+  } catch (error) {
+    return 'Something went wrong'
+  }
+}
+
 const Toast = ({ message, type = 'info', duration = 3000, onClose }) => {
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -15,9 +24,9 @@ const Toast = ({ message, type = 'info', duration = 3000, onClose }) => {
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      className={\`fixed top-4 right-4 z-50 px-4 py-2 rounded-lg shadow-lg \${type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500'} text-white\`}
+      className={`fixed top-4 right-4 z-50 px-4 py-2 rounded-lg shadow-lg ${type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500'} text-white`}
     >
-      {message}
+      {normalizeMessage(message)}
     </motion.div>
   )
 }

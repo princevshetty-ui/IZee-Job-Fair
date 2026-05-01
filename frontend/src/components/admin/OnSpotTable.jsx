@@ -4,9 +4,9 @@ const OnSpotTable = ({ registrations, onResend }) => {
   const [search, setSearch] = useState('');
 
   const filtered = registrations.filter(reg => 
-    reg.name.toLowerCase().includes(search.toLowerCase()) ||
-    reg.phone.includes(search) ||
-    reg.sid.includes(search)
+    (reg.full_name || '').toLowerCase().includes(search.toLowerCase()) ||
+    (reg.phone || '').includes(search) ||
+    (reg.sid || '').includes(search)
   );
 
   return (
@@ -44,11 +44,11 @@ const OnSpotTable = ({ registrations, onResend }) => {
             ) : (
               filtered.map((reg, index) => (
                 <tr key={index} className="border-t border-gray-700">
-                  <td className="px-4 py-2 text-white">{reg.name}</td>
+                  <td className="px-4 py-2 text-white">{reg.full_name}</td>
                   <td className="px-4 py-2 text-white">{reg.phone}</td>
-                  <td className="px-4 py-2 text-white">{reg.sid}</td>
+                  <td className="px-4 py-2 text-white">{reg.sid || '-'}</td>
                   <td className="px-4 py-2 text-white">{reg.academic_level}</td>
-                  <td className="px-4 py-2 text-white">{reg.stream}</td>
+                  <td className="px-4 py-2 text-white">{reg.stream || '-'}</td>
                   <td className="px-4 py-2 text-white">{new Date(reg.created_at).toLocaleString()}</td>
                   <td className="px-4 py-2">
                     <button 

@@ -3,7 +3,6 @@ import httpx
 import json
 from typing import List, Dict, Any
 import asyncio
-import base64
 from datetime import datetime
 
 # Get the Brevo API key from environment variables
@@ -35,6 +34,9 @@ async def send_pass_email(email: str, name: str, sid: str, pass_image_b64: str, 
         dict: Response from the API
     """
     # Create the email content
+    if not BREVO_API_KEY:
+        return {"error": "BREVO_API_KEY is not configured"}
+
     subject = f"Your IZEE Job Fair 2026 Pass - {sid}"
     
     html_content = f"""
@@ -46,8 +48,8 @@ async def send_pass_email(email: str, name: str, sid: str, pass_image_b64: str, 
             <p><strong>Event Details:</strong></p>
             <ul>
                 <li><strong>Event:</strong> IZEE Job Fair 2026</li>
-                <li><strong>Date:</strong> May 15, 2026</li>
- <li><strong>Time:</strong> 9:30 AM - 4:30 PM</li>
+                <li><strong>Date:</strong> 8th May 2026</li>
+                <li><strong>Time:</strong> 9:00 AM - 5:00 PM</li>
                 <li><strong>Venue:</strong> IZEE Campus</li>
                 <li><strong>Registration Type:</strong> {reg_type}</li>
                 <li><strong>Your SID:</strong> {sid}</li>
@@ -95,20 +97,52 @@ async def send_pass_email(email: str, name: str, sid: str, pass_image_b64: str, 
     except Exception as e:
         return {"error": str(e)}
 
-def send_batch_emails(attendees: List[Dict[str, Any]], start_index: int = 0):
+async def send_batch_emails(attendees: List[Dict[str, Any]], start_index: int = 0, daily_limit: int = 280):
     """
-    Send batch emails to attendees with 280/day safety limit
-    
-    Args:
-        attendees (list): List of attendees
-        start_index (int): Starting index for batch processing
-        
-    Returns:
-        dict: Batch email response
+    Send batch emails to attendees with a daily safety limit.
     """
-    # This would send emails in batches with a safety limit of 280/day
-    # For now, this is a simplified implementation
-    pass
+    if not attendees:
+        return {"sent": 0, "errors": []}
+
+    from pass_generator import generate_pass
+
+    sent = 0
+    errors = []
+    end_index = min(len(attendees), start_index + daily_limit)
+
+    for attendee in attendees[start_index:end_index]:
+        try:
+            sid = attendee.get("sid")
+            if not sid:
+                continue
+
+            reg_type_value = attendee.get("reg_type", "pre")
+            reg_type_label = "ON-SPOT" if reg_type_value == "onspot" else "PRE-REGISTERED"
+
+            pass_image = generate_pass(
+                academic_level=attendee.get("academic_level"),
+                full_name=attendee.get("full_name"),
+                stream=attendee.get("stream"),
+                sid=sid,
+                reg_type=reg_type_label
+            )
+
+            result = await send_pass_email(
+                attendee.get("email"),
+                attendee.get("full_name"),
+                sid,
+                pass_image,
+                reg_type_label
+            )
+
+            if result.get("error"):
+                errors.append(result)
+            else:
+                sent += 1
+        except Exception as exc:
+            errors.append({"error": str(exc)})
+
+    return {"sent": sent, "errors": errors}
 
 if __name__ == "__main__":
     # Test the email service

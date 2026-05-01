@@ -11,7 +11,7 @@ const MetricCards = ({ metrics }) => {
       >
         <h3 className="text-lg font-semibold text-gray-300">Pre-Registered</h3>
         <div className="text-2xl font-bold mt-2">
-          {useCountUp(metrics.pre)}
+          {useCountUp(metrics.total_pre_registered)}
         </div>
       </motion.div>
       
@@ -22,7 +22,7 @@ const MetricCards = ({ metrics }) => {
       >
         <h3 className="text-lg font-semibold text-gray-300">On-Spot</h3>
         <div className="text-2xl font-bold mt-2 text-blue-500">
-          {useCountUp(metrics.onspot)}
+          {useCountUp(metrics.total_onspot)}
         </div>
       </motion.div>
       
