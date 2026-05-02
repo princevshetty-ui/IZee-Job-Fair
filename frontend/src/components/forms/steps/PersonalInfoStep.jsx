@@ -47,7 +47,7 @@ const PersonalInfoStep = ({ formData, setFormData, errors }) => {
         onChange={handleChange}
         options={[
           { value: 'student', label: 'Student' },
-          { value: 'fresher', label: 'Fresher' },
+          { value: 'student', label: 'Fresher (Student)' },
           { value: 'professional', label: 'Professional' }
         ]}
         required
