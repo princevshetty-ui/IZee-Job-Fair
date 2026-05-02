@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel
 from db import supabase
 from typing import Optional
+from sid_generator import generate_sid
 
 router = APIRouter()
 
@@ -52,6 +53,9 @@ async def register_attendee(registration: RegistrationRequest):
             detail="Email already registered"
         )
     
+    # Generate a unique SID
+    sid = generate_sid(registration.academic_level)
+
     # Insert the registration data
     registration_data = {
         "full_name": registration.full_name,
@@ -61,6 +65,7 @@ async def register_attendee(registration: RegistrationRequest):
         "academic_level": registration.academic_level,
         "stream": registration.stream,
         "attendee_type": registration.attendee_type,
+        "sid": sid,
         "status": "pending",
         "reg_type": "pre",
         "principal_name": registration.principal_name,
