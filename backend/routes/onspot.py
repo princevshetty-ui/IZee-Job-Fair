@@ -78,7 +78,20 @@ async def register_onspot(background_tasks: BackgroundTasks, registration: OnSpo
         "graduation_year": registration.graduation_year
     }
 
-    response = supabase.table("attendees").insert(registration_data).execute()
+    try:
+        response = supabase.table("attendees").insert(registration_data).execute()
+    except Exception as e:
+        print(f"Error inserting attendee: {e}")
+        if "row-level security" in str(e) or "42501" in str(e):
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Supabase RLS Policy Error: Please use the service_role key as your SUPABASE_KEY in the backend/.env, or add the INSERT policy on the attendees table in Supabase."
+            )
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Database error: {str(e)}"
+        )
+
     if not response.data:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
