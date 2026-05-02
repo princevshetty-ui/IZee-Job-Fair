@@ -1,9 +1,12 @@
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, BackgroundTasks
 from fastapi.responses import Response
 from db import supabase
 from auth import get_current_admin
 from utils.csv_export import export_attendees_csv, export_pre_register_zip, export_onspot_csv
 from utils.csv_import import map_gforms_row
+from pass_generator import generate_pass
+from email_service import send_pass_email
+from sid_generator import generate_sid
 import csv
 import io
 import os
@@ -72,12 +75,42 @@ async def get_attendance(admin: dict = Depends(get_current_admin)):
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.put("/admin/approve/{attendee_id}")
-async def approve_attendee(attendee_id: int, admin: dict = Depends(get_current_admin)):
+async def approve_attendee(attendee_id: str, background_tasks: BackgroundTasks, admin: dict = Depends(get_current_admin)):
     try:
-        response = supabase.table("attendees").update({"status": "approved"}).eq("id", attendee_id).execute()
-        if not response.data:
+        update_response = supabase.table("attendees").update({"status": "approved"}).eq("id", attendee_id).execute()
+        if not update_response.data:
             raise HTTPException(status_code=404, detail="Attendee not found")
+
+        fetch_response = supabase.table("attendees").select("*").eq("id", attendee_id).execute()
+        if not fetch_response.data:
+            raise HTTPException(status_code=404, detail="Attendee not found")
+
+        attendee = fetch_response.data[0]
+        full_name = attendee.get("full_name")
+        email = attendee.get("email")
+        sid = attendee.get("sid")
+        attendee_type = attendee.get("attendee_type") or attendee.get("reg_type", "pre")
+
+        if not sid:
+            academic_level = attendee.get("academic_level", "UG")
+            sid = generate_sid(academic_level)
+            supabase.table("attendees").update({"sid": sid}).eq("id", attendee_id).execute()
+
+        reg_type_label = "ON-SPOT" if attendee_type == "onspot" else "PRE-REGISTERED"
+
+        pass_image_b64 = generate_pass(
+            academic_level=attendee.get("academic_level"),
+            full_name=full_name,
+            stream=attendee.get("stream"),
+            sid=sid,
+            reg_type=reg_type_label
+        )
+
+        background_tasks.add_task(send_pass_email, email, full_name, sid, pass_image_b64, reg_type_label)
+
         return {"message": "Attendee approved"}
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
