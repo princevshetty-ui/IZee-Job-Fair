@@ -11,8 +11,8 @@ const AcademicDetailsStep = ({ formData, setFormData, errors }) => {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold mb-6">Academic Details</h2>
-      <p className="text-gray-400 mb-6">Please provide your academic information</p>
+      <h2 className="text-2xl font-light text-white mb-2 font-heading-art tracking-tight">Academic Details</h2>
+      <p className="text-slate-400 text-sm mb-8">Please provide your academic information</p>
 
       <FormField
         label="Academic Level"

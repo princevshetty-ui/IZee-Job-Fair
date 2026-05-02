@@ -30,7 +30,32 @@ export const MBA_SPECIALIZATIONS = [
   { value: 'Marketing', label: 'Marketing' },
   { value: 'Finance', label: 'Finance' },
   { value: 'Health Care', label: 'Health Care' },
-  { value: 'Operations', label: 'Operations' }
+  { value: 'Operations', label: 'Operations' },
+  { value: 'Others', label: 'Others' }
+]
+
+export const DIPLOMA_STREAMS = [
+  { value: 'Computer Science', label: 'Computer Science' },
+  { value: 'Electronics', label: 'Electronics' },
+  { value: 'Mechanical', label: 'Mechanical' },
+  { value: 'Civil', label: 'Civil' },
+  { value: 'Electrical', label: 'Electrical' },
+  { value: 'Others', label: 'Others' }
+]
+
+export const ITI_STREAMS = [
+  { value: 'Fitter', label: 'Fitter' },
+  { value: 'Electrician', label: 'Electrician' },
+  { value: 'Mechanic', label: 'Mechanic' },
+  { value: 'Welder', label: 'Welder' },
+  { value: 'Others', label: 'Others' }
+]
+
+export const PUC_STREAMS = [
+  { value: 'Science', label: 'Science' },
+  { value: 'Commerce', label: 'Commerce' },
+  { value: 'Arts', label: 'Arts' },
+  { value: 'Others', label: 'Others' }
 ]
 
 export const getStreamsForLevel = (level) => {
@@ -39,6 +64,12 @@ export const getStreamsForLevel = (level) => {
       return UG_STREAMS
     case 'PG':
       return PG_STREAMS
+    case 'Diploma':
+      return DIPLOMA_STREAMS
+    case 'ITI':
+      return ITI_STREAMS
+    case 'PUC':
+      return PUC_STREAMS
     default:
       return null
   }

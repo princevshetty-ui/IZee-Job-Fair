@@ -25,6 +25,7 @@ const ResendConfirmModal = ({ show, onClose, onConfirm }) => {
         </p>
         <div className="flex justify-end space-x-3">
           <button
+            type="button"
             onClick={onClose}
             className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-500"
           >

@@ -1,28 +1,34 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import { useState, useEffect } from 'react'
+import GlobalBackground from './components/shared/GlobalBackground'
 
-// Import page components (we'll create these later)
 import LandingPage from './pages/LandingPage'
 import RegisterPage from './pages/RegisterPage'
-import OnSpotPage from './pages/OnSpotPage'
+import ConfirmationPage from './pages/ConfirmationPage'
 import VolunteerRegisterPage from './pages/VolunteerRegisterPage'
 import VolunteerValidatePage from './pages/VolunteerValidatePage'
 import AdminLoginPage from './pages/AdminLoginPage'
 import AdminDashboard from './pages/AdminDashboard'
+import NotFoundPage from './pages/NotFoundPage'
+import OnSpotRegisterPage from './pages/OnSpotRegisterPage'
 
 function App() {
   return (
-    <Router>
-      <Routes>
+    <div className="bg-[#0a0e1a] min-h-screen">
+      <GlobalBackground />
+      <Router>
+        <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/register" element={<RegisterPage />} />
-        <Route path="/onspot" element={<OnSpotPage />} />
+        <Route path="/register/confirmation" element={<ConfirmationPage />} />
         <Route path="/volunteer/register" element={<VolunteerRegisterPage />} />
         <Route path="/volunteer/validate" element={<VolunteerValidatePage />} />
+        <Route path="/onspot" element={<OnSpotRegisterPage />} />
         <Route path="/admin" element={<AdminLoginPage />} />
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
-      </Routes>
-    </Router>
+        <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+      </Router>
+    </div>
   )
 }
 

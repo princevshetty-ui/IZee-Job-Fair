@@ -7,6 +7,7 @@ import CollegeInfoStep from './steps/CollegeInfoStep'
 const RegistrationForm = ({ onSubmit, submitting = false }) => {
   const [currentStep, setCurrentStep] = useState(0)
   const [errors, setErrors] = useState({})
+  const [complianceAccepted, setComplianceAccepted] = useState(false)
   const [formData, setFormData] = useState({
     full_name: '',
     phone: '',
@@ -92,6 +93,10 @@ const RegistrationForm = ({ onSubmit, submitting = false }) => {
   const handleSubmit = (event) => {
     event.preventDefault()
     if (!validateStep()) return
+    if (!complianceAccepted) {
+      setErrors({ ...errors, compliance: 'You must confirm the checklist to proceed' })
+      return
+    }
     const payload = {
       ...formData,
       experience_years: formData.experience_years === '' ? null : Number(formData.experience_years),
@@ -102,14 +107,56 @@ const RegistrationForm = ({ onSubmit, submitting = false }) => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Step Progress */}
+      <div className="flex items-center justify-center gap-2 mb-2">
+        {steps.map((s, i) => (
+          <div key={s.key} className="flex items-center gap-2">
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold transition-all duration-300 ${
+              i < currentStep ? 'bg-gradient-to-br from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-500/30' :
+              i === currentStep ? 'bg-gradient-to-br from-indigo-600 to-cyan-500 text-white shadow-lg shadow-indigo-500/30' :
+              'bg-white/[0.06] text-slate-500 border border-white/10'
+            }`}>
+              {i < currentStep ? (
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+              ) : i + 1}
+            </div>
+            {i < steps.length - 1 && (
+              <div className={`w-8 md:w-12 h-0.5 rounded-full transition-all duration-300 ${i < currentStep ? 'bg-emerald-500' : 'bg-white/10'}`} />
+            )}
+          </div>
+        ))}
+      </div>
+
       <CurrentStep formData={formData} setFormData={setFormData} errors={errors} />
 
-      <div className="flex flex-col sm:flex-row gap-3 justify-between">
+      {currentStep === steps.length - 1 && (
+        <div className="glass-card rounded-xl p-5">
+          <div className="flex items-start gap-3">
+            <input
+              type="checkbox"
+              id="compliance"
+              checked={complianceAccepted}
+              onChange={(e) => setComplianceAccepted(e.target.checked)}
+              className="form-checkbox mt-0.5"
+            />
+            <label htmlFor="compliance" className="text-slate-300 text-sm leading-relaxed cursor-pointer select-none">
+              I confirm that I will bring <strong className="text-white">10 sets of updated CVs</strong>,{' '}
+              <strong className="text-white">10 passport-size photographs</strong>, and a{' '}
+              <strong className="text-white">valid government-issued ID proof</strong>. I understand that this is
+              a large-scale recruitment event with participation from <strong className="text-white">80+ companies</strong>{' '}
+              and I must come fully prepared.
+            </label>
+          </div>
+          {errors.compliance && <p className="text-red-400 text-xs mt-2">{errors.compliance}</p>}
+        </div>
+      )}
+
+      <div className="flex flex-col sm:flex-row gap-3 justify-between items-center pt-2">
         <button
           type="button"
           onClick={handleBack}
           disabled={currentStep === 0}
-          className="px-6 py-3 rounded-lg border border-white/10 text-white disabled:opacity-40"
+          className="w-full sm:w-auto px-6 py-3 rounded-lg border border-indigo-500/30 text-slate-300 disabled:opacity-40 hover:bg-white/[0.04] transition-all text-sm font-medium"
         >
           Back
         </button>
@@ -117,7 +164,7 @@ const RegistrationForm = ({ onSubmit, submitting = false }) => {
           <button
             type="button"
             onClick={handleNext}
-            className="px-6 py-3 rounded-lg bg-gradient-to-r from-blue-500 to-indigo-600 text-white"
+            className="w-full sm:w-auto px-8 py-3 rounded-lg bg-gradient-to-r from-indigo-600 to-cyan-500 text-white font-semibold text-sm tracking-[0.05em] uppercase transition-all shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:shadow-cyan-500/40 hover:scale-[1.02]"
           >
             Next
           </button>
@@ -125,9 +172,9 @@ const RegistrationForm = ({ onSubmit, submitting = false }) => {
           <button
             type="submit"
             disabled={submitting}
-            className="px-6 py-3 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-500 text-white disabled:opacity-60"
+            className="w-full sm:w-auto px-8 py-3 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-semibold text-sm tracking-[0.05em] uppercase transition-all shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/40 hover:scale-[1.02] disabled:opacity-60 disabled:hover:scale-100"
           >
-            {submitting ? 'Submitting...' : 'Submit'}
+            {submitting ? 'Submitting...' : 'Submit Registration'}
           </button>
         )}
       </div>

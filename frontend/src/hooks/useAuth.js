@@ -6,6 +6,7 @@ const decodeJwt = (jwt) => {
     const decoded = atob(payload.replace(/-/g, '+').replace(/_/g, '/'))
     return JSON.parse(decoded)
   } catch (error) {
+    console.error(error)
     return null
   }
 }

@@ -8,8 +8,8 @@ const PersonalInfoStep = ({ formData, setFormData, errors }) => {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold mb-6">Personal Information</h2>
-      <p className="text-gray-400 mb-6">Please fill in your personal details</p>
+      <h2 className="text-2xl font-light text-white mb-2 font-heading-art tracking-tight">Personal Information</h2>
+      <p className="text-slate-400 text-sm mb-8">Please fill in your personal details to get started</p>
 
       <FormField
         label="Full Name"
@@ -17,6 +17,7 @@ const PersonalInfoStep = ({ formData, setFormData, errors }) => {
         value={formData.full_name}
         onChange={handleChange}
         error={errors.full_name}
+        placeholder="Enter your full name"
         required
       />
       <FormField
@@ -25,6 +26,7 @@ const PersonalInfoStep = ({ formData, setFormData, errors }) => {
         value={formData.phone}
         onChange={handleChange}
         error={errors.phone}
+        placeholder="Enter your phone number"
         required
       />
       <FormField
@@ -34,6 +36,7 @@ const PersonalInfoStep = ({ formData, setFormData, errors }) => {
         value={formData.email}
         onChange={handleChange}
         error={errors.email}
+        placeholder="Enter your email address"
         required
       />
       <FormField
@@ -44,6 +47,7 @@ const PersonalInfoStep = ({ formData, setFormData, errors }) => {
         onChange={handleChange}
         options={[
           { value: 'student', label: 'Student' },
+          { value: 'fresher', label: 'Fresher' },
           { value: 'professional', label: 'Professional' }
         ]}
         required

@@ -8,8 +8,8 @@ const ProfessionalStep = ({ formData, setFormData, errors }) => {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold mb-6">Professional Information</h2>
-      <p className="text-gray-400 mb-6">Please provide your professional details</p>
+      <h2 className="text-2xl font-light text-white mb-2 font-heading-art tracking-tight">Professional Information</h2>
+      <p className="text-slate-400 text-sm mb-8">Please provide your professional details</p>
 
       <FormField
         label="Company Name"

@@ -1,11 +1,12 @@
 @import "tailwindcss";
 
+/* ─── Custom Fonts ─── */
 @font-face {
   font-family: 'Montage';
-  src: url('/src/assets/fonts/Montage.woff2') format('woff2'),
-       url('/src/assets/fonts/Montage.woff') format('woff'),
-       url('/src/assets/fonts/Montage.ttf') format('truetype'),
-       url('/src/assets/fonts/Montage.otf') format('opentype');
+  src: url('/fonts/Montage.woff2') format('woff2'),
+       url('/fonts/Montage.woff') format('woff'),
+       url('/fonts/Montage.ttf') format('truetype'),
+       url('/fonts/Montage.otf') format('opentype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -13,37 +14,412 @@
 
 @font-face {
   font-family: 'Nevara';
-  src: url('/src/assets/fonts/Nevarademo-6YXEY.otf') format('opentype');
+  src: url('/fonts/Nevarademo-6YXEY.otf') format('opentype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
 
+/* ─── Root Variables ─── */
+:root {
+  --gold: #c9a84c;
+  --gold-dim: rgba(201, 168, 76, 0.12);
+  --gold-border: rgba(201, 168, 76, 0.22);
+  --surface-0: #0b1020;
+  --surface-1: rgba(255, 255, 255, 0.04);
+  --surface-2: rgba(255, 255, 255, 0.08);
+  --text-muted: rgba(238, 230, 216, 0.6);
+  --text-dim: rgba(238, 230, 216, 0.35);
+  --radius-card: 16px;
+  --radius-pill: 999px;
+}
+
+/* ─── Base ─── */
 body {
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Inter', 'Montserrat', system-ui, -apple-system, sans-serif;
   background-color: #0a0e1a;
   color: #f0f0f0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Montserrat', sans-serif;
-  letter-spacing: 0.05em;
+  font-family: 'Montserrat', 'Inter', sans-serif;
+  letter-spacing: 0.03em;
 }
 
+/* ─── Font Helpers ─── */
 .font-heading-art {
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Montserrat', 'Inter', sans-serif;
 }
 
 .font-nevara {
   font-family: 'Nevara', serif;
 }
 
-.glass {
-  backdrop-filter: blur(16px);
-  background-color: rgba(255, 255, 255, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+/* ─── Glass Card — the main card component ─── */
+.glass-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px) saturate(1.3);
+  -webkit-backdrop-filter: blur(20px) saturate(1.3);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
+.glass-card:hover {
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+/* ─── Glass (legacy compat, used by MetricCards) ─── */
+.glass {
+  backdrop-filter: blur(16px) saturate(1.2);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
+}
+
+/* ─── Form Inputs ─── */
+.form-input {
+  display: block;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: #e2e8f0;
+  background-color: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.75rem;
+  outline: none;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.form-input::placeholder {
+  color: rgba(148, 163, 184, 0.5);
+}
+
+.form-input:hover {
+  border-color: rgba(255, 255, 255, 0.18);
+  background-color: rgba(255, 255, 255, 0.06);
+}
+
+.form-input:focus {
+  border-color: rgba(99, 102, 241, 0.5);
+  background-color: rgba(255, 255, 255, 0.06);
+  box-shadow:
+    0 0 0 3px rgba(99, 102, 241, 0.15),
+    0 0 20px rgba(99, 102, 241, 0.08);
+}
+
+.form-select {
+  display: block;
+  width: 100%;
+  padding: 0.75rem 2.5rem 0.75rem 1rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: #e2e8f0;
+  background-color: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.75rem;
+  outline: none;
+  transition: all 0.2s ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1rem;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.form-select option {
+  background-color: #1a1f3a;
+  color: #e2e8f0;
+  padding: 0.5rem;
+}
+
+.form-select:hover {
+  border-color: rgba(255, 255, 255, 0.18);
+  background-color: rgba(255, 255, 255, 0.06);
+}
+
+.form-select:focus {
+  border-color: rgba(99, 102, 241, 0.5);
+  background-color: rgba(255, 255, 255, 0.06);
+  box-shadow:
+    0 0 0 3px rgba(99, 102, 241, 0.15),
+    0 0 20px rgba(99, 102, 241, 0.08);
+}
+
+.form-checkbox {
+  width: 1.125rem;
+  height: 1.125rem;
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0.375rem;
+  background-color: rgba(255, 255, 255, 0.04);
+  cursor: pointer;
+  accent-color: #6366f1;
+  transition: all 0.15s ease;
+}
+
+.form-checkbox:checked {
+  background-color: #6366f1;
+  border-color: #6366f1;
+}
+
+.form-checkbox:focus {
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+
+/* ─── Admin Shell ─── */
+.admin-shell {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle 900px at 16% 88%, rgba(178, 34, 52, 0.14) 0%, transparent 62%),
+    radial-gradient(circle 700px at 82% 12%, rgba(201, 168, 76, 0.08) 0%, transparent 60%),
+    radial-gradient(circle 1400px at 50% 50%, rgba(20, 28, 60, 0.3) 0%, transparent 72%),
+    var(--surface-0);
+}
+
+.admin-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  border-bottom: 1px solid rgba(238, 230, 216, 0.1);
+  background: rgba(8, 9, 16, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.admin-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-card);
+  backdrop-filter: blur(12px) saturate(1.2);
+  -webkit-backdrop-filter: blur(12px) saturate(1.2);
+}
+
+.admin-card.gold {
+  background: linear-gradient(135deg, rgba(201, 168, 76, 0.08) 0%, rgba(201, 168, 76, 0.02) 100%);
+  border-color: var(--gold-border);
+}
+
+.admin-pill {
+  border-radius: var(--radius-pill);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--surface-1);
+  color: #efe6d8;
+  transition: all 0.2s ease;
+}
+
+.admin-pill:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.admin-pill.active {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: var(--gold-border);
+  color: #fff;
+  box-shadow: 0 0 12px rgba(201, 168, 76, 0.15);
+}
+
+.admin-button {
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--surface-1);
+  color: #efe6d8;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.admin-button:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.admin-button.gold {
+  background: linear-gradient(135deg, rgba(201, 168, 76, 0.2) 0%, rgba(201, 168, 76, 0.05) 100%);
+  border-color: var(--gold-border);
+  color: #fff;
+}
+
+.admin-button.gold:hover {
+  background: linear-gradient(135deg, rgba(201, 168, 76, 0.3) 0%, rgba(201, 168, 76, 0.1) 100%);
+  box-shadow: 0 0 15px rgba(201, 168, 76, 0.2);
+}
+
+/* ─── Admin Table ─── */
+.admin-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.admin-table thead tr {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.admin-table th {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: rgba(238, 230, 216, 0.45);
+  white-space: nowrap;
+}
+
+.admin-table td {
+  padding: 0.75rem 1rem;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.8);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  white-space: nowrap;
+}
+
+.admin-table tbody tr {
+  transition: background-color 0.15s ease;
+}
+
+.admin-table tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+/* ─── Admin Search Input ─── */
+.admin-search {
+  padding: 0.625rem 1rem 0.625rem 2.5rem;
+  font-size: 0.8rem;
+  color: #efe6d8;
+  background: var(--surface-1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  outline: none;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  width: 100%;
+}
+
+.admin-search::placeholder {
+  color: rgba(238, 230, 216, 0.3);
+}
+
+.admin-search:focus {
+  border-color: var(--gold-border);
+  box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.1);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* ─── Admin Filter Select ─── */
+.admin-filter {
+  padding: 0.5rem 2rem 0.5rem 0.75rem;
+  font-size: 0.75rem;
+  color: #efe6d8;
+  background: var(--surface-1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  outline: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23efe6d8' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.5rem center;
+  background-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.admin-filter option {
+  background-color: #1a1f3a;
+  color: #efe6d8;
+}
+
+.admin-filter:focus {
+  border-color: var(--gold-border);
+  box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.1);
+}
+
+/* ─── Status Badges ─── */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.status-badge.pending {
+  background: rgba(251, 191, 36, 0.12);
+  color: #fbbf24;
+  border: 1px solid rgba(251, 191, 36, 0.2);
+}
+
+.status-badge.approved {
+  background: rgba(52, 211, 153, 0.12);
+  color: #34d399;
+  border: 1px solid rgba(52, 211, 153, 0.2);
+}
+
+.status-badge.rejected {
+  background: rgba(251, 113, 133, 0.12);
+  color: #fb7185;
+  border: 1px solid rgba(251, 113, 133, 0.2);
+}
+
+/* ─── Action Buttons (admin tables) ─── */
+.action-btn {
+  padding: 0.3rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.action-btn.approve {
+  background: rgba(52, 211, 153, 0.12);
+  color: #34d399;
+  border-color: rgba(52, 211, 153, 0.25);
+}
+
+.action-btn.approve:hover {
+  background: rgba(52, 211, 153, 0.2);
+  box-shadow: 0 0 12px rgba(52, 211, 153, 0.15);
+}
+
+.action-btn.reject {
+  background: rgba(251, 113, 133, 0.12);
+  color: #fb7185;
+  border-color: rgba(251, 113, 133, 0.25);
+}
+
+.action-btn.reject:hover {
+  background: rgba(251, 113, 133, 0.2);
+  box-shadow: 0 0 12px rgba(251, 113, 133, 0.15);
+}
+
+.action-btn.resend {
+  background: rgba(96, 165, 250, 0.12);
+  color: #60a5fa;
+  border-color: rgba(96, 165, 250, 0.25);
+}
+
+.action-btn.resend:hover {
+  background: rgba(96, 165, 250, 0.2);
+  box-shadow: 0 0 12px rgba(96, 165, 250, 0.15);
+}
+
+/* ─── Gradients ─── */
 .gradient-primary {
   background: linear-gradient(to right, #3b82f6, #8b5cf6);
 }
@@ -64,6 +440,7 @@ h1, h2, h3, h4, h5, h6 {
   color: transparent;
 }
 
+/* ─── Glow Effects ─── */
 .glow {
   box-shadow: 0 0 15px rgba(96, 165, 250, 0.5);
 }
@@ -76,17 +453,18 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: 0 0 15px rgba(239, 68, 68, 0.5);
 }
 
+/* ─── Marquee Animations ─── */
 @keyframes marquee {
   0% { transform: translateX(0); }
-  100% { transform: translateX(-100%); }
+  100% { transform: translateX(-50%); }
 }
 
 .animate-marquee {
-  animation: marquee 200s linear infinite;
+  animation: marquee 90s linear infinite;
 }
 
 .animate-marquee2 {
-  animation: marquee 200s linear infinite reverse;
+  animation: marquee 55s linear infinite reverse;
 }
 
 .marquee-container:hover .animate-marquee,
@@ -94,6 +472,7 @@ h1, h2, h3, h4, h5, h6 {
   animation-play-state: paused;
 }
 
+/* ─── Pulse ─── */
 @keyframes pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.5; }
@@ -101,4 +480,29 @@ h1, h2, h3, h4, h5, h6 {
 
 .pulse {
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* ─── Selection ─── */
+::selection {
+  background: rgba(99, 102, 241, 0.3);
+  color: #fff;
 }

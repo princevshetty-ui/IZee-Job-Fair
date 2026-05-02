@@ -8,8 +8,8 @@ const CollegeInfoStep = ({ formData, setFormData, errors }) => {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold mb-6">College Information</h2>
-      <p className="text-gray-400 mb-6">Please provide your college details</p>
+      <h2 className="text-2xl font-light text-white mb-2 font-heading-art tracking-tight">College Information</h2>
+      <p className="text-slate-400 text-sm mb-8">Please provide your college and institutional details</p>
 
       <FormField
         label="College Name"
@@ -17,6 +17,7 @@ const CollegeInfoStep = ({ formData, setFormData, errors }) => {
         value={formData.college_name}
         onChange={handleChange}
         error={errors.college_name}
+        placeholder="Enter your college name"
         required
       />
       <FormField
@@ -24,6 +25,7 @@ const CollegeInfoStep = ({ formData, setFormData, errors }) => {
         name="principal_name"
         value={formData.principal_name}
         onChange={handleChange}
+        placeholder="Enter principal name (optional)"
       />
       <FormField
         label="Principal Email"
@@ -31,18 +33,21 @@ const CollegeInfoStep = ({ formData, setFormData, errors }) => {
         type="email"
         value={formData.principal_email}
         onChange={handleChange}
+        placeholder="Enter principal email (optional)"
       />
       <FormField
         label="Coordinator Name"
         name="coordinator_name"
         value={formData.coordinator_name}
         onChange={handleChange}
+        placeholder="Enter coordinator name (optional)"
       />
       <FormField
         label="Coordinator Phone"
         name="coordinator_phone"
         value={formData.coordinator_phone}
         onChange={handleChange}
+        placeholder="Enter coordinator phone (optional)"
       />
       <FormField
         label="Coordinator Email"
@@ -50,6 +55,7 @@ const CollegeInfoStep = ({ formData, setFormData, errors }) => {
         type="email"
         value={formData.coordinator_email}
         onChange={handleChange}
+        placeholder="Enter coordinator email (optional)"
       />
     </div>
   )

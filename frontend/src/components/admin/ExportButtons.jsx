@@ -20,18 +20,21 @@ const ExportButtons = () => {
   return (
     <div className="flex flex-wrap gap-3">
       <button 
+        type="button"
         onClick={() => downloadFile('/api/admin/export/all', 'registrations.csv')}
         className="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg hover:opacity-90"
       >
         Export All
       </button>
       <button 
+        type="button"
         onClick={() => downloadFile('/api/admin/export/attended', 'attended.csv')}
         className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-lg hover:opacity-90"
       >
         Export Attended
       </button>
       <button 
+        type="button"
         onClick={() => setShowResendConfirm(true)}
         className="px-4 py-2 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-lg hover:opacity-90"
       >

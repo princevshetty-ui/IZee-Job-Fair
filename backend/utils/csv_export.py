@@ -1,85 +1,100 @@
 import csv
+import zipfile
 from typing import List, Dict
-from io import StringIO
+from io import StringIO, BytesIO
 
-def export_attendees_csv(attendees: List[Dict], export_type: str = "all"):
-    """
-    Generate CSV for attendees export
-    
-    Args:
-        attendees (list): List of attendee dictionaries
-        export_type (str): Type of export ("all" or "attended")
-        
-    Returns:
-        str: CSV content as string
-    """
-    # Define CSV headers
-    headers = [
-        "SID",
-        "Full Name",
-        "Email",
-        "Phone",
-        "College Name",
-        "Academic Level",
-        "Stream",
-        "Attendee Type",
-        "Registration Type",
-        "Status",
-        "Attended",
-        "Attended At",
-        "Created At"
-    ]
-    
-    # Create CSV content in memory
+
+HEADERS = [
+    "SID", "Full Name", "Email", "Phone", "College Name",
+    "Academic Level", "Stream", "Attendee Type", "MBA Specialization",
+    "Company Name", "Designation", "Experience Years",
+    "Registration Type", "Status", "Attended", "Attended At", "Created At"
+]
+
+
+def _row(attendee: Dict) -> Dict:
+    """Map an attendee record to a CSV row dict."""
+    return {
+        "SID": attendee.get("sid", ""),
+        "Full Name": attendee.get("full_name", ""),
+        "Email": attendee.get("email", ""),
+        "Phone": attendee.get("phone", ""),
+        "College Name": attendee.get("college_name", ""),
+        "Academic Level": attendee.get("academic_level", ""),
+        "Stream": attendee.get("stream", ""),
+        "Attendee Type": attendee.get("attendee_type", ""),
+        "MBA Specialization": attendee.get("mba_specialization", ""),
+        "Company Name": attendee.get("company_name", ""),
+        "Designation": attendee.get("designation", ""),
+        "Experience Years": attendee.get("experience_years", ""),
+        "Registration Type": attendee.get("reg_type", ""),
+        "Status": attendee.get("status", ""),
+        "Attended": "Yes" if attendee.get("attended") else "No",
+        "Attended At": attendee.get("attended_at", "") or "",
+        "Created At": attendee.get("created_at", "") or ""
+    }
+
+
+def _write_csv(attendees: List[Dict]) -> str:
+    """Write a list of attendees to CSV string."""
     output = StringIO()
-    writer = csv.DictWriter(output, fieldnames=headers)
+    writer = csv.DictWriter(output, fieldnames=HEADERS)
     writer.writeheader()
-    
-    # Write attendee data
-    for attendee in attendees:
-        row = {
-            "SID": attendee.get("sid", ""),
-            "Full Name": attendee.get("full_name", ""),
-            "Email": attendee.get("email", ""),
-            "Phone": attendee.get("phone", ""),
-            "College Name": attendee.get("college_name", ""),
-            "Academic Level": attendee.get("academic_level", ""),
-            "Stream": attendee.get("stream", ""),
-            "Attendee Type": attendee.get("attendee_type", ""),
-            "Registration Type": attendee.get("reg_type", ""),
-            "Status": attendee.get("status", ""),
-            "Attended": attendee.get("attended", False),
-            "Attended At": attendee.get("attended_at", ""),
-            "Created At": attendee.get("created_at", "")
-        }
-            
-        writer.writerow(row)
-    
-    # Get the CSV content
-    csv_content = output.getvalue()
+    for a in attendees:
+        writer.writerow(_row(a))
+    result = output.getvalue()
     output.close()
-    
-    return csv_content
+    return result
+
+
+def export_attendees_csv(attendees: List[Dict], export_type: str = "all") -> str:
+    """
+    Simple flat CSV export (legacy — used by /export/all and /export/attended).
+    """
+    return _write_csv(attendees)
+
+
+def export_pre_register_zip(attendees: List[Dict]) -> bytes:
+    """
+    Export pre-registered attendees as a ZIP containing separate CSVs:
+      - Students.csv       (attendee_type == 'student')
+      - Professionals.csv  (attendee_type == 'professional')
+      - Freshers.csv       (attendee_type == 'fresher')
+      - All_Pre_Registered.csv (everything)
+
+    Returns bytes (ZIP file content).
+    """
+    students = [a for a in attendees if (a.get("attendee_type") or "").lower() == "student"]
+    professionals = [a for a in attendees if (a.get("attendee_type") or "").lower() == "professional"]
+    freshers = [a for a in attendees if (a.get("attendee_type") or "").lower() == "fresher"]
+
+    buf = BytesIO()
+    with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as zf:
+        zf.writestr("All_Pre_Registered.csv", _write_csv(attendees))
+        if students:
+            zf.writestr("Students.csv", _write_csv(students))
+        if professionals:
+            zf.writestr("Professionals.csv", _write_csv(professionals))
+        if freshers:
+            zf.writestr("Freshers.csv", _write_csv(freshers))
+
+    return buf.getvalue()
+
+
+def export_onspot_csv(attendees: List[Dict]) -> str:
+    """
+    Export on-spot registrations as a single CSV.
+    """
+    return _write_csv(attendees)
+
 
 if __name__ == "__main__":
-    # Test the function
-    test_attendees = [
-        {
-            "sid": "UGR12345",
-            "full_name": "John Doe",
-            "email": "john@example.com",
-            "phone": "1234567890",
-            "college_name": "Test College",
-            "academic_level": "UG",
-            "stream": "BCA",
-            "attendee_type": "student",
-            "reg_type": "pre",
-            "status": "approved",
-            "attended": False,
-            "created_at": "2026-05-01T10:00:00Z"
-        }
+    test = [
+        {"sid": "UGR12345", "full_name": "Alice", "attendee_type": "student", "reg_type": "pre", "status": "approved"},
+        {"sid": "PRO54321", "full_name": "Bob", "attendee_type": "professional", "reg_type": "pre", "status": "approved"},
+        {"sid": "UGR99999", "full_name": "Charlie", "attendee_type": "fresher", "reg_type": "pre", "status": "approved"},
     ]
-    
-    csv_result = export_attendees_csv(test_attendees)
-    print("CSV export test successful")
-    print(f"Generated CSV length: {len(csv_result)} characters")
+    z = export_pre_register_zip(test)
+    print(f"ZIP size: {len(z)} bytes")
+    print(f"CSV export: {len(export_onspot_csv(test))} chars")
+    print("All exports OK")

@@ -1,65 +1,42 @@
 const AttendanceTable = ({ attendances }) => {
-  const formatISTTime = (dateString) => {
-    const date = new Date(dateString);
-    const options = {
-      timeZone: 'Asia/Kolkata',
-      year: 'numeric',
-      month: 'short',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: true
-    };
-    return new Intl.DateTimeFormat('en-IN', options).format(date);
-  };
+  const fmt = (dateString) => {
+    if (!dateString) return '—'
+    return new Intl.DateTimeFormat('en-IN', {
+      timeZone: 'Asia/Kolkata', year: 'numeric', month: 'short', day: '2-digit',
+      hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true
+    }).format(new Date(dateString))
+  }
 
   return (
     <div>
-      <div className="overflow-x-auto">
-        <table className="min-w-full bg-gray-800 rounded-lg overflow-hidden">
+      <div className="overflow-x-auto rounded-xl">
+        <table className="admin-table">
           <thead>
-            <tr className="bg-gray-700">
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-300 uppercase tracking-wider">Name</th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-300 uppercase tracking-wider">Phone</th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-300 uppercase tracking-wider">SID</th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-300 uppercase tracking-wider">Level</th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-300 uppercase tracking-wider">Stream</th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-300 uppercase tracking-wider">Validated At (IST)</th>
-            </tr>
+            <tr><th>Name</th><th>Phone</th><th>SID</th><th>Level</th><th>Stream</th><th>Validated At (IST)</th></tr>
           </thead>
-          <tbody className="divide-y divide-gray-700">
+          <tbody>
             {!attendances || attendances.length === 0 ? (
-              <tr>
-                <td className="px-4 py-8 text-center text-gray-500" colSpan={6}>
-                  No attendance records found
-                </td>
+              <tr><td colSpan={6} className="text-center py-8" style={{ color: 'rgba(238,230,216,0.3)' }}>No attendance records found</td></tr>
+            ) : attendances.map((r, i) => (
+              <tr key={r.id || i}>
+                <td className="font-medium text-white">{r.full_name || '—'}</td>
+                <td>{r.phone || '—'}</td>
+                <td className="font-mono text-xs">{r.sid || '—'}</td>
+                <td>{r.academic_level || '—'}</td>
+                <td>{r.stream || '—'}</td>
+                <td className="text-xs">{fmt(r.attended_at)}</td>
               </tr>
-            ) : (
-              attendances.map((record, index) => (
-                <tr key={record.id || index} className="hover:bg-gray-700 transition-colors">
-                  <td className="px-4 py-3 text-white font-medium">{record.full_name || '-'}</td>
-                  <td className="px-4 py-3 text-gray-300">{record.phone || '-'}</td>
-                  <td className="px-4 py-3 text-gray-300 font-mono text-sm">{record.sid || '-'}</td>
-                  <td className="px-4 py-3 text-gray-300">{record.academic_level || '-'}</td>
-                  <td className="px-4 py-3 text-gray-300">{record.stream || '-'}</td>
-                  <td className="px-4 py-3 text-gray-300 text-sm">
-                    {record.attended_at ? formatISTTime(record.attended_at) : '-'}
-                  </td>
-                </tr>
-              ))
-            )}
+            ))}
           </tbody>
         </table>
       </div>
-
       {attendances && attendances.length > 0 && (
-        <div className="mt-4 text-sm text-gray-400">
-          Showing {attendances.length} attendance record{attendances.length !== 1 ? 's' : ''}
+        <div className="mt-4 text-xs" style={{ color: 'rgba(238,230,216,0.35)' }}>
+          Showing {attendances.length} record{attendances.length !== 1 ? 's' : ''}
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default AttendanceTable;
+export default AttendanceTable

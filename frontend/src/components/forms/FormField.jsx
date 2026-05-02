@@ -1,26 +1,26 @@
-const FormField = ({ 
-  label, 
-  name, 
-  type = "text", 
-  value, 
-  onChange, 
-  error, 
+const FormField = ({
+  label,
+  name,
+  type = "text",
+  value,
+  onChange,
+  error,
   required = false,
   placeholder,
   options = [],
-  ...props 
+  ...props
 }) => {
   return (
     <div className="mb-4">
-      <label className="block text-gray-300 text-sm font-bold mb-2">
-        {label} {required && <span className="text-red-500">*</span>}
+      <label className="block text-slate-300 text-sm font-medium mb-2 tracking-wide">
+        {label} {required && <span className="text-cyan-400">*</span>}
       </label>
       {type === "select" ? (
         <select
           name={name}
           value={value || ""}
           onChange={onChange}
-          className="w-full glass text-white px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="form-select"
           {...props}
         >
           <option value="">Select {label.toLowerCase()}</option>
@@ -30,6 +30,22 @@ const FormField = ({
             </option>
           ))}
         </select>
+      ) : type === "checkbox" ? (
+        <div className="flex items-start gap-3">
+          <input
+            type="checkbox"
+            name={name}
+            checked={!!value}
+            onChange={onChange}
+            className="form-checkbox mt-0.5"
+            {...props}
+          />
+          {label && (
+            <label className="text-slate-300 text-sm leading-relaxed cursor-pointer select-none">
+              {label}
+            </label>
+          )}
+        </div>
       ) : (
         <input
           type={type}
@@ -37,11 +53,11 @@ const FormField = ({
           value={value || ""}
           onChange={onChange}
           placeholder={placeholder}
-          className="w-full glass text-white px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="form-input"
           {...props}
         />
       )}
-      {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+      {error && <p className="text-red-400 text-xs mt-1.5">{error}</p>}
     </div>
   )
 }

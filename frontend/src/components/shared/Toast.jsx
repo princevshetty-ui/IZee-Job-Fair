@@ -6,6 +6,7 @@ const normalizeMessage = (value) => {
   try {
     return JSON.stringify(value)
   } catch (error) {
+    console.error(error)
     return 'Something went wrong'
   }
 }

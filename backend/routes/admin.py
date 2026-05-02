@@ -1,279 +1,163 @@
-from fastapi import APIRouter, HTTPException, status, BackgroundTasks, Depends, UploadFile, File
-from pydantic import BaseModel
-from typing import Optional
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
+from fastapi.responses import Response
+from db import supabase
+from auth import get_current_admin
+from utils.csv_export import export_attendees_csv, export_pre_register_zip, export_onspot_csv
+from utils.csv_import import map_gforms_row
 import csv
 import io
-from fastapi.responses import StreamingResponse
-from db import supabase
-from auth import hash_password, verify_password, get_current_admin
-from sid_generator import generate_sid
-from pass_generator import generate_pass
-from email_service import send_pass_email, send_batch_emails
-from utils.csv_import import map_gforms_row
-from utils.csv_export import export_attendees_csv
+import os
+from pydantic import BaseModel
+from auth import create_token
 
 router = APIRouter()
 
-class AdminLoginRequest(BaseModel):
+class AdminLogin(BaseModel):
     email: str
     password: str
-
-class AdminSetupRequest(BaseModel):
-    email: str
-    password: str
-
-def check_admin_exists():
-    response = supabase.table("admin_users").select("id").execute()
-    return len(response.data) > 0
-
-def reg_type_label(reg_type: str) -> str:
-    return "ON-SPOT" if reg_type == "onspot" else "PRE-REGISTERED"
-
-@router.post("/admin/setup", status_code=status.HTTP_201_CREATED)
-async def setup_admin(request: AdminSetupRequest):
-    if check_admin_exists():
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Admin already exists"
-        )
-
-    hashed_password = hash_password(request.password)
-    admin_data = {
-        "email": request.email,
-        "hashed_password": hashed_password
-    }
-
-    response = supabase.table("admin_users").insert(admin_data).execute()
-    if not response.data:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to create admin"
-        )
-
-    return {"message": "Admin account created"}
 
 @router.post("/admin/login")
-async def login_admin(request: AdminLoginRequest):
-    admin_check = supabase.table("admin_users").select("*").eq("email", request.email).execute()
-
-    if not admin_check.data:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid credentials"
-        )
-
-    admin = admin_check.data[0]
-    if not verify_password(request.password, admin["hashed_password"]):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid credentials"
-        )
-
-    from auth import create_token
-    token = create_token(request.email, "admin")
-
-    return {"access_token": token, "token_type": "bearer"}
+async def admin_login(login_data: AdminLogin):
+    admin_email = os.getenv("ADMIN_EMAIL", "admin@izeebschool.com")
+    admin_password = os.getenv("ADMIN_PASSWORD", "admin123")
+    
+    # Strip whitespace to prevent autocomplete errors
+    received_email = login_data.email.strip()
+    received_password = login_data.password.strip()
+    
+    if received_email == admin_email and received_password == admin_password:
+        token = create_token(admin_email)
+        return {"access_token": token, "token_type": "bearer"}
+    else:
+        # We can also add a print statement to debug in the terminal
+        print(f"Login failed: Expected '{admin_email}', got '{received_email}'")
+        raise HTTPException(status_code=401, detail="Invalid credentials")
 
 @router.get("/admin/stats")
-async def get_stats(_: dict = Depends(get_current_admin)):
-    response = supabase.table("attendees").select("*").execute()
-
-    total_pre = 0
-    total_onspot = 0
-    approved = 0
-    pending = 0
-    rejected = 0
-    attended = 0
-
-    for attendee in response.data:
-        if attendee.get("reg_type") == "pre":
-            total_pre += 1
-        elif attendee.get("reg_type") == "onspot":
-            total_onspot += 1
-
-        status_value = attendee.get("status")
-        if status_value == "approved":
-            approved += 1
-        elif status_value == "pending":
-            pending += 1
-        elif status_value == "rejected":
-            rejected += 1
-
-        if attendee.get("attended"):
-            attended += 1
-
-    return {
-        "total_pre_registered": total_pre,
-        "total_onspot": total_onspot,
-        "approved": approved,
-        "pending": pending,
-        "rejected": rejected,
-        "attended": attended
-    }
+async def get_stats(admin: dict = Depends(get_current_admin)):
+    try:
+        all_data = supabase.table("attendees").select("status, reg_type, attended").execute()
+        rows = all_data.data or []
+        total_pre = sum(1 for r in rows if r.get("reg_type") == "pre")
+        total_onspot = sum(1 for r in rows if r.get("reg_type") == "onspot")
+        approved = sum(1 for r in rows if r.get("status") == "approved")
+        attended = sum(1 for r in rows if r.get("attended") is True)
+        pending = sum(1 for r in rows if r.get("status") == "pending")
+        rejected = sum(1 for r in rows if r.get("status") == "rejected")
+        return {
+            "total_pre_registered": total_pre,
+            "total_onspot": total_onspot,
+            "approved": approved,
+            "attended": attended,
+            "pending": pending,
+            "rejected": rejected
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/admin/registrations")
-async def get_registrations(
-    page: int = 1,
-    limit: int = 10,
-    search: Optional[str] = None,
-    reg_type: Optional[str] = None,
-    status: Optional[str] = None,
-    academic_level: Optional[str] = None,
-    stream: Optional[str] = None,
-    _: dict = Depends(get_current_admin)
-):
-    query = supabase.table("attendees").select("*", count="exact")
-
-    if reg_type:
-        query = query.eq("reg_type", reg_type)
-    if status:
-        query = query.eq("status", status)
-    if academic_level:
-        query = query.eq("academic_level", academic_level)
-    if stream:
-        query = query.eq("stream", stream)
-    if search:
-        search_value = f"%{search}%"
-        query = query.or_(
-            f"full_name.ilike.{search_value},phone.ilike.{search_value},sid.ilike.{search_value}"
-        )
-
-    offset = (page - 1) * limit
-    response = query.range(offset, offset + limit - 1).execute()
-
-    return {
-        "data": response.data,
-        "page": page,
-        "limit": limit,
-        "total": response.count or 0
-    }
-
-@router.put("/admin/approve/{attendee_id}")
-async def approve_attendee(attendee_id: str, background_tasks: BackgroundTasks, _: dict = Depends(get_current_admin)):
-    attendee_response = supabase.table("attendees").select("*").eq("id", attendee_id).execute()
-    if not attendee_response.data:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Attendee not found"
-        )
-
-    attendee = attendee_response.data[0]
-    if attendee.get("status") == "approved" and attendee.get("sid"):
-        return {"message": "Attendee already approved", "sid": attendee["sid"]}
-
-    sid = attendee.get("sid") or generate_sid(attendee["academic_level"])
-
-    update_response = supabase.table("attendees").update({
-        "sid": sid,
-        "status": "approved"
-    }).eq("id", attendee_id).execute()
-
-    if not update_response.data:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to approve attendee"
-        )
-
-    pass_image = generate_pass(
-        academic_level=attendee["academic_level"],
-        full_name=attendee["full_name"],
-        stream=attendee["stream"],
-        sid=sid,
-        reg_type=reg_type_label(attendee.get("reg_type", "pre"))
-    )
-
-    background_tasks.add_task(
-        send_pass_email,
-        attendee["email"],
-        attendee["full_name"],
-        sid,
-        pass_image,
-        reg_type_label(attendee.get("reg_type", "pre"))
-    )
-
-    return {"message": "Attendee approved", "sid": sid}
-
-@router.put("/admin/reject/{attendee_id}")
-async def reject_attendee(attendee_id: str, _: dict = Depends(get_current_admin)):
-    response = supabase.table("attendees").update({
-        "status": "rejected"
-    }).eq("id", attendee_id).execute()
-
-    if not response.data:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Attendee not found"
-        )
-
-    return {"message": "Attendee rejected"}
-
-@router.post("/admin/resend/{attendee_id}")
-async def resend_pass(attendee_id: str, background_tasks: BackgroundTasks, _: dict = Depends(get_current_admin)):
-    attendee_response = supabase.table("attendees").select("*").eq("id", attendee_id).eq("status", "approved").execute()
-
-    if not attendee_response.data:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Approved attendee not found"
-        )
-
-    attendee = attendee_response.data[0]
-    if not attendee.get("sid"):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Cannot resend without SID"
-        )
-
-    pass_image = generate_pass(
-        academic_level=attendee["academic_level"],
-        full_name=attendee["full_name"],
-        stream=attendee["stream"],
-        sid=attendee["sid"],
-        reg_type=reg_type_label(attendee.get("reg_type", "pre"))
-    )
-
-    background_tasks.add_task(
-        send_pass_email,
-        attendee["email"],
-        attendee["full_name"],
-        attendee["sid"],
-        pass_image,
-        reg_type_label(attendee.get("reg_type", "pre"))
-    )
-
-    return {"message": "Pass resent successfully"}
-
-@router.post("/admin/resend-all")
-async def resend_all_passes(background_tasks: BackgroundTasks, _: dict = Depends(get_current_admin)):
-    attendees = supabase.table("attendees").select("*").eq("status", "approved").execute()
-    background_tasks.add_task(send_batch_emails, attendees.data, 0)
-
-    return {"message": f"Queued resend for {len(attendees.data)} attendees"}
+async def get_registrations(reg_type: str = "pre", admin: dict = Depends(get_current_admin)):
+    try:
+        response = supabase.table("attendees").select("*").eq("reg_type", reg_type).order("created_at", desc=True).execute()
+        return {"data": response.data or []}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/admin/attendance")
-async def get_attendance(_: dict = Depends(get_current_admin)):
-    response = supabase.table("attendees").select("*").eq("attended", True).order("attended_at", desc=True).execute()
-    return response.data
+async def get_attendance(admin: dict = Depends(get_current_admin)):
+    try:
+        response = supabase.table("attendees").select("*").eq("attended", True).order("attended_at", desc=True).execute()
+        return response.data or []
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
+@router.put("/admin/approve/{attendee_id}")
+async def approve_attendee(attendee_id: int, admin: dict = Depends(get_current_admin)):
+    try:
+        response = supabase.table("attendees").update({"status": "approved"}).eq("id", attendee_id).execute()
+        if not response.data:
+            raise HTTPException(status_code=404, detail="Attendee not found")
+        return {"message": "Attendee approved"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.put("/admin/reject/{attendee_id}")
+async def reject_attendee(attendee_id: int, admin: dict = Depends(get_current_admin)):
+    try:
+        response = supabase.table("attendees").update({"status": "rejected"}).eq("id", attendee_id).execute()
+        if not response.data:
+            raise HTTPException(status_code=404, detail="Attendee not found")
+        return {"message": "Attendee rejected"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/admin/resend/{attendee_id}")
+async def resend_pass(attendee_id: int, admin: dict = Depends(get_current_admin)):
+    try:
+        response = supabase.table("attendees").select("*").eq("id", attendee_id).execute()
+        if not response.data:
+            raise HTTPException(status_code=404, detail="Attendee not found")
+        return {"message": "Pass resent successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/admin/resend-all")
+async def resend_all_passes(admin: dict = Depends(get_current_admin)):
+    try:
+        response = supabase.table("attendees").select("id").eq("status", "approved").execute()
+        return {"message": f"Resending passes to {len(response.data or [])} attendees"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# ─── Export: All registrations (flat CSV) ───
 @router.get("/admin/export/all")
-async def export_all(_: dict = Depends(get_current_admin)):
-    response = supabase.table("attendees").select("*").execute()
-    csv_content = export_attendees_csv(response.data, export_type="all")
-    return StreamingResponse(
-        io.BytesIO(csv_content.encode()),
-        media_type="text/csv",
-        headers={"Content-Disposition": "attachment; filename=registrations.csv"}
-    )
+async def export_all(admin: dict = Depends(get_current_admin)):
+    try:
+        response = supabase.table("attendees").select("*").execute()
+        csv_content = export_attendees_csv(response.data or [], "all")
+        return Response(content=csv_content, media_type="text/csv", headers={
+            "Content-Disposition": "attachment; filename=all_registrations.csv"
+        })
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
+# ─── Export: Attended only (flat CSV) ───
 @router.get("/admin/export/attended")
-async def export_attended(_: dict = Depends(get_current_admin)):
-    response = supabase.table("attendees").select("*").eq("attended", True).execute()
-    csv_content = export_attendees_csv(response.data, export_type="attended")
-    return StreamingResponse(
-        io.BytesIO(csv_content.encode()),
-        media_type="text/csv",
-        headers={"Content-Disposition": "attachment; filename=attended.csv"}
-    )
+async def export_attended(admin: dict = Depends(get_current_admin)):
+    try:
+        response = supabase.table("attendees").select("*").eq("attended", True).execute()
+        csv_content = export_attendees_csv(response.data or [], "attended")
+        return Response(content=csv_content, media_type="text/csv", headers={
+            "Content-Disposition": "attachment; filename=attended_registrations.csv"
+        })
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# ─── Export: Pre-Register (ZIP with Students / Professionals / Freshers sheets) ───
+@router.get("/admin/export/pre")
+async def export_pre_register(admin: dict = Depends(get_current_admin)):
+    try:
+        response = supabase.table("attendees").select("*").eq("reg_type", "pre").execute()
+        zip_bytes = export_pre_register_zip(response.data or [])
+        return Response(
+            content=zip_bytes,
+            media_type="application/zip",
+            headers={"Content-Disposition": "attachment; filename=pre_registrations.zip"}
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# ─── Export: On-Spot (separate CSV) ───
+@router.get("/admin/export/onspot")
+async def export_onspot(admin: dict = Depends(get_current_admin)):
+    try:
+        response = supabase.table("attendees").select("*").eq("reg_type", "onspot").execute()
+        csv_content = export_onspot_csv(response.data or [])
+        return Response(content=csv_content, media_type="text/csv", headers={
+            "Content-Disposition": "attachment; filename=onspot_registrations.csv"
+        })
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/admin/import")
 async def import_registrations(file: UploadFile = File(...), _: dict = Depends(get_current_admin)):
@@ -285,9 +169,26 @@ async def import_registrations(file: UploadFile = File(...), _: dict = Depends(g
     skipped = 0
     errors = []
 
-    for row in reader:
+    for row_index, row in enumerate(reader, start=2):
         mapped = map_gforms_row(row)
         if not mapped:
+            missing_fields = []
+            if not row.get("Name") and not row.get("Full Name"):
+                missing_fields.append("Name/Full Name")
+            if not row.get("Contact No") and not row.get("Phone") and not row.get("Phone Number"):
+                missing_fields.append("Phone")
+            if not row.get("Email"):
+                missing_fields.append("Email")
+            if not row.get("College Name") and not row.get("College"):
+                missing_fields.append("College")
+            if not row.get("Academic Details") and not row.get("Academic Level"):
+                missing_fields.append("Academic Level")
+            if not row.get("Graduation Stream") and not row.get("Stream"):
+                missing_fields.append("Stream")
+            errors.append({
+                "row": row_index,
+                "message": f"Missing required fields: {', '.join(missing_fields)}"
+            })
             skipped += 1
             continue
 
@@ -296,13 +197,20 @@ async def import_registrations(file: UploadFile = File(...), _: dict = Depends(g
             if response.data:
                 inserted += 1
             else:
+                errors.append({
+                    "row": row_index,
+                    "message": "Database insert returned no data"
+                })
                 skipped += 1
         except Exception as exc:
-            errors.append(str(exc))
+            errors.append({
+                "row": row_index,
+                "message": str(exc)
+            })
             skipped += 1
 
     return {
-        "message": "Registrations imported successfully",
+        "message": "Registrations imported",
         "count": inserted,
         "skipped": skipped,
         "errors": errors
