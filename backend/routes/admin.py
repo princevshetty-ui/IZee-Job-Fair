@@ -115,7 +115,7 @@ async def approve_attendee(attendee_id: str, background_tasks: BackgroundTasks, 
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.put("/admin/reject/{attendee_id}")
-async def reject_attendee(attendee_id: int, admin: dict = Depends(get_current_admin)):
+async def reject_attendee(attendee_id: str, admin: dict = Depends(get_current_admin)):
     try:
         response = supabase.table("attendees").update({"status": "rejected"}).eq("id", attendee_id).execute()
         if not response.data:
@@ -125,7 +125,7 @@ async def reject_attendee(attendee_id: int, admin: dict = Depends(get_current_ad
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/admin/resend/{attendee_id}")
-async def resend_pass(attendee_id: int, admin: dict = Depends(get_current_admin)):
+async def resend_pass(attendee_id: str, admin: dict = Depends(get_current_admin)):
     try:
         response = supabase.table("attendees").select("*").eq("id", attendee_id).execute()
         if not response.data:
