@@ -12,7 +12,7 @@ load_dotenv()
 # Password hashing context
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-# JWT secret key from environment variables
+# Reads JWT_SECRET first, falls back to SUPABASE_JWT_SECRET for compatibility
 JWT_SECRET_KEY = os.getenv("JWT_SECRET") or os.getenv("SUPABASE_JWT_SECRET")
 
 # Create OAuth2 password bearer

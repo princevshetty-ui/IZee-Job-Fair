@@ -5,6 +5,7 @@ import FormField from '../components/forms/FormField'
 import Toast from '../components/shared/Toast'
 
 const VolunteerValidatePage = () => {
+  const API_URL = import.meta.env.VITE_API_URL || ''
   const [token, setToken] = useState(localStorage.getItem('volunteer_token'))
   const [rollNumber, setRollNumber] = useState('')
   const [email, setEmail] = useState('')
@@ -17,7 +18,7 @@ const VolunteerValidatePage = () => {
   const handleValidate = useCallback(async (sidValue) => {
     if (!sidValue) return
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/volunteer/validate`, {
+      const response = await fetch(`${API_URL}/api/volunteer/validate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -73,7 +74,7 @@ const VolunteerValidatePage = () => {
   const handleLogin = async (event) => {
     event.preventDefault()
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/volunteer/login`, {
+      const response = await fetch(`${API_URL}/api/volunteer/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ roll_number: rollNumber, email })

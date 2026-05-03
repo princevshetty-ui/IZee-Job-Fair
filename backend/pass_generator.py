@@ -3,6 +3,8 @@ from PIL import Image, ImageDraw, ImageFont
 import base64
 from io import BytesIO
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 # Academic level display mapping
 ACADEMIC_DISPLAY = {
     "UG": "UNDERGRADUATE",
@@ -27,7 +29,7 @@ ACADEMIC_BADGE_POSITION = (100, 150)
 REG_TYPE_BADGE_POSITION = (300, 150)
 QR_POSITION = (100, 350)
 
-def generate_pass(academic_level, full_name, stream, sid, reg_type, template_path="assets/templates/jobfair_template.png"):
+def generate_pass(academic_level, full_name, stream, sid, reg_type, template_path=None):
     """
     Generate a job fair pass image with the provided details.
     
@@ -43,6 +45,10 @@ def generate_pass(academic_level, full_name, stream, sid, reg_type, template_pat
         str: Base64 encoded JPEG image
     """
     try:
+        # Resolve template path relative to this file if not provided
+        if template_path is None:
+            template_path = os.path.join(BASE_DIR, "assets", "templates", "jobfair_template.png")
+
         # Load template
         if os.path.exists(template_path):
             template = Image.open(template_path).convert("RGBA")
@@ -61,11 +67,14 @@ def generate_pass(academic_level, full_name, stream, sid, reg_type, template_pat
         
         # Try to load a font, fallback to default if not found
         try:
-            # Try to use a nice font if available
-            font = ImageFont.truetype("arial.ttf", 20)
-            small_font = ImageFont.truetype("arial.ttf", 16)
-        except:
+            # Use bundled DejaVuSans fonts (available on all platforms)
+            bold_font_path = os.path.join(BASE_DIR, "assets", "fonts", "DejaVuSans-Bold.ttf")
+            regular_font_path = os.path.join(BASE_DIR, "assets", "fonts", "DejaVuSans.ttf")
+            font = ImageFont.truetype(bold_font_path, 20)
+            small_font = ImageFont.truetype(regular_font_path, 16)
+        except OSError as font_err:
             # Fallback to default font
+            print(f"Warning: could not load DejaVuSans fonts ({font_err}), using bitmap default")
             font = ImageFont.load_default()
             small_font = ImageFont.load_default()
         

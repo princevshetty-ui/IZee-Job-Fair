@@ -11,13 +11,16 @@ app = FastAPI(
 )
 
 # Add CORS middleware
+_origins = [
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "http://localhost:5175",
+    os.getenv("FRONTEND_URL", ""),
+    os.getenv("RAILWAY_FRONTEND_URL", ""),
+]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        os.getenv("FRONTEND_URL", ""),
-        os.getenv("RAILWAY_FRONTEND_URL", "")
-    ],
+    allow_origins=[url for url in _origins if url],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
