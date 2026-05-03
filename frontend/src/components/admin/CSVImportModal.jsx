@@ -12,10 +12,11 @@ const CSVImportModal = ({ show, onClose, onImportSuccess }) => {
     setLoading(true);
     setResult(null);
     try {
+      const API_URL = import.meta.env.VITE_API_URL || ''
       const formData = new FormData();
       formData.append('file', file);
 
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/import`, {
+      const response = await fetch(`${API_URL}/api/admin/import`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`

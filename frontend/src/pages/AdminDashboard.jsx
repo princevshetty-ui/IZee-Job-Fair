@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import { apiCall } from '../utils/api';
 import MetricCards from '../components/admin/MetricCards';
 import RegistrationsTable from '../components/admin/RegistrationsTable';
 import OnSpotTable from '../components/admin/OnSpotTable';
@@ -74,7 +75,8 @@ const AdminDashboard = () => {
   }, [token, isAuthenticated, navigate, fetchData])
 
   const downloadFile = async (endpoint, filename) => {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}${endpoint}`, {
+    const API_URL = import.meta.env.VITE_API_URL || ''
+    const response = await fetch(`${API_URL}${endpoint}`, {
       headers: { Authorization: `Bearer ${token}` }
     })
     const blob = await response.blob()
@@ -87,10 +89,7 @@ const AdminDashboard = () => {
   }
 
   const handleResendAll = async () => {
-    await fetch(`${import.meta.env.VITE_API_URL}/api/admin/resend-all`, {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${token}` }
-    })
+    await apiCall('/api/admin/resend-all', { method: 'POST' })
   }
 
   return (
@@ -212,21 +211,13 @@ const AdminDashboard = () => {
                       const endpoint = action === 'approve'
                         ? `/api/admin/approve/${id}`
                         : `/api/admin/reject/${id}`
-                      await fetch(`${import.meta.env.VITE_API_URL}${endpoint}`, {
-                        method: 'PUT',
-                        headers: { 'Authorization': `Bearer ${token}` }
-                      })
-                      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/registrations?reg_type=pre`, {
-                        headers: { 'Authorization': `Bearer ${token}` }
-                      })
+                      await apiCall(endpoint, { method: 'PUT' })
+                      const res = await apiCall('/api/admin/registrations?reg_type=pre')
                       const data = await res.json()
                       setRegistrations(data.data || [])
                     }}
                     onResend={async (id) => {
-                      await fetch(`${import.meta.env.VITE_API_URL}/api/admin/resend/${id}`, {
-                        method: 'POST',
-                        headers: { 'Authorization': `Bearer ${token}` }
-                      })
+                      await apiCall(`/api/admin/resend/${id}`, { method: 'POST' })
                     }}
                   />
                 </div>
@@ -237,10 +228,7 @@ const AdminDashboard = () => {
                   <OnSpotTable
                     registrations={onSpotRegistrations}
                     onResend={async (id) => {
-                      await fetch(`${import.meta.env.VITE_API_URL}/api/admin/resend/${id}`, {
-                        method: 'POST',
-                        headers: { 'Authorization': `Bearer ${token}` }
-                      });
+                      await apiCall(`/api/admin/resend/${id}`, { method: 'POST' });
                     }}
                   />
                 </div>

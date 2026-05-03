@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import ResendConfirmModal from './ResendConfirmModal';
+import { apiCall } from '../../utils/api';
 
 const ExportButtons = () => {
   const [showResendConfirm, setShowResendConfirm] = useState(false);
 
   const downloadFile = async (endpoint, filename) => {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}${endpoint}`, {
+    const API_URL = import.meta.env.VITE_API_URL || ''
+    const response = await fetch(`${API_URL}${endpoint}`, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     })
     const blob = await response.blob()
@@ -44,10 +46,7 @@ const ExportButtons = () => {
         show={showResendConfirm} 
         onClose={() => setShowResendConfirm(false)}
         onConfirm={async () => {
-          await fetch(`${import.meta.env.VITE_API_URL}/api/admin/resend-all`, {
-            method: 'POST',
-            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-          })
+          await apiCall('/api/admin/resend-all', { method: 'POST' })
           setShowResendConfirm(false)
         }}
       />
