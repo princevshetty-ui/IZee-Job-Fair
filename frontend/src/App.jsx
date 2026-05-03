@@ -10,22 +10,24 @@ import AdminLoginPage from './pages/AdminLoginPage'
 import AdminDashboard from './pages/AdminDashboard'
 import NotFoundPage from './pages/NotFoundPage'
 import OnSpotRegisterPage from './pages/OnSpotRegisterPage'
+import ScanPage from './pages/ScanPage'
 
 function App() {
   return (
-    <div className="bg-[#0a0e1a] min-h-screen">
+    <div className="bg-[#0A0A0F] min-h-screen">
       <GlobalBackground />
       <Router>
         <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/register/confirmation" element={<ConfirmationPage />} />
-        <Route path="/volunteer/register" element={<VolunteerRegisterPage />} />
-        <Route path="/volunteer/validate" element={<VolunteerValidatePage />} />
-        <Route path="/onspot" element={<OnSpotRegisterPage />} />
-        <Route path="/admin" element={<AdminLoginPage />} />
-        <Route path="/admin/dashboard" element={<AdminDashboard />} />
-        <Route path="*" element={<NotFoundPage />} />
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/register/confirmation" element={<ConfirmationPage />} />
+          <Route path="/volunteer/register" element={<VolunteerRegisterPage />} />
+          <Route path="/volunteer/validate" element={<VolunteerValidatePage />} />
+          <Route path="/onspot" element={<OnSpotRegisterPage />} />
+          <Route path="/scan" element={<ScanPage />} />
+          <Route path="/admin" element={<AdminLoginPage />} />
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Router>
     </div>

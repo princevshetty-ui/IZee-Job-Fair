@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import PersonalInfoStep from './steps/PersonalInfoStep'
 import AcademicDetailsStep from './steps/AcademicDetailsStep'
 import ProfessionalStep from './steps/ProfessionalStep'
@@ -127,7 +128,17 @@ const RegistrationForm = ({ onSubmit, submitting = false }) => {
         ))}
       </div>
 
-      <CurrentStep formData={formData} setFormData={setFormData} errors={errors} />
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={currentStep}
+          initial={{ opacity: 0, x: 24 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -24 }}
+          transition={{ duration: 0.22, ease: 'easeInOut' }}
+        >
+          <CurrentStep formData={formData} setFormData={setFormData} errors={errors} />
+        </motion.div>
+      </AnimatePresence>
 
       {currentStep === steps.length - 1 && (
         <div className="glass-card rounded-xl p-5">

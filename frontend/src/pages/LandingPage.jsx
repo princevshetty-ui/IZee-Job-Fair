@@ -94,11 +94,17 @@ const LandingPage = () => {
               </div>
             </motion.div>
 
-            <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.55, ease: [0.16, 1, 0.3, 1] }}>
+            <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.55, ease: [0.16, 1, 0.3, 1] }}
+              className="flex flex-col sm:flex-row items-center gap-3 justify-center">
               <Link to="/register" className="group inline-block">
-                <div className="px-10 md:px-14 py-4 md:py-[1.1rem] rounded-full bg-gradient-to-r from-indigo-600 to-cyan-500 text-white font-semibold text-sm md:text-[0.9rem] tracking-[0.08em] uppercase transition-all duration-300 shadow-[0_4px_25px_rgba(99,102,241,0.35)] hover:shadow-[0_4px_40px_rgba(99,102,241,0.55)] hover:scale-[1.04] flex items-center justify-center gap-2.5">
+                <div className="px-10 md:px-14 py-4 md:py-[1.1rem] rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold text-sm md:text-[0.9rem] tracking-[0.08em] uppercase transition-all duration-300 shadow-[0_4px_25px_rgba(37,99,235,0.4)] hover:shadow-[0_4px_40px_rgba(37,99,235,0.6)] hover:scale-[1.04] flex items-center justify-center gap-2.5">
                   Secure Your Pass
                   <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
+                </div>
+              </Link>
+              <Link to="/volunteer/register" className="group inline-block">
+                <div className="px-8 md:px-10 py-4 md:py-[1.1rem] rounded-full bg-white/[0.04] border border-indigo-500/30 text-indigo-300 font-semibold text-sm tracking-[0.08em] uppercase transition-all duration-300 hover:bg-indigo-600/15 hover:border-indigo-400/50 hover:scale-[1.04] flex items-center justify-center gap-2.5 backdrop-blur-sm">
+                  Volunteer
                 </div>
               </Link>
             </motion.div>
@@ -185,7 +191,7 @@ const LandingPage = () => {
                   Your next opportunity is one registration away.
                 </p>
                 <Link to="/register" className="group inline-block">
-                  <div className="px-10 sm:px-14 py-4 sm:py-[1.1rem] rounded-full bg-gradient-to-r from-indigo-600 to-cyan-500 text-white font-semibold text-sm tracking-[0.08em] uppercase transition-all duration-300 shadow-[0_4px_25px_rgba(99,102,241,0.35)] hover:shadow-[0_4px_40px_rgba(99,102,241,0.55)] hover:scale-[1.04] inline-flex items-center gap-2.5">
+                  <div className="px-10 sm:px-14 py-4 sm:py-[1.1rem] rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold text-sm tracking-[0.08em] uppercase transition-all duration-300 shadow-[0_4px_25px_rgba(37,99,235,0.4)] hover:shadow-[0_4px_40px_rgba(37,99,235,0.6)] hover:scale-[1.04] inline-flex items-center gap-2.5">
                     Claim Your Spot
                     <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
                   </div>
