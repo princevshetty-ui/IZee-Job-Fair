@@ -226,6 +226,7 @@ async def import_registrations(file: UploadFile = File(...), _: dict = Depends(g
             continue
 
         try:
+            mapped["sid"] = generate_sid(mapped["academic_level"])
             response = supabase.table("attendees").insert(mapped).execute()
             if response.data:
                 inserted += 1
