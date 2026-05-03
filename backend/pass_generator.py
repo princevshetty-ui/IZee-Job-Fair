@@ -72,7 +72,7 @@ def generate_pass(academic_level, full_name, stream, sid, reg_type, template_pat
             regular_font_path = os.path.join(BASE_DIR, "assets", "fonts", "DejaVuSans.ttf")
             font = ImageFont.truetype(bold_font_path, 20)
             small_font = ImageFont.truetype(regular_font_path, 16)
-        except Exception as font_err:
+        except OSError as font_err:
             # Fallback to default font
             print(f"Warning: could not load DejaVuSans fonts ({font_err}), using bitmap default")
             font = ImageFont.load_default()
