@@ -89,14 +89,14 @@ async def approve_attendee(attendee_id: str, background_tasks: BackgroundTasks, 
         full_name = attendee.get("full_name")
         email = attendee.get("email")
         sid = attendee.get("sid")
-        attendee_type = attendee.get("attendee_type") or attendee.get("reg_type", "pre")
+        reg_type = attendee.get("reg_type", "pre")
 
         if not sid:
             academic_level = attendee.get("academic_level", "UG")
             sid = generate_sid(academic_level)
             supabase.table("attendees").update({"sid": sid}).eq("id", attendee_id).execute()
 
-        reg_type_label = "ON-SPOT" if attendee_type == "onspot" else "PRE-REGISTERED"
+        reg_type_label = "ON-SPOT" if reg_type == "onspot" else "PRE-REGISTERED"
 
         pass_image_b64 = generate_pass(
             academic_level=attendee.get("academic_level"),
