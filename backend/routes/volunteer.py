@@ -81,7 +81,7 @@ async def login_volunteer(request: VolunteerLoginRequest):
         )
     
     # Create volunteer token
-    token = create_volunteer_token(request.roll_number, volunteer["id"])
+    token = create_volunteer_token(request.roll_number, str(volunteer["id"]))
     
     return {"access_token": token, "token_type": "bearer"}
 
