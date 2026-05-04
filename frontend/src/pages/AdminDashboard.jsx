@@ -165,6 +165,8 @@ const AdminDashboard = () => {
         console.warn('Volunteers fetch failed:', e)
       }
 
+      console.log('Stats response:', stats)
+      console.log('Metrics set to:', { ...EMPTY_METRICS, ...stats })
       setMetrics({ ...EMPTY_METRICS, ...stats })
       setRegistrations(preData.data || [])
       setOnSpotRegistrations(onspotData.data || [])
