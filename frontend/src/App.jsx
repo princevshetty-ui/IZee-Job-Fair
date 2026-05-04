@@ -13,7 +13,7 @@ import OnSpotRegisterPage from './pages/OnSpotRegisterPage'
 
 function App() {
   return (
-    <div className="bg-[#0a0e1a] min-h-screen">
+    <div className="min-h-screen" style={{ backgroundColor: '#020208' }}>
       <GlobalBackground />
       <Router>
         <Routes>

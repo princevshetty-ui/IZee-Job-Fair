@@ -1,118 +1,117 @@
-import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Link, useSearchParams } from 'react-router-dom'
 import Navbar from '../components/shared/Navbar'
-
-const GlobalParticles = () => {
-  const [particles] = useState(() => Array.from({ length: 60 }).map((_, i) => ({
-    id: i,
-    x: Math.random() * 100,
-    y: Math.random() * 100,
-    size: Math.random() * 3 + 1.5,
-    duration: Math.random() * 30 + 25,
-    delay: Math.random() * 10,
-    opacity: Math.random() * 0.4 + 0.1
-  })))
-
-  return (
-    <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden">
-      {particles.map((p) => (
-        <motion.div
-          key={p.id}
-          className="absolute bg-gradient-to-b from-cyan-400/30 to-indigo-600/30 rounded-full"
-          style={{ width: p.size, height: p.size, left: `${p.x}%`, top: `${p.y}%`, opacity: p.opacity, filter: 'blur(0.5px)' }}
-          animate={{ y: [0, -600], opacity: [0, p.opacity, 0] }}
-          transition={{ duration: p.duration, repeat: Infinity, delay: p.delay, ease: "linear" }}
-        />
-      ))}
-    </div>
-  )
-}
 
 const ConfirmationPage = () => {
   const [searchParams] = useSearchParams()
   const requestId = searchParams.get('id') || 'N/A'
 
   return (
-    <div className="min-h-screen text-white selection:bg-indigo-500/20 font-light overflow-x-hidden" style={{ backgroundColor: '#0a0e1a' }}>
-      <div
-        className="fixed inset-0 pointer-events-none z-0"
-        style={{
-          background: 'linear-gradient(135deg, #0a0e1a 0%, #1a1f3a 40%, #0f1628 100%)'
-        }}
-      />
-      <div className="fixed inset-0 overflow-hidden pointer-events-none z-[1]">
-        <motion.div
-          className="absolute rounded-full blur-[100px] pointer-events-none"
-          style={{
-            width: 500,
-            height: 500,
-            background: 'radial-gradient(circle at 50% 50%, rgba(99,102,241,0.1) 0%, rgba(99,102,241,0.02) 50%, transparent 100%)',
-            left: '50%',
-            top: '50%',
-            transform: 'translate(-50%, -50%)'
-          }}
-          animate={{ scale: [1, 1.1, 1], opacity: [0.5, 0.8, 0.5] }}
-          transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
-        />
+    <div className="min-h-screen text-white overflow-x-hidden" style={{ backgroundColor: '#020208' }}>
+      {/* Ambient glow */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+        <div className="absolute rounded-full blur-[160px]"
+          style={{ width: 600, height: 600, background: 'radial-gradient(circle, rgba(16,185,129,0.08) 0%, transparent 70%)', top: '50%', left: '50%', transform: 'translate(-50%,-50%)' }} />
+        <div className="absolute rounded-full blur-[120px]"
+          style={{ width: 400, height: 400, background: 'radial-gradient(circle, rgba(99,102,241,0.07) 0%, transparent 70%)', top: '20%', right: '15%' }} />
       </div>
-      <GlobalParticles />
 
       <div className="relative z-10 w-full">
         <Navbar transparent={false} />
 
         <section className="min-h-[100dvh] flex items-center justify-center px-4 pt-32 pb-20">
-          <div className="w-full max-w-2xl mx-auto relative z-10">
+          <div className="w-full max-w-xl mx-auto relative z-10">
             <motion.div
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 32 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
               className="text-center"
             >
+              {/* Success icon */}
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                transition={{ delay: 0.2, type: 'spring', stiffness: 200, damping: 15 }}
-                className="w-20 h-20 mx-auto mb-8 rounded-full bg-gradient-to-br from-emerald-400 to-cyan-500 flex items-center justify-center shadow-lg shadow-emerald-500/30"
+                transition={{ delay: 0.2, type: 'spring', stiffness: 240, damping: 16 }}
+                className="w-24 h-24 mx-auto mb-8 rounded-full flex items-center justify-center"
+                style={{
+                  background: 'linear-gradient(135deg, #10B981, #0d9488)',
+                  boxShadow: '0 0 50px rgba(16,185,129,0.4), 0 0 100px rgba(16,185,129,0.1)'
+                }}
               >
-                <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                 </svg>
               </motion.div>
 
-              <h1 className="text-3xl md:text-5xl font-light text-white mb-4 font-heading-art tracking-tight">
-                Registration Submitted
-              </h1>
-              <p className="text-slate-300 text-base md:text-lg mb-10 max-w-lg mx-auto leading-relaxed">
-                Thank you for registering for the IZEE Job Fair 2026. Your request has been received and is being reviewed.
-              </p>
+              <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35, duration: 0.8 }}>
+                <p className="text-[10px] uppercase tracking-[0.28em] font-semibold mb-3" style={{ color: 'rgba(16,185,129,0.6)' }}>
+                  Submission Received
+                </p>
+                <h1 className="text-3xl md:text-5xl font-bold text-white mb-4 font-heading-art tracking-tight">
+                  Registration Submitted
+                </h1>
+                <p className="text-base md:text-lg mb-10 max-w-md mx-auto leading-relaxed" style={{ color: '#475569' }}>
+                  Thank you for registering for the IZEE Job Fair 2026. Your request has been received and is under review.
+                </p>
+              </motion.div>
 
-              <div className="glass-card rounded-2xl p-8 mb-8 max-w-md mx-auto">
-                <p className="text-slate-400 text-xs tracking-[0.15em] uppercase mb-3 font-semibold">Request ID</p>
-                <p className="text-2xl md:text-3xl font-mono font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-indigo-500 tracking-wider">
+              {/* Request ID */}
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5, duration: 0.8 }}
+                className="rounded-2xl p-7 mb-5 max-w-sm mx-auto"
+                style={{ background: '#0D0D1A', border: '1px solid rgba(99,102,241,0.2)', boxShadow: '0 0 40px rgba(99,102,241,0.06)' }}
+              >
+                <p className="text-[10px] uppercase tracking-[0.22em] font-semibold mb-3" style={{ color: '#475569' }}>
+                  Request ID
+                </p>
+                <p className="text-2xl md:text-3xl font-mono font-bold tracking-wider text-gradient-hero">
                   {requestId}
                 </p>
-              </div>
+              </motion.div>
 
-              <div className="glass-card rounded-2xl p-6 mb-10 max-w-lg mx-auto text-left">
-                <div className="flex items-start gap-3">
-                  <svg className="w-5 h-5 text-cyan-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
+              {/* Next steps */}
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.6, duration: 0.8 }}
+                className="rounded-2xl p-6 mb-10 max-w-lg mx-auto text-left"
+                style={{ background: '#0D0D1A', border: '1px solid #1a1a2e' }}
+              >
+                <div className="flex items-start gap-3.5">
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5"
+                    style={{ background: 'rgba(6,182,212,0.1)', border: '1px solid rgba(6,182,212,0.2)' }}>
+                    <svg className="w-4 h-4" style={{ color: '#06B6D4' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
                   <div>
-                    <p className="text-slate-200 text-sm font-medium mb-1">What Happens Next?</p>
-                    <p className="text-slate-400 text-sm leading-relaxed">
-                      If approved, your event pass will be sent to your registered email address. Please check both your <strong className="text-slate-300">Inbox</strong> and <strong className="text-slate-300">Spam</strong> folders. Keep your pass handy for entry on the day of the event.
+                    <p className="text-sm font-semibold text-white mb-1.5">What Happens Next?</p>
+                    <p className="text-sm leading-relaxed" style={{ color: '#475569' }}>
+                      If approved, your event pass will be sent to your registered email. Check both your{' '}
+                      <strong style={{ color: '#94A3B8' }}>Inbox</strong> and{' '}
+                      <strong style={{ color: '#94A3B8' }}>Spam</strong> folders. Keep your pass ready for entry on event day.
                     </p>
                   </div>
                 </div>
-              </div>
+              </motion.div>
 
-              <Link to="/" className="inline-block group">
-                <div className="px-8 py-3 rounded-lg bg-gradient-to-r from-indigo-600 to-cyan-500 text-white font-semibold text-sm tracking-[0.05em] uppercase transition-all shadow-lg shadow-indigo-500/40 hover:shadow-xl hover:shadow-cyan-500/50 hover:scale-105 group-hover:from-indigo-700 group-hover:to-cyan-600">
-                  Return Home
-                </div>
-              </Link>
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.75 }}>
+                <Link to="/" className="inline-block group">
+                  <div
+                    className="px-10 py-3.5 rounded-xl font-semibold text-sm tracking-[0.06em] uppercase text-white flex items-center gap-2.5 transition-all duration-300"
+                    style={{ background: 'linear-gradient(135deg, #6366F1, #8B5CF6)', boxShadow: '0 4px 20px rgba(99,102,241,0.35)' }}
+                    onMouseEnter={e => { e.currentTarget.style.opacity = '0.9'; e.currentTarget.style.transform = 'translateY(-1px)' }}
+                    onMouseLeave={e => { e.currentTarget.style.opacity = '1'; e.currentTarget.style.transform = 'translateY(0)' }}
+                  >
+                    <svg className="w-4 h-4 transition-transform duration-300 group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    Return Home
+                  </div>
+                </Link>
+              </motion.div>
             </motion.div>
           </div>
         </section>

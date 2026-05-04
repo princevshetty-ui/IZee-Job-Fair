@@ -1,3 +1,5 @@
+import { motion, AnimatePresence } from 'framer-motion'
+
 const FormField = ({
   label,
   name,
@@ -12,9 +14,10 @@ const FormField = ({
 }) => {
   return (
     <div className="mb-4">
-      <label className="block text-slate-300 text-sm font-medium mb-2 tracking-wide">
-        {label} {required && <span className="text-cyan-400">*</span>}
+      <label className="block text-xs font-semibold uppercase tracking-[0.12em] mb-2" style={{ color: '#475569' }}>
+        {label}{required && <span className="ml-1" style={{ color: '#6366F1' }}>*</span>}
       </label>
+
       {type === "select" ? (
         <select
           name={name}
@@ -41,7 +44,7 @@ const FormField = ({
             {...props}
           />
           {label && (
-            <label className="text-slate-300 text-sm leading-relaxed cursor-pointer select-none">
+            <label className="text-sm leading-relaxed cursor-pointer select-none" style={{ color: '#94A3B8' }}>
               {label}
             </label>
           )}
@@ -57,7 +60,24 @@ const FormField = ({
           {...props}
         />
       )}
-      {error && <p className="text-red-400 text-xs mt-1.5">{error}</p>}
+
+      <AnimatePresence>
+        {error && (
+          <motion.p
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            transition={{ duration: 0.2 }}
+            className="text-xs mt-1.5 flex items-center gap-1.5"
+            style={{ color: '#EF4444' }}
+          >
+            <svg className="w-3 h-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+            </svg>
+            {error}
+          </motion.p>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
