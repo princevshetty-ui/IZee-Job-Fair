@@ -135,26 +135,37 @@ const AdminDashboard = () => {
     try {
       const headers = { Authorization: `Bearer ${t}` }
       const API = import.meta.env.VITE_API_URL || ''
-      const [statsRes, preRes, onspotRes, attendanceRes, volunteersRes] = await Promise.all([
+      const [statsRes, preRes, onspotRes, attendanceRes] = await Promise.all([
         fetch(`${API}/api/admin/stats`, { headers }),
         fetch(`${API}/api/admin/registrations?reg_type=pre`, { headers }),
         fetch(`${API}/api/admin/registrations?reg_type=onspot`, { headers }),
         fetch(`${API}/api/admin/attendance`, { headers }),
-        fetch(`${API}/api/admin/volunteers`, { headers }),
       ])
-      if ([statsRes, preRes, onspotRes, attendanceRes, volunteersRes].some(r => r.status === 401)) {
+      if ([statsRes, preRes, onspotRes, attendanceRes].some(r => r.status === 401)) {
         localStorage.removeItem('token')
         navigate('/admin')
         return
       }
-      const [stats, preData, onspotData, attendanceData, volunteersData] = await Promise.all([
-        statsRes.json(), preRes.json(), onspotRes.json(), attendanceRes.json(), volunteersRes.json()
+      const [stats, preData, onspotData, attendanceData] = await Promise.all([
+        statsRes.json(), preRes.json(), onspotRes.json(), attendanceRes.json()
       ])
+
+      let volunteersData = []
+      try {
+        const volunteersRes = await fetch(`${API}/api/admin/volunteers`, { headers })
+        if (volunteersRes.ok) {
+          const vd = await volunteersRes.json()
+          volunteersData = vd.data || vd || []
+        }
+      } catch (e) {
+        console.warn('Volunteers endpoint not available:', e)
+      }
+
       setMetrics({ ...EMPTY_METRICS, ...stats })
       setRegistrations(preData.data || [])
       setOnSpotRegistrations(onspotData.data || [])
       setAttendance(attendanceData || [])
-      setVolunteers(volunteersData.data || [])
+      setVolunteers(volunteersData)
     } catch (e) {
       console.error('Fetch error:', e)
     } finally {
