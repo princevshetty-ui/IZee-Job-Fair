@@ -106,15 +106,26 @@ const ResultOverlay = ({ result, onDismiss }) => {
 
 const VolunteerValidatePage = () => {
   const API_URL = import.meta.env.VITE_API_URL || ''
-  const [token, setToken] = useState(localStorage.getItem('volunteer_token'))
+
+  // ── Auth state ──
+  const [token, setToken] = useState(() => localStorage.getItem('volunteer_token'))
   const [rollNumber, setRollNumber] = useState('')
-  const [email, setEmail] = useState('')
+  const [loginEmail, setLoginEmail] = useState('')
+
+  // ── Scanner state ──
+  const [facingMode, setFacingMode] = useState('environment')
+  const [cameraError, setCameraError] = useState(null)
   const [manualSid, setManualSid] = useState('')
   const [result, setResult] = useState(null)
   const [toast, setToast] = useState(null)
+
   const qrRef = useRef(null)
   const qrInstanceRef = useRef(null)
+  // Fix 2: track whether the scanner has actually started so cleanup never
+  // calls stop() on a scanner that never reached the running state.
+  const isRunningRef = useRef(false)
 
+  // ── Validate SID against API ──
   const handleValidate = useCallback(async (sidValue) => {
     if (!sidValue) return
     try {
@@ -127,6 +138,15 @@ const VolunteerValidatePage = () => {
         body: JSON.stringify({ sid: sidValue })
       })
       const data = await response.json()
+
+      // Fix 4: if token is expired/invalid, clear it and force re-login
+      if (response.status === 401) {
+        localStorage.removeItem('volunteer_token')
+        setToken(null)
+        setToast({ type: 'error', message: 'Session expired. Please log in again.' })
+        return
+      }
+
       if (response.ok) {
         if (data.warning) {
           setResult({ status: 'duplicate', message: data.warning, attendee: data.attendee })
@@ -142,40 +162,72 @@ const VolunteerValidatePage = () => {
     }
   }, [token, API_URL])
 
+  // ── Camera scanner effect ──
+  // Re-runs whenever token is set or facingMode changes (Fix 3).
+  // Cleanup is always safe because we guard with isRunningRef (Fix 2).
   useEffect(() => {
     if (!token || !qrRef.current) return
-    const qr = new Html5Qrcode(qrRef.current.id)
-    qrInstanceRef.current = qr
+
+    let mounted = true
+
     const start = async () => {
+      // Reset any previous camera error on each attempt
+      setCameraError(null)
+
+      const qr = new Html5Qrcode(qrRef.current.id)
+      qrInstanceRef.current = qr
+
       try {
         await qr.start(
-          { facingMode: 'environment' },
+          { facingMode },
           { fps: 10, qrbox: 260 },
-          (decodedText) => handleValidate(decodedText),
+          (decodedText) => { if (mounted) handleValidate(decodedText) },
           () => {}
         )
+        // Fix 2: only mark running after a successful start
+        if (mounted) isRunningRef.current = true
       } catch (error) {
-        console.error(error)
-        setToast({ type: 'error', message: 'Unable to start QR scanner' })
+        console.error('QR scanner start error:', error)
+        // Fix 1: distinguish permission denied from other camera errors
+        if (
+          error.name === 'NotAllowedError' ||
+          (typeof error.message === 'string' && error.message.toLowerCase().includes('permission'))
+        ) {
+          setCameraError(
+            'Camera access denied. Please allow camera access in your browser settings, or use manual SID entry below.'
+          )
+        } else {
+          setCameraError('Unable to start camera. Please use manual SID entry below.')
+        }
       }
     }
 
     start()
-    return () => {
-      if (qrInstanceRef.current) {
-        qrInstanceRef.current.stop().catch(() => {})
-        qrInstanceRef.current.clear().catch(() => {})
-      }
-    }
-  }, [token, handleValidate])
 
+    return () => {
+      mounted = false
+      const instance = qrInstanceRef.current
+      // Fix 2: only call stop() when the scanner is actually running
+      if (instance && isRunningRef.current) {
+        isRunningRef.current = false
+        instance.stop()
+          .then(() => instance.clear().catch(() => {}))
+          .catch(() => {})
+      } else if (instance) {
+        instance.clear().catch(() => {})
+      }
+      qrInstanceRef.current = null
+    }
+  }, [token, handleValidate, facingMode])
+
+  // ── Volunteer login ──
   const handleLogin = async (event) => {
     event.preventDefault()
     try {
       const response = await fetch(`${API_URL}/api/volunteer/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ roll_number: rollNumber, email })
+        body: JSON.stringify({ roll_number: rollNumber, email: loginEmail })
       })
       const data = await response.json()
       if (response.ok) {
@@ -190,12 +242,23 @@ const VolunteerValidatePage = () => {
     }
   }
 
+  const handleLogout = () => {
+    localStorage.removeItem('volunteer_token')
+    setToken(null)
+  }
+
+  // Fix 3: stop current scanner and restart with opposite facing mode
+  const flipCamera = useCallback(() => {
+    setFacingMode(prev => prev === 'environment' ? 'user' : 'environment')
+  }, [])
+
   const handleManualSubmit = (event) => {
     event.preventDefault()
     handleValidate(manualSid)
     setManualSid('')
   }
 
+  // ── Fix 4: Auth gate — show login if no token ──
   if (!token) {
     return (
       <div className="min-h-screen text-white overflow-x-hidden" style={{ backgroundColor: '#020208' }}>
@@ -231,8 +294,8 @@ const VolunteerValidatePage = () => {
                   label="Email"
                   name="email"
                   type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  value={loginEmail}
+                  onChange={(e) => setLoginEmail(e.target.value)}
                   required
                 />
                 <button
@@ -251,6 +314,7 @@ const VolunteerValidatePage = () => {
     )
   }
 
+  // ── Scanner view ──
   return (
     <div className="min-h-screen text-white overflow-x-hidden" style={{ backgroundColor: '#020208' }}>
       <div className="relative z-10">
@@ -265,6 +329,16 @@ const VolunteerValidatePage = () => {
             <p className="text-[10px] uppercase tracking-[0.28em] font-semibold mb-3" style={{ color: 'rgba(6,182,212,0.5)' }}>Scanner Active</p>
             <h1 className="text-3xl md:text-5xl font-bold text-white tracking-tight font-heading-art mb-3">Attendance Scanner</h1>
             <p className="text-sm" style={{ color: '#475569' }}>Scan QR code or enter SID manually to validate attendance</p>
+            {/* Logout */}
+            <button
+              onClick={handleLogout}
+              className="mt-4 text-xs uppercase tracking-[0.12em] font-semibold transition-colors duration-200"
+              style={{ color: '#334155' }}
+              onMouseEnter={e => e.currentTarget.style.color = '#EF4444'}
+              onMouseLeave={e => e.currentTarget.style.color = '#334155'}
+            >
+              Sign Out
+            </button>
           </motion.div>
 
           <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
@@ -282,23 +356,51 @@ const VolunteerValidatePage = () => {
                 <h2 className="text-sm font-semibold uppercase tracking-[0.15em]" style={{ color: '#94A3B8' }}>QR Scanner</h2>
               </div>
 
-              {/* Camera frame wrapper */}
-              <div className="relative rounded-xl overflow-hidden" style={{ border: '1px solid rgba(6,182,212,0.15)' }}>
-                <div id="qr-reader" ref={qrRef} className="w-full" />
-
-                {/* Animated corner brackets */}
-                <div className="scanner-frame rounded-xl">
-                  <div className="scanner-corner tl" />
-                  <div className="scanner-corner tr" />
-                  <div className="scanner-corner bl" />
-                  <div className="scanner-corner br" />
-                  {/* Scan line */}
-                  <div className="scan-line" />
+              {/* Fix 1: Camera permission error message */}
+              {cameraError ? (
+                <div className="rounded-xl p-5 mb-4" style={{ background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.3)' }}>
+                  <div className="flex items-start gap-3">
+                    <svg className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: '#F59E0B' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+                    </svg>
+                    <p className="text-sm leading-relaxed" style={{ color: '#FCD34D' }}>{cameraError}</p>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <>
+                  {/* Camera frame wrapper */}
+                  <div className="relative rounded-xl overflow-hidden" style={{ border: '1px solid rgba(6,182,212,0.15)' }}>
+                    <div id="qr-reader" ref={qrRef} className="w-full" />
 
-              <p className="text-center text-xs mt-4" style={{ color: '#334155' }}>
-                Position QR code within the frame
+                    {/* Animated corner brackets */}
+                    <div className="scanner-frame rounded-xl">
+                      <div className="scanner-corner tl" />
+                      <div className="scanner-corner tr" />
+                      <div className="scanner-corner bl" />
+                      <div className="scanner-corner br" />
+                      <div className="scan-line" />
+                    </div>
+                  </div>
+
+                  {/* Fix 3: Flip camera button */}
+                  <button
+                    onClick={flipCamera}
+                    className="mt-3 w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-semibold uppercase tracking-[0.1em] transition-all duration-200"
+                    style={{ background: 'rgba(6,182,212,0.08)', border: '1px solid rgba(6,182,212,0.15)', color: '#06B6D4' }}
+                    onMouseEnter={e => e.currentTarget.style.background = 'rgba(6,182,212,0.14)'}
+                    onMouseLeave={e => e.currentTarget.style.background = 'rgba(6,182,212,0.08)'}
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    Flip Camera ({facingMode === 'environment' ? 'Back' : 'Front'})
+                  </button>
+                </>
+              )}
+
+              <p className="text-center text-xs mt-3" style={{ color: '#334155' }}>
+                {cameraError ? 'Use manual entry on the right →' : 'Position QR code within the frame'}
               </p>
             </motion.div>
 
