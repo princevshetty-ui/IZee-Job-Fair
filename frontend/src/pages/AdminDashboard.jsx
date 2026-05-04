@@ -46,7 +46,7 @@ const METRIC_CFGS = {
     { key: 'pending',              label: 'Pending',       color: '#fbbf24', dot: '#F59E0B', glow: 'rgba(245,158,11,0.15)' },
     { key: 'approved',             label: 'Approved',      color: '#34d399', dot: '#10B981', glow: 'rgba(16,185,129,0.15)' },
     { key: 'rejected',             label: 'Rejected',      color: '#f87171', dot: '#EF4444', glow: 'rgba(239,68,68,0.15)' },
-    { key: 'passes_sent',          label: 'Passes Sent',   color: '#a78bfa', dot: '#8B5CF6', glow: 'rgba(139,92,246,0.15)' },
+    { key: 'approved',             label: 'Passes Sent',   color: '#a78bfa', dot: '#8B5CF6', glow: 'rgba(139,92,246,0.15)' },
   ],
   onspot: [
     { key: 'total_onspot',          label: 'Total On-Spot',   color: '#38bdf8', dot: '#0ea5e9', glow: 'rgba(14,165,233,0.15)' },
@@ -107,7 +107,7 @@ const Skeleton = () => (
 // ─── Main Component ────────────────────────────────────────────
 const EMPTY_METRICS = {
   total_pre_registered: 0, total_onspot: 0, approved: 0, attended: 0,
-  pending: 0, rejected: 0, passes_sent: 0, total_volunteers: 0,
+  pending: 0, rejected: 0, total_volunteers: 0,
   onspot_students: 0, onspot_freshers: 0, onspot_professionals: 0,
   total_validated: 0, pre_attended: 0, onspot_attended: 0,
   students_attended: 0, freshers_attended: 0, professionals_attended: 0,
@@ -214,7 +214,7 @@ const AdminDashboard = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const handleRefresh = () => fetchAll(false)
+  const handleRefresh = () => fetchAll(true)
   const handleSilentRefresh = () => fetchAll(true)
 
   const handleLogout = () => {
@@ -258,25 +258,27 @@ const AdminDashboard = () => {
 
       {/* ── Main ── */}
       <div className="max-w-7xl mx-auto px-5 py-8">
+
+        {/* Tab Bar — always visible */}
+        <div className="flex flex-wrap gap-2 mb-5">
+          {TABS.map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`admin-pill px-4 py-2 text-[11px] uppercase tracking-[0.12em] font-semibold flex items-center gap-2 ${activeTab === tab.id ? 'active' : ''}`}
+            >
+              {tab.icon}
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Loading skeleton or content */}
         {loading ? <Skeleton /> : (
           <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
 
             {/* Metric Cards (tab-specific) */}
             <MetricCards cards={metricCards} />
-
-            {/* Tab Bar */}
-            <div className="flex flex-wrap gap-2 mb-5">
-              {TABS.map(tab => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`admin-pill px-4 py-2 text-[11px] uppercase tracking-[0.12em] font-semibold flex items-center gap-2 ${activeTab === tab.id ? 'active' : ''}`}
-                >
-                  {tab.icon}
-                  {tab.label}
-                </button>
-              ))}
-            </div>
 
             {/* Tab Content */}
             <AnimatePresence mode="wait">
