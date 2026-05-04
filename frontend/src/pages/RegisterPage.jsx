@@ -20,7 +20,7 @@ const RegisterPage = () => {
 
       if (response?.ok) {
         const data = await response.json()
-        navigate(`/register/confirmation?id=${data.id}`)
+        navigate(`/register/confirmation?id=${data.id}&email=${encodeURIComponent(formData.email || '')}`)
       } else {
         const errorData = await response.json()
         setToast({ type: 'error', message: errorData.detail || 'Registration failed' })
