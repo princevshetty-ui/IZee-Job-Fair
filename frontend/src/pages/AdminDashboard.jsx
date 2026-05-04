@@ -130,7 +130,6 @@ const AdminDashboard = () => {
   // ── Fetch all data (silent = no full skeleton) ──
   const fetchAll = async (silent = false) => {
     const t = localStorage.getItem('token')
-    console.log('Token from localStorage:', t ? 'EXISTS' : 'NULL')
     if (!t) { navigate('/admin'); return }
     if (!silent) setLoading(true)
     try {
@@ -165,9 +164,25 @@ const AdminDashboard = () => {
         console.warn('Volunteers fetch failed:', e)
       }
 
-      console.log('Stats response:', stats)
-      console.log('Metrics set to:', { ...EMPTY_METRICS, ...stats })
-      setMetrics({ ...EMPTY_METRICS, ...stats })
+      setMetrics({
+        total_pre_registered:   stats.total_pre_registered   || 0,
+        pending:                stats.pending                || 0,
+        approved:               stats.approved               || 0,
+        rejected:               stats.rejected               || 0,
+        passes_sent:            stats.passes_sent            || 0,
+        total_onspot:           stats.total_onspot           || 0,
+        onspot_students:        stats.onspot_students        || 0,
+        onspot_freshers:        stats.onspot_freshers        || 0,
+        onspot_professionals:   stats.onspot_professionals   || 0,
+        total_volunteers:       stats.total_volunteers       || 0,
+        attended:               stats.attended               || 0,
+        total_validated:        stats.total_validated        || 0,
+        pre_attended:           stats.pre_attended           || 0,
+        onspot_attended:        stats.onspot_attended        || 0,
+        students_attended:      stats.students_attended      || 0,
+        freshers_attended:      stats.freshers_attended      || 0,
+        professionals_attended: stats.professionals_attended || 0,
+      })
       setRegistrations(preData.data || [])
       setOnSpotRegistrations(onspotData.data || [])
       setAttendance(attendanceData || [])
