@@ -15,48 +15,79 @@ from auth import create_token
 
 router = APIRouter()
 
+
 class AdminLogin(BaseModel):
     email: str
     password: str
+
+
+class BulkActionRequest(BaseModel):
+    ids: list[str]
+
 
 @router.post("/admin/login")
 async def admin_login(login_data: AdminLogin):
     admin_email = os.getenv("ADMIN_EMAIL", "admin@izeebschool.com")
     admin_password = os.getenv("ADMIN_PASSWORD", "admin123")
-    
-    # Strip whitespace to prevent autocomplete errors
     received_email = login_data.email.strip()
     received_password = login_data.password.strip()
-    
     if received_email == admin_email and received_password == admin_password:
         token = create_token(admin_email)
         return {"access_token": token, "token_type": "bearer"}
-    else:
-        # We can also add a print statement to debug in the terminal
-        print(f"Login failed: Expected '{admin_email}', got '{received_email}'")
-        raise HTTPException(status_code=401, detail="Invalid credentials")
+    print(f"Login failed: Expected '{admin_email}', got '{received_email}'")
+    raise HTTPException(status_code=401, detail="Invalid credentials")
+
 
 @router.get("/admin/stats")
 async def get_stats(admin: dict = Depends(get_current_admin)):
     try:
-        all_data = supabase.table("attendees").select("status, reg_type, attended").execute()
+        all_data = supabase.table("attendees").select(
+            "status, reg_type, attended, attendee_type"
+        ).execute()
         rows = all_data.data or []
+
+        vol_data = supabase.table("volunteers").select("id").execute()
+        total_volunteers = len(vol_data.data or [])
+
         total_pre = sum(1 for r in rows if r.get("reg_type") == "pre")
         total_onspot = sum(1 for r in rows if r.get("reg_type") == "onspot")
         approved = sum(1 for r in rows if r.get("status") == "approved")
         attended = sum(1 for r in rows if r.get("attended") is True)
         pending = sum(1 for r in rows if r.get("status") == "pending")
         rejected = sum(1 for r in rows if r.get("status") == "rejected")
+
+        onspot_students = sum(1 for r in rows if r.get("reg_type") == "onspot" and r.get("attendee_type") == "student")
+        onspot_freshers = sum(1 for r in rows if r.get("reg_type") == "onspot" and r.get("attendee_type") == "fresher")
+        onspot_professionals = sum(1 for r in rows if r.get("reg_type") == "onspot" and r.get("attendee_type") == "professional")
+
+        pre_attended = sum(1 for r in rows if r.get("reg_type") == "pre" and r.get("attended") is True)
+        onspot_attended = sum(1 for r in rows if r.get("reg_type") == "onspot" and r.get("attended") is True)
+        students_attended = sum(1 for r in rows if r.get("attendee_type") == "student" and r.get("attended") is True)
+        freshers_attended = sum(1 for r in rows if r.get("attendee_type") == "fresher" and r.get("attended") is True)
+        professionals_attended = sum(1 for r in rows if r.get("attendee_type") == "professional" and r.get("attended") is True)
+
         return {
             "total_pre_registered": total_pre,
             "total_onspot": total_onspot,
             "approved": approved,
             "attended": attended,
             "pending": pending,
-            "rejected": rejected
+            "rejected": rejected,
+            "passes_sent": approved,
+            "total_volunteers": total_volunteers,
+            "onspot_students": onspot_students,
+            "onspot_freshers": onspot_freshers,
+            "onspot_professionals": onspot_professionals,
+            "total_validated": attended,
+            "pre_attended": pre_attended,
+            "onspot_attended": onspot_attended,
+            "students_attended": students_attended,
+            "freshers_attended": freshers_attended,
+            "professionals_attended": professionals_attended,
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @router.get("/admin/registrations")
 async def get_registrations(reg_type: str = "pre", admin: dict = Depends(get_current_admin)):
@@ -66,6 +97,7 @@ async def get_registrations(reg_type: str = "pre", admin: dict = Depends(get_cur
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @router.get("/admin/attendance")
 async def get_attendance(admin: dict = Depends(get_current_admin)):
     try:
@@ -73,6 +105,29 @@ async def get_attendance(admin: dict = Depends(get_current_admin)):
         return response.data or []
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/admin/volunteers")
+async def get_volunteers(admin: dict = Depends(get_current_admin)):
+    try:
+        response = supabase.table("volunteers").select("*").order("created_at", desc=True).execute()
+        return {"data": response.data or []}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/admin/volunteers/delete")
+async def delete_volunteers_bulk(req: BulkActionRequest, admin: dict = Depends(get_current_admin)):
+    deleted = 0
+    for vid in req.ids:
+        try:
+            r = supabase.table("volunteers").delete().eq("id", vid).execute()
+            if r.data:
+                deleted += 1
+        except Exception:
+            pass
+    return {"deleted": deleted}
+
 
 @router.put("/admin/approve/{attendee_id}")
 async def approve_attendee(attendee_id: str, background_tasks: BackgroundTasks, admin: dict = Depends(get_current_admin)):
@@ -97,7 +152,6 @@ async def approve_attendee(attendee_id: str, background_tasks: BackgroundTasks, 
             supabase.table("attendees").update({"sid": sid}).eq("id", attendee_id).execute()
 
         reg_type_label = "ON-SPOT" if reg_type == "onspot" else "PRE-REGISTERED"
-
         pass_image_b64 = generate_pass(
             academic_level=attendee.get("academic_level"),
             full_name=full_name,
@@ -105,14 +159,13 @@ async def approve_attendee(attendee_id: str, background_tasks: BackgroundTasks, 
             sid=sid,
             reg_type=reg_type_label
         )
-
         background_tasks.add_task(send_pass_email, email, full_name, sid, pass_image_b64, reg_type_label)
-
-        return {"message": "Attendee approved"}
+        return {"message": "Attendee approved", "email": email}
     except HTTPException:
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @router.put("/admin/reject/{attendee_id}")
 async def reject_attendee(attendee_id: str, admin: dict = Depends(get_current_admin)):
@@ -121,28 +174,155 @@ async def reject_attendee(attendee_id: str, admin: dict = Depends(get_current_ad
         if not response.data:
             raise HTTPException(status_code=404, detail="Attendee not found")
         return {"message": "Attendee rejected"}
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @router.post("/admin/resend/{attendee_id}")
-async def resend_pass(attendee_id: str, admin: dict = Depends(get_current_admin)):
+async def resend_pass(attendee_id: str, background_tasks: BackgroundTasks, admin: dict = Depends(get_current_admin)):
     try:
         response = supabase.table("attendees").select("*").eq("id", attendee_id).execute()
         if not response.data:
             raise HTTPException(status_code=404, detail="Attendee not found")
-        return {"message": "Pass resent successfully"}
+
+        attendee = response.data[0]
+        if attendee.get("status") != "approved":
+            raise HTTPException(status_code=400, detail="Attendee is not approved")
+
+        sid = attendee.get("sid")
+        if not sid:
+            academic_level = attendee.get("academic_level", "UG")
+            sid = generate_sid(academic_level)
+            supabase.table("attendees").update({"sid": sid}).eq("id", attendee_id).execute()
+
+        reg_type = attendee.get("reg_type", "pre")
+        reg_type_label = "ON-SPOT" if reg_type == "onspot" else "PRE-REGISTERED"
+        pass_image_b64 = generate_pass(
+            academic_level=attendee.get("academic_level"),
+            full_name=attendee.get("full_name"),
+            stream=attendee.get("stream"),
+            sid=sid,
+            reg_type=reg_type_label
+        )
+        background_tasks.add_task(send_pass_email, attendee.get("email"), attendee.get("full_name"), sid, pass_image_b64, reg_type_label)
+        return {"message": "Pass resent successfully", "email": attendee.get("email")}
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/admin/bulk-approve")
+async def bulk_approve(req: BulkActionRequest, background_tasks: BackgroundTasks, admin: dict = Depends(get_current_admin)):
+    approved_count = 0
+    failed_count = 0
+    errors = []
+
+    for attendee_id in req.ids:
+        try:
+            supabase.table("attendees").update({"status": "approved"}).eq("id", attendee_id).execute()
+            r = supabase.table("attendees").select("*").eq("id", attendee_id).execute()
+            if not r.data:
+                failed_count += 1
+                errors.append(f"{attendee_id}: not found")
+                continue
+
+            attendee = r.data[0]
+            sid = attendee.get("sid")
+            if not sid:
+                sid = generate_sid(attendee.get("academic_level", "UG"))
+                supabase.table("attendees").update({"sid": sid}).eq("id", attendee_id).execute()
+
+            pass_image = generate_pass(
+                academic_level=attendee.get("academic_level"),
+                full_name=attendee.get("full_name"),
+                stream=attendee.get("stream"),
+                sid=sid,
+                reg_type="PRE-REGISTERED"
+            )
+            background_tasks.add_task(
+                send_pass_email,
+                attendee.get("email"), attendee.get("full_name"), sid, pass_image, "PRE-REGISTERED"
+            )
+            approved_count += 1
+        except Exception as e:
+            failed_count += 1
+            errors.append(str(e))
+
+    return {"approved": approved_count, "failed": failed_count, "errors": errors}
+
+
+@router.post("/admin/bulk-resend")
+async def bulk_resend(req: BulkActionRequest, background_tasks: BackgroundTasks, admin: dict = Depends(get_current_admin)):
+    queued_count = 0
+    failed_count = 0
+
+    for attendee_id in req.ids:
+        try:
+            r = supabase.table("attendees").select("*").eq("id", attendee_id).execute()
+            if not r.data:
+                failed_count += 1
+                continue
+
+            attendee = r.data[0]
+            if attendee.get("status") != "approved":
+                failed_count += 1
+                continue
+
+            sid = attendee.get("sid")
+            if not sid:
+                sid = generate_sid(attendee.get("academic_level", "UG"))
+                supabase.table("attendees").update({"sid": sid}).eq("id", attendee_id).execute()
+
+            reg_type = attendee.get("reg_type", "pre")
+            reg_type_label = "ON-SPOT" if reg_type == "onspot" else "PRE-REGISTERED"
+            pass_image = generate_pass(
+                academic_level=attendee.get("academic_level"),
+                full_name=attendee.get("full_name"),
+                stream=attendee.get("stream"),
+                sid=sid,
+                reg_type=reg_type_label
+            )
+            background_tasks.add_task(
+                send_pass_email,
+                attendee.get("email"), attendee.get("full_name"), sid, pass_image, reg_type_label
+            )
+            queued_count += 1
+        except Exception:
+            failed_count += 1
+
+    return {"queued": queued_count, "failed": failed_count}
+
 
 @router.post("/admin/resend-all")
-async def resend_all_passes(admin: dict = Depends(get_current_admin)):
+async def resend_all_passes(background_tasks: BackgroundTasks, admin: dict = Depends(get_current_admin)):
     try:
-        response = supabase.table("attendees").select("id").eq("status", "approved").execute()
-        return {"message": f"Resending passes to {len(response.data or [])} attendees"}
+        response = supabase.table("attendees").select("*").eq("status", "approved").execute()
+        attendees = response.data or []
+        for attendee in attendees:
+            sid = attendee.get("sid")
+            if not sid:
+                sid = generate_sid(attendee.get("academic_level", "UG"))
+                supabase.table("attendees").update({"sid": sid}).eq("id", attendee.get("id")).execute()
+            reg_type = attendee.get("reg_type", "pre")
+            reg_type_label = "ON-SPOT" if reg_type == "onspot" else "PRE-REGISTERED"
+            pass_image_b64 = generate_pass(
+                academic_level=attendee.get("academic_level"),
+                full_name=attendee.get("full_name"),
+                stream=attendee.get("stream"),
+                sid=sid,
+                reg_type=reg_type_label
+            )
+            background_tasks.add_task(send_pass_email, attendee.get("email"), attendee.get("full_name"), sid, pass_image_b64, reg_type_label)
+        return {"message": f"Queued {len(attendees)} emails for sending", "queued": len(attendees)}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-# ─── Export: All registrations (flat CSV) ───
+
+# ─── Exports ───
+
 @router.get("/admin/export/all")
 async def export_all(admin: dict = Depends(get_current_admin)):
     try:
@@ -154,7 +334,7 @@ async def export_all(admin: dict = Depends(get_current_admin)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-# ─── Export: Attended only (flat CSV) ───
+
 @router.get("/admin/export/attended")
 async def export_attended(admin: dict = Depends(get_current_admin)):
     try:
@@ -166,7 +346,7 @@ async def export_attended(admin: dict = Depends(get_current_admin)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-# ─── Export: Pre-Register (ZIP with Students / Professionals / Freshers sheets) ───
+
 @router.get("/admin/export/pre")
 async def export_pre_register(admin: dict = Depends(get_current_admin)):
     try:
@@ -180,7 +360,7 @@ async def export_pre_register(admin: dict = Depends(get_current_admin)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-# ─── Export: On-Spot (separate CSV) ───
+
 @router.get("/admin/export/onspot")
 async def export_onspot(admin: dict = Depends(get_current_admin)):
     try:
@@ -191,6 +371,45 @@ async def export_onspot(admin: dict = Depends(get_current_admin)):
         })
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/admin/export/volunteers")
+async def export_volunteers(admin: dict = Depends(get_current_admin)):
+    try:
+        response = supabase.table("volunteers").select("*").execute()
+        rows = response.data or []
+        out = io.StringIO()
+        if rows:
+            writer = csv.DictWriter(out, fieldnames=rows[0].keys())
+            writer.writeheader()
+            writer.writerows(rows)
+        return Response(content=out.getvalue(), media_type="text/csv", headers={
+            "Content-Disposition": "attachment; filename=volunteers.csv"
+        })
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/admin/export/attendee-type/{attendee_type}")
+async def export_by_type(attendee_type: str, admin: dict = Depends(get_current_admin)):
+    if attendee_type not in ("student", "fresher", "professional"):
+        raise HTTPException(status_code=400, detail="Invalid attendee type")
+    try:
+        response = supabase.table("attendees").select("*").eq("attendee_type", attendee_type).execute()
+        rows = response.data or []
+        out = io.StringIO()
+        if rows:
+            writer = csv.DictWriter(out, fieldnames=rows[0].keys())
+            writer.writeheader()
+            writer.writerows(rows)
+        return Response(content=out.getvalue(), media_type="text/csv", headers={
+            "Content-Disposition": f"attachment; filename={attendee_type}s.csv"
+        })
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ─── Import ───
 
 @router.post("/admin/import")
 async def import_registrations(file: UploadFile = File(...), _: dict = Depends(get_current_admin)):
@@ -218,10 +437,7 @@ async def import_registrations(file: UploadFile = File(...), _: dict = Depends(g
                 missing_fields.append("Academic Level")
             if not row.get("Graduation Stream") and not row.get("Stream"):
                 missing_fields.append("Stream")
-            errors.append({
-                "row": row_index,
-                "message": f"Missing required fields: {', '.join(missing_fields)}"
-            })
+            errors.append({"row": row_index, "message": f"Missing required fields: {', '.join(missing_fields)}"})
             skipped += 1
             continue
 
@@ -231,21 +447,10 @@ async def import_registrations(file: UploadFile = File(...), _: dict = Depends(g
             if response.data:
                 inserted += 1
             else:
-                errors.append({
-                    "row": row_index,
-                    "message": "Database insert returned no data"
-                })
+                errors.append({"row": row_index, "message": "Database insert returned no data"})
                 skipped += 1
         except Exception as exc:
-            errors.append({
-                "row": row_index,
-                "message": str(exc)
-            })
+            errors.append({"row": row_index, "message": str(exc)})
             skipped += 1
 
-    return {
-        "message": "Registrations imported",
-        "count": inserted,
-        "skipped": skipped,
-        "errors": errors
-    }
+    return {"message": "Registrations imported", "count": inserted, "skipped": skipped, "errors": errors}
