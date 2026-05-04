@@ -119,10 +119,8 @@ const VolunteerValidatePage = () => {
   const [result, setResult] = useState(null)
   const [toast, setToast] = useState(null)
 
-  const qrRef = useRef(null)
-  const qrInstanceRef = useRef(null)
-  // Fix 2: track whether the scanner has actually started so cleanup never
-  // calls stop() on a scanner that never reached the running state.
+  const scannerRef = useRef(null)   // DOM element for Html5Qrcode to mount into
+  const qrRef = useRef(null)        // Html5Qrcode instance
   const isRunningRef = useRef(false)
 
   // ── Validate SID against API ──
@@ -163,60 +161,42 @@ const VolunteerValidatePage = () => {
   }, [token, API_URL])
 
   // ── Camera scanner effect ──
-  // Re-runs whenever token is set or facingMode changes (Fix 3).
-  // Cleanup is always safe because we guard with isRunningRef (Fix 2).
   useEffect(() => {
-    if (!token || !qrRef.current) return
+    if (!token || !scannerRef.current) return
 
-    let mounted = true
-
-    const start = async () => {
-      // Reset any previous camera error on each attempt
+    const startScanner = async () => {
+      if (!scannerRef.current) return
       setCameraError(null)
-
-      const qr = new Html5Qrcode(qrRef.current.id)
-      qrInstanceRef.current = qr
-
       try {
+        const qr = new Html5Qrcode(scannerRef.current.id)
+        qrRef.current = qr
         await qr.start(
-          { facingMode },
-          { fps: 10, qrbox: 260 },
-          (decodedText) => { if (mounted) handleValidate(decodedText) },
-          () => {}
+          { facingMode: facingMode },
+          { fps: 10, qrbox: { width: 250, height: 250 } },
+          (decodedText) => { handleValidate(decodedText) },
+          undefined
         )
-        // Fix 2: only mark running after a successful start
-        if (mounted) isRunningRef.current = true
-      } catch (error) {
-        console.error('QR scanner start error:', error)
-        // Fix 1: distinguish permission denied from other camera errors
-        if (
-          error.name === 'NotAllowedError' ||
-          (typeof error.message === 'string' && error.message.toLowerCase().includes('permission'))
-        ) {
-          setCameraError(
-            'Camera access denied. Please allow camera access in your browser settings, or use manual SID entry below.'
-          )
+        isRunningRef.current = true
+      } catch (err) {
+        const msg = err?.message || String(err)
+        if (msg.includes('NotAllowed') || msg.includes('Permission')) {
+          setCameraError('Camera access denied. Please allow camera access in your browser settings, or use manual SID entry below.')
         } else {
-          setCameraError('Unable to start camera. Please use manual SID entry below.')
+          setCameraError('Could not start camera: ' + msg)
         }
+        isRunningRef.current = false
       }
     }
 
-    start()
+    startScanner()
 
     return () => {
-      mounted = false
-      const instance = qrInstanceRef.current
-      // Fix 2: only call stop() when the scanner is actually running
-      if (instance && isRunningRef.current) {
-        isRunningRef.current = false
-        instance.stop()
-          .then(() => instance.clear().catch(() => {}))
-          .catch(() => {})
-      } else if (instance) {
-        instance.clear().catch(() => {})
+      if (isRunningRef.current && qrRef.current) {
+        qrRef.current.stop().catch(() => {}).finally(() => {
+          qrRef.current = null
+          isRunningRef.current = false
+        })
       }
-      qrInstanceRef.current = null
     }
   }, [token, handleValidate, facingMode])
 
@@ -370,7 +350,7 @@ const VolunteerValidatePage = () => {
                 <>
                   {/* Camera frame wrapper */}
                   <div className="relative rounded-xl overflow-hidden" style={{ border: '1px solid rgba(6,182,212,0.15)' }}>
-                    <div id="qr-reader" ref={qrRef} className="w-full" />
+                    <div id="qr-reader" ref={scannerRef} className="w-full" />
 
                     {/* Animated corner brackets */}
                     <div className="scanner-frame rounded-xl">
