@@ -1,31 +1,25 @@
 import { useState, useEffect, useRef } from 'react'
 
 const useCountUp = (target, duration = 1200) => {
-  const [count, setCount] = useState(0)
   const ref = useRef(null)
-  const [started, setStarted] = useState(false)
+  const [count, setCount] = useState(0)
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting && !started) setStarted(true) },
-      { threshold: 0.3 }
-    )
-    if (ref.current) observer.observe(ref.current)
-    return () => observer.disconnect()
-  }, [started])
-
-  useEffect(() => {
-    if (!started || target === 0) { setCount(target); return }
+    if (target === 0) { setCount(0); return }
+    let start = 0
     const steps = 40
     const inc = target / steps
-    let current = 0
     const interval = setInterval(() => {
-      current += inc
-      if (current >= target) { setCount(target); clearInterval(interval) }
-      else setCount(Math.floor(current))
+      start += inc
+      if (start >= target) {
+        setCount(target)
+        clearInterval(interval)
+      } else {
+        setCount(Math.floor(start))
+      }
     }, duration / steps)
     return () => clearInterval(interval)
-  }, [started, target, duration])
+  }, [target, duration])
 
   return { count, ref }
 }
@@ -56,10 +50,17 @@ const Card = ({ label, value, color, dot, glow }) => {
 }
 
 const MetricCards = ({ cards }) => {
-  if (!cards || cards.length === 0) return null
-  const cols = cards.length <= 3 ? cards.length : cards.length <= 4 ? 4 : cards.length <= 5 ? 5 : 6
+  if (!cards || cards.length === 0) return (
+    <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-3 mb-6">
+      {Array.from({ length: 5 }).map((_, i) => (
+        <div key={i} className="rounded-xl p-5 animate-pulse"
+          style={{ background: '#0D0D1A', border: '1px solid #1a1a2e', height: '88px' }} />
+      ))}
+    </div>
+  )
+
   return (
-    <div className={`grid grid-cols-2 md:grid-cols-${Math.min(cols, 3)} xl:grid-cols-${cols} gap-3 mb-6`}>
+    <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-3 mb-6">
       {cards.map(c => (
         <Card key={c.label} label={c.label} value={c.value} color={c.color} dot={c.dot} glow={c.glow} />
       ))}

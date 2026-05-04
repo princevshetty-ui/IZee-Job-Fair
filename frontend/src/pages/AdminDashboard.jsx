@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { motion, AnimatePresence } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 import MetricCards from '../components/admin/MetricCards'
 import RegistrationsTable from '../components/admin/RegistrationsTable'
 import OnSpotTable from '../components/admin/OnSpotTable'
@@ -10,65 +10,42 @@ import CSVImportModal from '../components/admin/CSVImportModal'
 import Toast from '../components/shared/Toast'
 import collegeLogo from '../assets/images/college-logo.png'
 
-// ─── Tab config ──────────────────────────────────────────────
 const TABS = [
-  {
-    id: 'pre',
-    label: 'Pre-Registration',
-    icon: <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
-  },
-  {
-    id: 'onspot',
-    label: 'On-Spot',
-    icon: <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-  },
-  {
-    id: 'volunteers',
-    label: 'Volunteers',
-    icon: <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-  },
-  {
-    id: 'attendance',
-    label: 'Attendance',
-    icon: <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>
-  },
-  {
-    id: 'import',
-    label: 'Import / Export',
-    icon: <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" /></svg>
-  },
+  { id: 'pre', label: 'Pre-Registration', icon: <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg> },
+  { id: 'onspot', label: 'On-Spot', icon: <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg> },
+  { id: 'volunteers', label: 'Volunteers', icon: <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg> },
+  { id: 'attendance', label: 'Attendance', icon: <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg> },
+  { id: 'import', label: 'Import / Export', icon: <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" /></svg> },
 ]
 
-// ─── Per-tab metric card configs ─────────────────────────────
 const METRIC_CFGS = {
   pre: [
     { key: 'total_pre_registered', label: 'Total Pre-Reg', color: '#818CF8', dot: '#6366F1', glow: 'rgba(99,102,241,0.15)' },
-    { key: 'pending',              label: 'Pending',       color: '#fbbf24', dot: '#F59E0B', glow: 'rgba(245,158,11,0.15)' },
-    { key: 'approved',             label: 'Approved',      color: '#34d399', dot: '#10B981', glow: 'rgba(16,185,129,0.15)' },
-    { key: 'rejected',             label: 'Rejected',      color: '#f87171', dot: '#EF4444', glow: 'rgba(239,68,68,0.15)' },
-    { key: 'approved',             label: 'Passes Sent',   color: '#a78bfa', dot: '#8B5CF6', glow: 'rgba(139,92,246,0.15)' },
+    { key: 'pending', label: 'Pending', color: '#fbbf24', dot: '#F59E0B', glow: 'rgba(245,158,11,0.15)' },
+    { key: 'approved', label: 'Approved', color: '#34d399', dot: '#10B981', glow: 'rgba(16,185,129,0.15)' },
+    { key: 'rejected', label: 'Rejected', color: '#f87171', dot: '#EF4444', glow: 'rgba(239,68,68,0.15)' },
+    { key: 'approved', label: 'Passes Sent', color: '#a78bfa', dot: '#8B5CF6', glow: 'rgba(139,92,246,0.15)' },
   ],
   onspot: [
-    { key: 'total_onspot',          label: 'Total On-Spot',   color: '#38bdf8', dot: '#0ea5e9', glow: 'rgba(14,165,233,0.15)' },
-    { key: 'onspot_students',       label: 'Students',         color: '#34d399', dot: '#10B981', glow: 'rgba(16,185,129,0.15)' },
-    { key: 'onspot_freshers',       label: 'Freshers',         color: '#a78bfa', dot: '#8B5CF6', glow: 'rgba(139,92,246,0.15)' },
-    { key: 'onspot_professionals',  label: 'Professionals',    color: '#fbbf24', dot: '#F59E0B', glow: 'rgba(245,158,11,0.15)' },
+    { key: 'total_onspot', label: 'Total On-Spot', color: '#38bdf8', dot: '#0ea5e9', glow: 'rgba(14,165,233,0.15)' },
+    { key: 'onspot_students', label: 'Students', color: '#34d399', dot: '#10B981', glow: 'rgba(16,185,129,0.15)' },
+    { key: 'onspot_freshers', label: 'Freshers', color: '#a78bfa', dot: '#8B5CF6', glow: 'rgba(139,92,246,0.15)' },
+    { key: 'onspot_professionals', label: 'Professionals', color: '#fbbf24', dot: '#F59E0B', glow: 'rgba(245,158,11,0.15)' },
   ],
   volunteers: [
     { key: 'total_volunteers', label: 'Total Volunteers', color: '#34d399', dot: '#10B981', glow: 'rgba(16,185,129,0.15)' },
   ],
   attendance: [
-    { key: 'total_validated',       label: 'Total Validated',  color: '#2dd4bf', dot: '#14b8a6', glow: 'rgba(20,184,166,0.15)' },
-    { key: 'pre_attended',          label: 'Pre-Reg',           color: '#818CF8', dot: '#6366F1', glow: 'rgba(99,102,241,0.15)' },
-    { key: 'onspot_attended',       label: 'On-Spot',           color: '#38bdf8', dot: '#0ea5e9', glow: 'rgba(14,165,233,0.15)' },
-    { key: 'students_attended',     label: 'Students',          color: '#34d399', dot: '#10B981', glow: 'rgba(16,185,129,0.15)' },
-    { key: 'freshers_attended',     label: 'Freshers',          color: '#a78bfa', dot: '#8B5CF6', glow: 'rgba(139,92,246,0.15)' },
-    { key: 'professionals_attended',label: 'Professionals',     color: '#fbbf24', dot: '#F59E0B', glow: 'rgba(245,158,11,0.15)' },
+    { key: 'total_validated', label: 'Total Validated', color: '#2dd4bf', dot: '#14b8a6', glow: 'rgba(20,184,166,0.15)' },
+    { key: 'pre_attended', label: 'Pre-Reg', color: '#818CF8', dot: '#6366F1', glow: 'rgba(99,102,241,0.15)' },
+    { key: 'onspot_attended', label: 'On-Spot', color: '#38bdf8', dot: '#0ea5e9', glow: 'rgba(14,165,233,0.15)' },
+    { key: 'students_attended', label: 'Students', color: '#34d399', dot: '#10B981', glow: 'rgba(16,185,129,0.15)' },
+    { key: 'freshers_attended', label: 'Freshers', color: '#a78bfa', dot: '#8B5CF6', glow: 'rgba(139,92,246,0.15)' },
+    { key: 'professionals_attended', label: 'Professionals', color: '#fbbf24', dot: '#F59E0B', glow: 'rgba(245,158,11,0.15)' },
   ],
   import: [],
 }
 
-// ─── Export helper ────────────────────────────────────────────
 const downloadFile = async (endpoint, filename) => {
   const API = import.meta.env.VITE_API_URL || ''
   const response = await fetch(`${API}${endpoint}`, {
@@ -83,28 +60,6 @@ const downloadFile = async (endpoint, filename) => {
   window.URL.revokeObjectURL(url)
 }
 
-// ─── Skeleton ─────────────────────────────────────────────────
-const Skeleton = () => (
-  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-5">
-    <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-3">
-      {Array.from({ length: 5 }).map((_, i) => (
-        <div key={i} className="rounded-xl p-5 animate-pulse" style={{ background: '#0D0D1A', border: '1px solid #1a1a2e' }}>
-          <div className="h-2 rounded mb-3 mx-auto w-16" style={{ background: '#1a1a2e' }} />
-          <div className="h-7 rounded mx-auto w-12" style={{ background: '#1a1a2e' }} />
-        </div>
-      ))}
-    </div>
-    <div className="rounded-xl p-6" style={{ background: '#0D0D1A', border: '1px solid #1a1a2e' }}>
-      <div className="space-y-3">
-        {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="h-10 rounded animate-pulse" style={{ background: '#1a1a2e' }} />
-        ))}
-      </div>
-    </div>
-  </motion.div>
-)
-
-// ─── Main Component ────────────────────────────────────────────
 const EMPTY_METRICS = {
   total_pre_registered: 0, total_onspot: 0, approved: 0, attended: 0,
   pending: 0, rejected: 0, total_volunteers: 0,
@@ -127,7 +82,6 @@ const AdminDashboard = () => {
 
   const showToast = (message, type = 'success') => setToast({ message, type })
 
-  // ── Fetch all data (silent = no full skeleton) ──
   const fetchAll = async (silent = false) => {
     const t = localStorage.getItem('token')
     if (!t) { navigate('/admin'); return }
@@ -152,10 +106,7 @@ const AdminDashboard = () => {
 
       let volunteersData = []
       try {
-        const t2 = localStorage.getItem('token')
-        const volRes = await fetch(`${API}/api/admin/volunteers`, {
-          headers: { Authorization: `Bearer ${t2}` }
-        })
+        const volRes = await fetch(`${API}/api/admin/volunteers`, { headers: { Authorization: `Bearer ${t}` } })
         if (volRes.ok) {
           const vd = await volRes.json()
           volunteersData = vd.data || vd || []
@@ -165,22 +116,21 @@ const AdminDashboard = () => {
       }
 
       setMetrics({
-        total_pre_registered:   stats.total_pre_registered   || 0,
-        pending:                stats.pending                || 0,
-        approved:               stats.approved               || 0,
-        rejected:               stats.rejected               || 0,
-        passes_sent:            stats.passes_sent            || 0,
-        total_onspot:           stats.total_onspot           || 0,
-        onspot_students:        stats.onspot_students        || 0,
-        onspot_freshers:        stats.onspot_freshers        || 0,
-        onspot_professionals:   stats.onspot_professionals   || 0,
-        total_volunteers:       stats.total_volunteers       || 0,
-        attended:               stats.attended               || 0,
-        total_validated:        stats.total_validated        || 0,
-        pre_attended:           stats.pre_attended           || 0,
-        onspot_attended:        stats.onspot_attended        || 0,
-        students_attended:      stats.students_attended      || 0,
-        freshers_attended:      stats.freshers_attended      || 0,
+        total_pre_registered: stats.total_pre_registered || 0,
+        pending: stats.pending || 0,
+        approved: stats.approved || 0,
+        rejected: stats.rejected || 0,
+        total_onspot: stats.total_onspot || 0,
+        onspot_students: stats.onspot_students || 0,
+        onspot_freshers: stats.onspot_freshers || 0,
+        onspot_professionals: stats.onspot_professionals || 0,
+        total_volunteers: stats.total_volunteers || 0,
+        attended: stats.attended || 0,
+        total_validated: stats.total_validated || 0,
+        pre_attended: stats.pre_attended || 0,
+        onspot_attended: stats.onspot_attended || 0,
+        students_attended: stats.students_attended || 0,
+        freshers_attended: stats.freshers_attended || 0,
         professionals_attended: stats.professionals_attended || 0,
       })
       setRegistrations(preData.data || [])
@@ -190,11 +140,10 @@ const AdminDashboard = () => {
     } catch (e) {
       console.error('Fetch error:', e)
     } finally {
-      if (!silent) setLoading(false)
+      setLoading(false)
     }
   }
 
-  // ── Mount: auth check + initial load (runs once) ──
   useEffect(() => {
     const t = localStorage.getItem('token')
     if (!t) { navigate('/admin'); return }
@@ -216,19 +165,12 @@ const AdminDashboard = () => {
 
   const handleRefresh = () => fetchAll(true)
   const handleSilentRefresh = () => fetchAll(true)
+  const handleLogout = () => { localStorage.removeItem('token'); navigate('/admin') }
 
-  const handleLogout = () => {
-    localStorage.removeItem('token')
-    navigate('/admin')
-  }
-
-  // ── Build metric cards for active tab ──
   const metricCards = (METRIC_CFGS[activeTab] || []).map(c => ({ ...c, value: metrics[c.key] ?? 0 }))
 
   return (
     <div className="admin-shell text-white min-h-screen">
-
-      {/* ── Top Bar ── */}
       <header className="admin-topbar">
         <div className="max-w-7xl mx-auto px-5 py-3.5 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-4">
@@ -243,29 +185,38 @@ const AdminDashboard = () => {
               <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
               Refresh
             </button>
-            <button
-              onClick={handleLogout}
-              className="px-3.5 py-2 text-[11px] uppercase tracking-[0.1em] rounded-lg font-medium transition-all duration-200"
-              style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#f87171' }}
-              onMouseEnter={e => e.currentTarget.style.background = 'rgba(239,68,68,0.14)'}
-              onMouseLeave={e => e.currentTarget.style.background = 'rgba(239,68,68,0.08)'}
-            >
+            <button onClick={handleLogout} className="px-3.5 py-2 text-[11px] uppercase tracking-[0.1em] rounded-lg font-medium transition-all duration-200" style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#f87171' }}>
               Logout
             </button>
           </div>
         </div>
       </header>
 
-      {/* ── Main ── */}
       <div className="max-w-7xl mx-auto px-5 py-8">
 
-        {/* Tab Bar — always visible */}
-        <div className="flex flex-wrap gap-2 mb-5">
+        {/* Tab Bar — always visible, no animation */}
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '20px' }}>
           {TABS.map(tab => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`admin-pill px-4 py-2 text-[11px] uppercase tracking-[0.12em] font-semibold flex items-center gap-2 ${activeTab === tab.id ? 'active' : ''}`}
+              style={{
+                borderRadius: '999px',
+                border: activeTab === tab.id ? '1px solid rgba(99,102,241,0.4)' : '1px solid #1a1a2e',
+                background: activeTab === tab.id ? 'rgba(99,102,241,0.15)' : 'rgba(255,255,255,0.03)',
+                color: activeTab === tab.id ? 'white' : '#94A3B8',
+                padding: '8px 16px',
+                fontSize: '11px',
+                textTransform: 'uppercase',
+                letterSpacing: '0.12em',
+                fontWeight: '600',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                cursor: 'pointer',
+                boxShadow: activeTab === tab.id ? '0 0 16px rgba(99,102,241,0.2)' : 'none',
+                transition: 'all 0.2s ease',
+              }}
             >
               {tab.icon}
               {tab.label}
@@ -273,119 +224,93 @@ const AdminDashboard = () => {
           ))}
         </div>
 
-        {/* Loading skeleton or content */}
-        {loading ? <Skeleton /> : (
-          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+        {/* Metric Cards — always visible, no animation wrapper */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '12px', marginBottom: '24px' }}>
+          {metricCards.length > 0 ? metricCards.map(c => (
+            <div
+              key={c.label}
+              style={{
+                background: '#0D0D1A',
+                border: '1px solid #1a1a2e',
+                borderRadius: '12px',
+                padding: '20px',
+                textAlign: 'center',
+                transition: 'all 0.3s ease',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '12px' }}>
+                <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: c.dot, boxShadow: `0 0 6px ${c.dot}`, display: 'inline-block' }} />
+                <p style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.18em', fontWeight: '600', color: '#475569', margin: 0 }}>{c.label}</p>
+              </div>
+              <div style={{ fontSize: '28px', fontWeight: '700', color: c.color }}>{(c.value || 0).toLocaleString()}</div>
+            </div>
+          )) : (
+            <div style={{ gridColumn: '1/-1', height: '88px', background: '#0D0D1A', border: '1px solid #1a1a2e', borderRadius: '12px' }} />
+          )}
+        </div>
 
-            {/* Metric Cards (tab-specific) */}
-            <MetricCards cards={metricCards} />
-
-            {/* Tab Content */}
-            <AnimatePresence mode="wait">
-              {activeTab === 'pre' && (
-                <motion.div key="pre" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }}
-                  className="admin-card rounded-xl p-6">
-                  <RegistrationsTable
-                    registrations={registrations}
-                    onRefresh={handleSilentRefresh}
-                    onToast={showToast}
-                  />
-                </motion.div>
-              )}
-
-              {activeTab === 'onspot' && (
-                <motion.div key="onspot" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }}
-                  className="admin-card rounded-xl p-6">
-                  <OnSpotTable
-                    registrations={onSpotRegistrations}
-                    onRefresh={handleSilentRefresh}
-                    onToast={showToast}
-                  />
-                </motion.div>
-              )}
-
-              {activeTab === 'volunteers' && (
-                <motion.div key="volunteers" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }}
-                  className="admin-card rounded-xl p-6">
-                  <VolunteersTable
-                    volunteers={volunteers}
-                    onRefresh={handleSilentRefresh}
-                    onToast={showToast}
-                  />
-                </motion.div>
-              )}
-
-              {activeTab === 'attendance' && (
-                <motion.div key="attendance" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }}
-                  className="admin-card rounded-xl p-6">
-                  <AttendanceTable attendances={attendance} />
-                </motion.div>
-              )}
-
-              {activeTab === 'import' && (
-                <motion.div key="import" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }}>
-                  <div className="space-y-6">
-
-                    {/* Import */}
-                    <div className="admin-card rounded-xl p-6">
-                      <p className="text-[10px] uppercase tracking-[0.2em] font-semibold mb-1" style={{ color: '#e5c87a' }}>Import</p>
-                      <p className="text-sm mb-5" style={{ color: '#64748B' }}>Upload a Google Forms CSV to bulk-import pre-registrations.</p>
-                      <button
-                        onClick={() => setShowImportModal(true)}
-                        className="admin-button gold px-5 py-2.5 text-xs uppercase tracking-[0.12em]"
-                      >
-                        Choose CSV File
-                      </button>
-                    </div>
-
-                    {/* Export */}
-                    <div className="admin-card rounded-xl p-6">
-                      <p className="text-[10px] uppercase tracking-[0.2em] font-semibold mb-1" style={{ color: '#818CF8' }}>Export</p>
-                      <p className="text-sm mb-5" style={{ color: '#64748B' }}>Download registration data as spreadsheet or CSV.</p>
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                        {[
-                          { label: 'Excel Pre-Reg', endpoint: '/api/admin/export/pre', filename: 'pre_registrations.zip' },
-                          { label: 'Excel On-Spot', endpoint: '/api/admin/export/onspot', filename: 'onspot_registrations.csv' },
-                          { label: 'Excel Volunteers', endpoint: '/api/admin/export/volunteers', filename: 'volunteers.csv' },
-                          { label: 'CSV Students', endpoint: '/api/admin/export/attendee-type/student', filename: 'students.csv' },
-                          { label: 'CSV Freshers', endpoint: '/api/admin/export/attendee-type/fresher', filename: 'freshers.csv' },
-                          { label: 'CSV Professionals', endpoint: '/api/admin/export/attendee-type/professional', filename: 'professionals.csv' },
-                        ].map(({ label, endpoint, filename }) => (
-                          <button
-                            key={label}
-                            type="button"
-                            onClick={() => downloadFile(endpoint, filename)}
-                            className="admin-button px-4 py-2.5 text-xs uppercase tracking-[0.1em] text-left"
-                          >
-                            {label}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
+        {/* Loading or Content */}
+        {loading ? (
+          <div style={{ background: '#0D0D1A', border: '1px solid #1a1a2e', borderRadius: '12px', padding: '24px' }}>
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} style={{ height: '40px', background: '#1a1a2e', borderRadius: '8px', marginBottom: '12px', animation: 'pulse 2s infinite' }} />
+            ))}
+          </div>
+        ) : (
+          <AnimatePresence mode="wait">
+            {activeTab === 'pre' && (
+              <motion.div key="pre" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="admin-card rounded-xl p-6">
+                <RegistrationsTable registrations={registrations} onRefresh={handleSilentRefresh} onToast={showToast} />
+              </motion.div>
+            )}
+            {activeTab === 'onspot' && (
+              <motion.div key="onspot" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="admin-card rounded-xl p-6">
+                <OnSpotTable registrations={onSpotRegistrations} onRefresh={handleSilentRefresh} onToast={showToast} />
+              </motion.div>
+            )}
+            {activeTab === 'volunteers' && (
+              <motion.div key="volunteers" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="admin-card rounded-xl p-6">
+                <VolunteersTable volunteers={volunteers} onRefresh={handleSilentRefresh} onToast={showToast} />
+              </motion.div>
+            )}
+            {activeTab === 'attendance' && (
+              <motion.div key="attendance" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="admin-card rounded-xl p-6">
+                <AttendanceTable attendances={attendance} />
+              </motion.div>
+            )}
+            {activeTab === 'import' && (
+              <motion.div key="import" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                  <div className="admin-card rounded-xl p-6">
+                    <p style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.2em', fontWeight: '600', color: '#e5c87a', marginBottom: '4px' }}>Import</p>
+                    <p style={{ fontSize: '14px', color: '#64748B', marginBottom: '20px' }}>Upload a Google Forms CSV to bulk-import pre-registrations.</p>
+                    <button onClick={() => setShowImportModal(true)} className="admin-button gold px-5 py-2.5 text-xs uppercase tracking-[0.12em]">Choose CSV File</button>
                   </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-          </motion.div>
+                  <div className="admin-card rounded-xl p-6">
+                    <p style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.2em', fontWeight: '600', color: '#818CF8', marginBottom: '4px' }}>Export</p>
+                    <p style={{ fontSize: '14px', color: '#64748B', marginBottom: '20px' }}>Download registration data as spreadsheet or CSV.</p>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
+                      {[
+                        { label: 'Excel Pre-Reg', endpoint: '/api/admin/export/pre', filename: 'pre_registrations.zip' },
+                        { label: 'Excel On-Spot', endpoint: '/api/admin/export/onspot', filename: 'onspot_registrations.csv' },
+                        { label: 'Excel Volunteers', endpoint: '/api/admin/export/volunteers', filename: 'volunteers.csv' },
+                        { label: 'CSV Students', endpoint: '/api/admin/export/attendee-type/student', filename: 'students.csv' },
+                        { label: 'CSV Freshers', endpoint: '/api/admin/export/attendee-type/fresher', filename: 'freshers.csv' },
+                        { label: 'CSV Professionals', endpoint: '/api/admin/export/attendee-type/professional', filename: 'professionals.csv' },
+                      ].map(({ label, endpoint, filename }) => (
+                        <button key={label} type="button" onClick={() => downloadFile(endpoint, filename)} className="admin-button px-4 py-2.5 text-xs uppercase tracking-[0.1em] text-left">{label}</button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         )}
       </div>
 
-      {/* ── Modals + Toast ── */}
-      <CSVImportModal
-        show={showImportModal}
-        onClose={() => setShowImportModal(false)}
-        onImportSuccess={() => { setShowImportModal(false); fetchAll(true) }}
-      />
-
-      {toast && (
-        <Toast
-          type={toast.type}
-          message={toast.message}
-          onClose={() => setToast(null)}
-        />
-      )}
+      <CSVImportModal show={showImportModal} onClose={() => setShowImportModal(false)} onImportSuccess={() => { setShowImportModal(false); fetchAll(true) }} />
+      {toast && <Toast type={toast.type} message={toast.message} onClose={() => setToast(null)} />}
     </div>
   )
 }
