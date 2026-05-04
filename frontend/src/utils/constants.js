@@ -1,3 +1,36 @@
+export const ATTENDEE_TYPES = [
+  { value: 'student', label: 'Student (Currently Studying)' },
+  { value: 'fresher', label: 'Fresher (Recently Graduated)' },
+  { value: 'professional', label: 'Working Professional' },
+]
+
+export const CITIES = [
+  'Bangalore', 'Mysore', 'Mangalore', 'Hubli', 'Belgaum', 'Tumkur', 'Others'
+]
+
+export const PASSED_OUT_YEARS = Array.from({ length: 12 }, (_, i) => 2015 + i) // 2015 to 2026
+
+export const STUDENT_ACADEMIC_LEVELS = [
+  { value: 'UG', label: 'Undergraduate' },
+  { value: 'PG', label: 'Postgraduate' },
+  { value: 'Diploma', label: 'Diploma' },
+  { value: 'ITI', label: 'ITI' },
+]
+
+export const FRESHER_STREAMS = [
+  { value: 'BBA', label: 'BBA' },
+  { value: 'BCA', label: 'BCA' },
+  { value: 'BCom', label: 'BCom' },
+  { value: 'BSc', label: 'BSc' },
+  { value: 'BA', label: 'BA' },
+  { value: 'MCA', label: 'MCA' },
+  { value: 'MCom', label: 'MCom' },
+  { value: 'MBA', label: 'MBA' },
+  { value: 'MSc', label: 'MSc' },
+  { value: 'MA', label: 'MA' },
+  { value: 'Others', label: 'Others' },
+]
+
 export const ACADEMIC_LEVELS = [
   { value: 'UG', label: 'Undergraduate' },
   { value: 'PG', label: 'Postgraduate' },

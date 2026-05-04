@@ -1,7 +1,5 @@
 import { motion } from 'framer-motion'
 import { Link, useSearchParams } from 'react-router-dom'
-import Navbar from '../components/shared/Navbar'
-
 const ConfirmationPage = () => {
   const [searchParams] = useSearchParams()
   const requestId = searchParams.get('id') || 'N/A'
@@ -17,9 +15,7 @@ const ConfirmationPage = () => {
       </div>
 
       <div className="relative z-10 w-full">
-        <Navbar transparent={false} />
-
-        <section className="min-h-[100dvh] flex items-center justify-center px-4 pt-32 pb-20">
+        <section className="min-h-[100dvh] flex items-center justify-center px-4 pt-16 pb-20">
           <div className="w-full max-w-xl mx-auto relative z-10">
             <motion.div
               initial={{ opacity: 0, y: 32 }}

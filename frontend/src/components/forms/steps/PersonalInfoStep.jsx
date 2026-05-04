@@ -1,4 +1,8 @@
+import { motion, AnimatePresence } from 'framer-motion'
 import FormField from '../FormField'
+import { ATTENDEE_TYPES, CITIES } from '../../../utils/constants'
+
+const CITY_OPTIONS = CITIES.map(c => ({ value: c, label: c }))
 
 const PersonalInfoStep = ({ formData, setFormData, errors }) => {
   const handleChange = (event) => {
@@ -40,15 +44,45 @@ const PersonalInfoStep = ({ formData, setFormData, errors }) => {
         required
       />
       <FormField
+        label="City"
+        name="city"
+        type="select"
+        value={formData.city}
+        onChange={handleChange}
+        error={errors.city}
+        options={CITY_OPTIONS}
+        required
+      />
+
+      <AnimatePresence>
+        {formData.city === 'Others' && (
+          <motion.div
+            initial={{ opacity: 0, y: -8, height: 0 }}
+            animate={{ opacity: 1, y: 0, height: 'auto' }}
+            exit={{ opacity: 0, y: -8, height: 0 }}
+            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+            style={{ overflow: 'hidden' }}
+          >
+            <FormField
+              label="Enter Your City"
+              name="city_other"
+              value={formData.city_other}
+              onChange={handleChange}
+              error={errors.city_other}
+              placeholder="Type your city name"
+              required
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <FormField
         label="Attendee Type"
         name="attendee_type"
         type="select"
         value={formData.attendee_type}
         onChange={handleChange}
-        options={[
-          { value: 'student', label: 'Fresher (Student)' },
-          { value: 'professional', label: 'Professional' }
-        ]}
+        options={ATTENDEE_TYPES}
         required
       />
     </div>

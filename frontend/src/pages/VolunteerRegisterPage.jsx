@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import Navbar from '../components/shared/Navbar'
 import FormField from '../components/forms/FormField'
 import Toast from '../components/shared/Toast'
 import { apiCall } from '../utils/api'
@@ -55,8 +54,7 @@ const VolunteerRegisterPage = () => {
           style={{ width: 600, height: 600, background: 'radial-gradient(circle, rgba(139,92,246,0.07) 0%, transparent 70%)', top: '20%', left: '50%', transform: 'translateX(-50%)' }} />
       </div>
       <div className="relative z-10">
-        <Navbar />
-        <div className="container mx-auto px-4 py-24">
+        <div className="container mx-auto px-4 py-12">
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}

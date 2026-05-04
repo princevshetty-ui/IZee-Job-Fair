@@ -1,10 +1,14 @@
 import FormField from '../FormField'
-import { ACADEMIC_LEVELS, getStreamsForLevel, MBA_SPECIALIZATIONS } from '../../../utils/constants'
+import { STUDENT_ACADEMIC_LEVELS, getStreamsForLevel, MBA_SPECIALIZATIONS } from '../../../utils/constants'
 
 const AcademicDetailsStep = ({ formData, setFormData, errors }) => {
   const handleChange = (event) => {
     const { name, value } = event.target
-    setFormData({ ...formData, [name]: value })
+    if (name === 'academic_level') {
+      setFormData({ ...formData, academic_level: value, stream: '', mba_specialization: '', stream_other: '' })
+    } else {
+      setFormData({ ...formData, [name]: value })
+    }
   }
 
   const streamOptions = getStreamsForLevel(formData.academic_level) || []
@@ -21,20 +25,22 @@ const AcademicDetailsStep = ({ formData, setFormData, errors }) => {
         value={formData.academic_level}
         onChange={handleChange}
         error={errors.academic_level}
-        options={ACADEMIC_LEVELS}
+        options={STUDENT_ACADEMIC_LEVELS}
         required
       />
 
-      <FormField
-        label="Stream"
-        name="stream"
-        type="select"
-        value={formData.stream}
-        onChange={handleChange}
-        error={errors.stream}
-        options={streamOptions}
-        required
-      />
+      {streamOptions.length > 0 && (
+        <FormField
+          label="Stream"
+          name="stream"
+          type="select"
+          value={formData.stream}
+          onChange={handleChange}
+          error={errors.stream}
+          options={streamOptions}
+          required
+        />
+      )}
 
       {formData.stream === 'MBA' && (
         <FormField
@@ -59,6 +65,16 @@ const AcademicDetailsStep = ({ formData, setFormData, errors }) => {
           required
         />
       )}
+
+      <FormField
+        label="College Name & Location"
+        name="college_name"
+        value={formData.college_name}
+        onChange={handleChange}
+        error={errors.college_name}
+        placeholder="e.g. ABC College, Bangalore"
+        required
+      />
     </div>
   )
 }

@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import Navbar from '../components/shared/Navbar'
 import RegistrationForm from '../components/forms/RegistrationForm'
 import Toast from '../components/shared/Toast'
 import { apiCall } from '../utils/api'
@@ -43,8 +42,7 @@ const RegisterPage = () => {
       </div>
 
       <div className="relative z-10">
-        <Navbar />
-        <div className="container mx-auto px-4 py-24">
+        <div className="container mx-auto px-4 py-12">
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}

@@ -9,7 +9,8 @@ PREFIXES = {
     "ITI": "ITI",
     "PUC": "PUC",
     "Graduate": "GRD",
-    "Professional": "PRO"
+    "Professional": "PRO",
+    "Fresher": "FRS"  # e.g. FRS59134
 }
 
 def generate_sid(academic_level: str) -> str:

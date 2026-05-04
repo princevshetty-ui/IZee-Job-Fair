@@ -19,7 +19,6 @@ const WHAT_TO_EXPECT = [
 
 const STATS = [
   { value: '80+', label: 'Companies Hiring' },
-  { value: '2500+', label: 'Candidates' },
   { value: '1', label: 'Day Event' },
   { value: '8th May', label: '2026' },
 ]
@@ -165,28 +164,6 @@ const LandingPage = () => {
                 >
                   Secure Your Pass
                   <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
-                </div>
-              </Link>
-
-              <Link to="/volunteer/register" className="group w-full sm:w-auto">
-                <div className="px-10 py-4 rounded-xl font-semibold text-sm tracking-[0.06em] uppercase flex items-center justify-center gap-2.5 transition-all duration-300"
-                  style={{
-                    background: 'rgba(13,13,26,0.8)',
-                    border: '1px solid rgba(99,102,241,0.25)',
-                    color: '#94A3B8',
-                  }}
-                  onMouseEnter={e => {
-                    e.currentTarget.style.borderColor = 'rgba(99,102,241,0.5)'
-                    e.currentTarget.style.color = '#c4b5fd'
-                    e.currentTarget.style.background = 'rgba(99,102,241,0.08)'
-                  }}
-                  onMouseLeave={e => {
-                    e.currentTarget.style.borderColor = 'rgba(99,102,241,0.25)'
-                    e.currentTarget.style.color = '#94A3B8'
-                    e.currentTarget.style.background = 'rgba(13,13,26,0.8)'
-                  }}
-                >
-                  Volunteer Register
                 </div>
               </Link>
             </motion.div>

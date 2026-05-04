@@ -1,4 +1,7 @@
 import FormField from '../FormField'
+import { PASSED_OUT_YEARS } from '../../../utils/constants'
+
+const YEAR_OPTIONS = PASSED_OUT_YEARS.map(y => ({ value: String(y), label: String(y) }))
 
 const ProfessionalStep = ({ formData, setFormData, errors }) => {
   const handleChange = (event) => {
@@ -17,6 +20,7 @@ const ProfessionalStep = ({ formData, setFormData, errors }) => {
         value={formData.company_name}
         onChange={handleChange}
         error={errors.company_name}
+        placeholder="Enter your company name"
         required
       />
       <FormField
@@ -25,6 +29,7 @@ const ProfessionalStep = ({ formData, setFormData, errors }) => {
         value={formData.designation}
         onChange={handleChange}
         error={errors.designation}
+        placeholder="Enter your designation"
         required
       />
       <FormField
@@ -33,25 +38,28 @@ const ProfessionalStep = ({ formData, setFormData, errors }) => {
         type="number"
         value={formData.experience_years}
         onChange={handleChange}
+        error={errors.experience_years}
+        placeholder="e.g. 3"
+        required
       />
       <FormField
-        label="Graduation College"
+        label="Graduation College & Location"
         name="graduation_college"
         value={formData.graduation_college}
         onChange={handleChange}
+        error={errors.graduation_college}
+        placeholder="e.g. ABC College, Bangalore"
+        required
       />
       <FormField
-        label="Graduation Stream"
-        name="graduation_stream"
-        value={formData.graduation_stream}
-        onChange={handleChange}
-      />
-      <FormField
-        label="Graduation Year"
+        label="Passed Out Year"
         name="graduation_year"
-        type="number"
+        type="select"
         value={formData.graduation_year}
         onChange={handleChange}
+        error={errors.graduation_year}
+        options={YEAR_OPTIONS}
+        required
       />
     </div>
   )

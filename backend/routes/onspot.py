@@ -36,6 +36,9 @@ async def register_onspot(background_tasks: BackgroundTasks, registration: OnSpo
     if registration.attendee_type == "professional":
         registration.academic_level = "Professional"
         registration.stream = "N/A"
+    elif registration.attendee_type == "fresher":
+        registration.academic_level = "Graduate"
+        # stream comes from form
 
     phone_check = supabase.table("attendees").select("id").eq("phone", registration.phone).execute()
     if phone_check.data:

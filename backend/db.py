@@ -11,3 +11,15 @@ SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 
 # Create the Supabase client
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+
+# --- Supabase SQL to run in the SQL editor ---
+#
+# ALTER TABLE attendees DROP CONSTRAINT IF EXISTS attendees_attendee_type_check;
+# ALTER TABLE attendees ADD CONSTRAINT attendees_attendee_type_check
+#   CHECK (attendee_type IN ('student', 'professional', 'fresher'));
+#
+# ALTER TABLE attendees DROP CONSTRAINT IF EXISTS attendees_academic_level_check;
+# ALTER TABLE attendees ADD CONSTRAINT attendees_academic_level_check
+#   CHECK (academic_level IN ('UG', 'PG', 'Diploma', 'ITI', 'PUC', 'Graduate', 'Professional'));
+#
+# ALTER TABLE attendees ADD COLUMN IF NOT EXISTS city TEXT;

@@ -32,10 +32,13 @@ class RegistrationRequest(BaseModel):
 
 @router.post("/register", status_code=status.HTTP_201_CREATED)
 async def register_attendee(registration: RegistrationRequest):
-    # If attendee_type is professional, auto-set academic_level and stream
+    # Auto-set academic_level/stream based on attendee_type
     if registration.attendee_type == 'professional':
         registration.academic_level = 'Professional'
         registration.stream = 'N/A'
+    elif registration.attendee_type == 'fresher':
+        registration.academic_level = 'Graduate'
+        # stream comes from form
     
     # Check phone uniqueness
     phone_check = supabase.table("attendees").select("id").eq("phone", registration.phone).execute()
