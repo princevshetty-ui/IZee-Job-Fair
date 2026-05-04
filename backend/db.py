@@ -7,6 +7,9 @@ load_dotenv()
 
 # Get Supabase credentials
 SUPABASE_URL = os.getenv("SUPABASE_URL")
+# SUPABASE_KEY must be the service_role key (bypasses RLS).
+# The Supabase dashboard may label it "deprecated" — that is a UI naming change only;
+# the key itself is valid and correct. Do not swap it for the anon key.
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 
 # Create the Supabase client

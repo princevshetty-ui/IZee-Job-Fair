@@ -32,12 +32,12 @@ async def register_volunteer(request: VolunteerRegistrationRequest):
             detail="Roll number must be exactly 12 alphanumeric characters"
         )
     
-    # Check if roll_number is unique
+    # Block if roll_number already exists, regardless of status
     roll_check = supabase.table("volunteers").select("id").eq("roll_number", request.roll_number).execute()
     if roll_check.data:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail="Roll number already registered"
+            detail="This roll number is already registered."
         )
     
     # Insert volunteer data

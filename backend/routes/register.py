@@ -40,21 +40,29 @@ async def register_attendee(registration: RegistrationRequest):
         registration.academic_level = 'Graduate'
         # stream comes from form
     
-    # Check phone uniqueness
+    # Block only when all three fields match an existing record
+    exact_check = (
+        supabase.table("attendees")
+        .select("id")
+        .eq("full_name", registration.full_name)
+        .eq("phone", registration.phone)
+        .eq("email", registration.email)
+        .execute()
+    )
+    if exact_check.data:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="You have already registered with these details."
+        )
+
+    # Soft warnings — phone or email alone overlap but are not blocked
     phone_check = supabase.table("attendees").select("id").eq("phone", registration.phone).execute()
     if phone_check.data:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="Phone number already registered"
-        )
-    
-    # Check email uniqueness
+        print(f"[WARN] Phone {registration.phone} already exists but name/email differ — allowing registration")
+
     email_check = supabase.table("attendees").select("id").eq("email", registration.email).execute()
     if email_check.data:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="Email already registered"
-        )
+        print(f"[WARN] Email {registration.email} already exists but name/phone differ — allowing registration")
     
     # Generate a unique SID
     sid = generate_sid(registration.academic_level)

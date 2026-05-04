@@ -1,7 +1,6 @@
-import random
+import re
 from db import supabase
 
-# Define prefixes for different academic levels
 PREFIXES = {
     "UG": "UGR",
     "PG": "PGR",
@@ -10,32 +9,32 @@ PREFIXES = {
     "PUC": "PUC",
     "Graduate": "GRD",
     "Professional": "PRO",
-    "Fresher": "FRS"  # e.g. FRS59134
+    "Fresher": "FRS"
 }
+
 
 def generate_sid(academic_level: str) -> str:
     """
-    Generate a unique SID with appropriate prefix and check for uniqueness in database.
-    Returns a unique SID string.
+    Generate a sequential SID for the given academic level.
+
+    Queries the DB for the highest existing number under this prefix,
+    then returns prefix + (max + 1) zero-padded to at least 3 digits.
+    Each prefix has its own independent sequence (UGR001, PGR001, DIP001 …).
     """
-    # Get the prefix for the academic level
-    prefix = PREFIXES.get(academic_level, "GEN")  # Default to "GEN" if not found
-    
-    # Generate SID with prefix and random 5-digit number
-    max_retries = 100
-    for _ in range(max_retries):
-        # Generate random 5-digit number between 10000-99999
-        random_number = random.randint(10000, 99999)
-        sid = f"{prefix}{random_number}"
-        
-        # Check if SID already exists in database
-        try:
-            response = supabase.table("attendees").select("id").eq("sid", sid).execute()
-            if not response.data:
-                return sid
-        except Exception:
-            # If there's an error checking uniqueness, we'll assume it's unique and return it
-            return sid
-    
-    # If we've exhausted retries, raise an exception
-    raise Exception("Could not generate unique SID after 100 retries")
+    prefix = PREFIXES.get(academic_level, "GEN")
+
+    # Fetch all SIDs that start with this prefix
+    response = supabase.table("attendees").select("sid").like("sid", f"{prefix}%").execute()
+    existing = response.data or []
+
+    max_num = 0
+    for row in existing:
+        sid = row.get("sid", "")
+        # Extract the numeric suffix after the prefix
+        match = re.match(rf"^{re.escape(prefix)}(\d+)$", sid)
+        if match:
+            max_num = max(max_num, int(match.group(1)))
+
+    next_num = max_num + 1
+    # Zero-pad to at least 3 digits; if the sequence grows beyond 3 digits it expands naturally
+    return f"{prefix}{next_num:03d}"
