@@ -130,6 +130,7 @@ const AdminDashboard = () => {
   // ── Fetch all data (silent = no full skeleton) ──
   const fetchAll = async (silent = false) => {
     const t = localStorage.getItem('token')
+    console.log('Token from localStorage:', t ? 'EXISTS' : 'NULL')
     if (!t) { navigate('/admin'); return }
     if (!silent) setLoading(true)
     try {
@@ -152,13 +153,16 @@ const AdminDashboard = () => {
 
       let volunteersData = []
       try {
-        const volunteersRes = await fetch(`${API}/api/admin/volunteers`, { headers })
-        if (volunteersRes.ok) {
-          const vd = await volunteersRes.json()
+        const t2 = localStorage.getItem('token')
+        const volRes = await fetch(`${API}/api/admin/volunteers`, {
+          headers: { Authorization: `Bearer ${t2}` }
+        })
+        if (volRes.ok) {
+          const vd = await volRes.json()
           volunteersData = vd.data || vd || []
         }
       } catch (e) {
-        console.warn('Volunteers endpoint not available:', e)
+        console.warn('Volunteers fetch failed:', e)
       }
 
       setMetrics({ ...EMPTY_METRICS, ...stats })
