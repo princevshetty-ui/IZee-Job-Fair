@@ -77,14 +77,13 @@ const RegistrationForm = ({ onSubmit, submitting = false }) => {
       if (!formData.full_name) nextErrors.full_name = 'Full name is required'
       if (!formData.phone) nextErrors.phone = 'Phone is required'
       if (!formData.email) nextErrors.email = 'Email is required'
-      if (!formData.city) nextErrors.city = 'City is required'
-      if (formData.city === 'Others' && !formData.city_other) nextErrors.city_other = 'Please enter your city'
     }
 
     if (key === 'academic') {
       if (!formData.academic_level) nextErrors.academic_level = 'Academic level is required'
       if (!formData.stream) nextErrors.stream = 'Stream is required'
       if (!formData.college_name) nextErrors.college_name = 'College name is required'
+      if (!formData.city) nextErrors.city = 'College city is required'
       if (formData.stream === 'MBA' && !formData.mba_specialization) {
         nextErrors.mba_specialization = 'MBA specialization is required'
       }
@@ -93,13 +92,11 @@ const RegistrationForm = ({ onSubmit, submitting = false }) => {
       }
     }
 
-    if (key === 'coordinator') {
-      if (!formData.coordinator_name) nextErrors.coordinator_name = 'Coordinator name is required'
-      if (!formData.coordinator_phone) nextErrors.coordinator_phone = 'Coordinator phone is required'
-      if (!formData.coordinator_email) nextErrors.coordinator_email = 'Coordinator email is required'
-    }
+    // coordinator — all fields optional, no validation needed
 
     if (key === 'fresher') {
+      if (!formData.college_name) nextErrors.college_name = 'College name is required'
+      if (!formData.city) nextErrors.city = 'City is required'
       if (!formData.graduation_college) nextErrors.graduation_college = 'Graduation college is required'
       if (!formData.graduation_year) nextErrors.graduation_year = 'Passed out year is required'
       if (!formData.stream) nextErrors.stream = 'Stream is required'
@@ -136,7 +133,6 @@ const RegistrationForm = ({ onSubmit, submitting = false }) => {
     const { city_other, ...rest } = formData
     const payload = {
       ...rest,
-      city: formData.city === 'Others' ? city_other : formData.city,
       experience_years: formData.experience_years === '' ? null : Number(formData.experience_years),
       graduation_year: formData.graduation_year === '' ? null : Number(formData.graduation_year),
     }

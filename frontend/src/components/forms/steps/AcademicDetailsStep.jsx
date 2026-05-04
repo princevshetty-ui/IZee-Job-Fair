@@ -1,5 +1,7 @@
 import FormField from '../FormField'
-import { STUDENT_ACADEMIC_LEVELS, getStreamsForLevel, MBA_SPECIALIZATIONS } from '../../../utils/constants'
+import { STUDENT_ACADEMIC_LEVELS, getStreamsForLevel, MBA_SPECIALIZATIONS, CITIES } from '../../../utils/constants'
+
+const CITY_OPTIONS = CITIES.map(c => ({ value: c, label: c }))
 
 const AcademicDetailsStep = ({ formData, setFormData, errors }) => {
   const handleChange = (event) => {
@@ -67,12 +69,23 @@ const AcademicDetailsStep = ({ formData, setFormData, errors }) => {
       )}
 
       <FormField
-        label="College Name & Location"
+        label="College Name"
         name="college_name"
         value={formData.college_name}
         onChange={handleChange}
         error={errors.college_name}
-        placeholder="e.g. ABC College, Bangalore"
+        placeholder="e.g. ABC Institute of Technology"
+        required
+      />
+
+      <FormField
+        label="College City"
+        name="city"
+        type="select"
+        value={formData.city}
+        onChange={handleChange}
+        error={errors.city}
+        options={CITY_OPTIONS}
         required
       />
     </div>

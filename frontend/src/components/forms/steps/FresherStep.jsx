@@ -1,7 +1,8 @@
 import FormField from '../FormField'
-import { FRESHER_STREAMS, PASSED_OUT_YEARS } from '../../../utils/constants'
+import { FRESHER_STREAMS, PASSED_OUT_YEARS, CITIES } from '../../../utils/constants'
 
 const YEAR_OPTIONS = PASSED_OUT_YEARS.map(y => ({ value: String(y), label: String(y) }))
+const CITY_OPTIONS = CITIES.map(c => ({ value: c, label: c }))
 
 const FresherStep = ({ formData, setFormData, errors }) => {
   const handleChange = (event) => {
@@ -13,6 +14,27 @@ const FresherStep = ({ formData, setFormData, errors }) => {
     <div>
       <h2 className="text-2xl font-light text-white mb-2 font-heading-art tracking-tight">Education Details</h2>
       <p className="text-slate-400 text-sm mb-8">Please provide your graduation details</p>
+
+      <FormField
+        label="College Name"
+        name="college_name"
+        value={formData.college_name}
+        onChange={handleChange}
+        error={errors.college_name}
+        placeholder="e.g. ABC Institute of Technology"
+        required
+      />
+
+      <FormField
+        label="City"
+        name="city"
+        type="select"
+        value={formData.city}
+        onChange={handleChange}
+        error={errors.city}
+        options={CITY_OPTIONS}
+        required
+      />
 
       <FormField
         label="Graduation College & Location"

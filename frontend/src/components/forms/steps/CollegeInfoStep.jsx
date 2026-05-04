@@ -9,25 +9,21 @@ const CollegeInfoStep = ({ formData, setFormData, errors }) => {
   return (
     <div>
       <h2 className="text-2xl font-light text-white mb-2 font-heading-art tracking-tight">Coordinator Information</h2>
-      <p className="text-slate-400 text-sm mb-8">Please provide your college coordinator's contact details</p>
+      <p className="text-slate-400 text-sm mb-8">Coordinator details are optional — fill in if available</p>
 
       <FormField
         label="Coordinator Name"
         name="coordinator_name"
         value={formData.coordinator_name}
         onChange={handleChange}
-        error={errors.coordinator_name}
-        placeholder="Enter coordinator name"
-        required
+        placeholder="Enter coordinator name (optional)"
       />
       <FormField
         label="Coordinator Phone"
         name="coordinator_phone"
         value={formData.coordinator_phone}
         onChange={handleChange}
-        error={errors.coordinator_phone}
-        placeholder="Enter coordinator phone"
-        required
+        placeholder="Enter coordinator phone (optional)"
       />
       <FormField
         label="Coordinator Email"
@@ -35,9 +31,7 @@ const CollegeInfoStep = ({ formData, setFormData, errors }) => {
         type="email"
         value={formData.coordinator_email}
         onChange={handleChange}
-        error={errors.coordinator_email}
-        placeholder="Enter coordinator email"
-        required
+        placeholder="Enter coordinator email (optional)"
       />
       <FormField
         label="Principal Name"

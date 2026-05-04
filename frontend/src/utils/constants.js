@@ -8,13 +8,17 @@ export const CITIES = [
   'Bangalore', 'Mysore', 'Mangalore', 'Hubli', 'Belgaum', 'Tumkur', 'Others'
 ]
 
-export const PASSED_OUT_YEARS = Array.from({ length: 12 }, (_, i) => 2015 + i) // 2015 to 2026
+export const PASSED_OUT_YEARS = Array.from({ length: 27 }, (_, i) => 2000 + i) // 2000 to 2026
 
 export const STUDENT_ACADEMIC_LEVELS = [
   { value: 'UG', label: 'Undergraduate' },
   { value: 'PG', label: 'Postgraduate' },
   { value: 'Diploma', label: 'Diploma' },
   { value: 'ITI', label: 'ITI' },
+  { value: 'PUC', label: 'PUC Pass' },
+  // DB: run ALTER TABLE attendees DROP CONSTRAINT attendees_academic_level_check;
+  // ALTER TABLE attendees ADD CONSTRAINT attendees_academic_level_check
+  //   CHECK (academic_level IN ('UG','PG','Diploma','ITI','PUC','Graduate','Professional'));
 ]
 
 export const FRESHER_STREAMS = [

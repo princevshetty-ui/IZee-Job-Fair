@@ -21,8 +21,10 @@ supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 # ALTER TABLE attendees ADD CONSTRAINT attendees_attendee_type_check
 #   CHECK (attendee_type IN ('student', 'professional', 'fresher'));
 #
+# Fix 3 — PUC added back to academic level options:
 # ALTER TABLE attendees DROP CONSTRAINT IF EXISTS attendees_academic_level_check;
 # ALTER TABLE attendees ADD CONSTRAINT attendees_academic_level_check
 #   CHECK (academic_level IN ('UG', 'PG', 'Diploma', 'ITI', 'PUC', 'Graduate', 'Professional'));
 #
+# Fix 4 — city stored separately from college_name:
 # ALTER TABLE attendees ADD COLUMN IF NOT EXISTS city TEXT;
