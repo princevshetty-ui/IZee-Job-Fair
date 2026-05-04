@@ -150,7 +150,7 @@ const LandingPage = () => {
               <Link to="/register" className="group w-full sm:w-auto">
                 <div className="relative overflow-hidden px-10 py-4 rounded-xl font-semibold text-sm tracking-[0.06em] uppercase text-white flex items-center justify-center gap-2.5 transition-all duration-300"
                   style={{
-                    background: 'linear-gradient(135deg, #6366F1, #8B5CF6)',
+                    background: 'linear-gradient(135deg, #6146b3ff, #2177daff)',
                     boxShadow: '0 4px 24px rgba(99,102,241,0.4)',
                   }}
                   onMouseEnter={e => {
@@ -314,7 +314,7 @@ const LandingPage = () => {
                 </p>
                 <Link to="/register" className="group inline-block">
                   <div className="relative overflow-hidden px-12 py-4 rounded-xl font-semibold text-sm tracking-[0.06em] uppercase text-white inline-flex items-center gap-2.5 transition-all duration-300"
-                    style={{ background: 'linear-gradient(135deg, #6366F1, #8B5CF6)', boxShadow: '0 4px 24px rgba(99,102,241,0.4)' }}
+                    style={{ background: 'linear-gradient(135deg, #6146b3ff, #2177daff)', boxShadow: '0 4px 24px rgba(61, 64, 240, 0.4)' }}
                     onMouseEnter={e => {
                       e.currentTarget.style.transform = 'translateY(-2px)'
                       e.currentTarget.style.boxShadow = '0 10px 40px rgba(99,102,241,0.55)'
