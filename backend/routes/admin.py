@@ -156,13 +156,7 @@ async def approve_attendee(attendee_id: str, background_tasks: BackgroundTasks, 
             supabase.table("attendees").update({"sid": sid}).eq("id", attendee_id).execute()
 
         reg_type_label = "ON-SPOT" if reg_type == "onspot" else "PRE-REGISTERED"
-        pass_image_b64 = generate_pass(
-            academic_level=attendee.get("academic_level"),
-            full_name=full_name,
-            stream=attendee.get("stream"),
-            sid=sid,
-            reg_type=reg_type_label
-        )
+        pass_image_b64 = generate_pass({**attendee, "sid": sid})
         background_tasks.add_task(send_pass_email, email, full_name, sid, pass_image_b64, reg_type_label)
         return {"message": "Attendee approved", "email": email}
     except HTTPException:
@@ -203,13 +197,7 @@ async def resend_pass(attendee_id: str, background_tasks: BackgroundTasks, admin
 
         reg_type = attendee.get("reg_type", "pre")
         reg_type_label = "ON-SPOT" if reg_type == "onspot" else "PRE-REGISTERED"
-        pass_image_b64 = generate_pass(
-            academic_level=attendee.get("academic_level"),
-            full_name=attendee.get("full_name"),
-            stream=attendee.get("stream"),
-            sid=sid,
-            reg_type=reg_type_label
-        )
+        pass_image_b64 = generate_pass({**attendee, "sid": sid})
         background_tasks.add_task(send_pass_email, attendee.get("email"), attendee.get("full_name"), sid, pass_image_b64, reg_type_label)
         return {"message": "Pass resent successfully", "email": attendee.get("email")}
     except HTTPException:
@@ -239,13 +227,7 @@ async def bulk_approve(req: BulkActionRequest, background_tasks: BackgroundTasks
                 sid = generate_sid(attendee.get("academic_level", "UG"))
                 supabase.table("attendees").update({"sid": sid}).eq("id", attendee_id).execute()
 
-            pass_image = generate_pass(
-                academic_level=attendee.get("academic_level"),
-                full_name=attendee.get("full_name"),
-                stream=attendee.get("stream"),
-                sid=sid,
-                reg_type="PRE-REGISTERED"
-            )
+            pass_image = generate_pass({**attendee, "sid": sid})
             background_tasks.add_task(
                 send_pass_email,
                 attendee.get("email"), attendee.get("full_name"), sid, pass_image, "PRE-REGISTERED"
@@ -282,13 +264,7 @@ async def bulk_resend(req: BulkActionRequest, background_tasks: BackgroundTasks,
 
             reg_type = attendee.get("reg_type", "pre")
             reg_type_label = "ON-SPOT" if reg_type == "onspot" else "PRE-REGISTERED"
-            pass_image = generate_pass(
-                academic_level=attendee.get("academic_level"),
-                full_name=attendee.get("full_name"),
-                stream=attendee.get("stream"),
-                sid=sid,
-                reg_type=reg_type_label
-            )
+            pass_image = generate_pass({**attendee, "sid": sid})
             background_tasks.add_task(
                 send_pass_email,
                 attendee.get("email"), attendee.get("full_name"), sid, pass_image, reg_type_label
@@ -312,13 +288,7 @@ async def resend_all_passes(background_tasks: BackgroundTasks, admin: dict = Dep
                 supabase.table("attendees").update({"sid": sid}).eq("id", attendee.get("id")).execute()
             reg_type = attendee.get("reg_type", "pre")
             reg_type_label = "ON-SPOT" if reg_type == "onspot" else "PRE-REGISTERED"
-            pass_image_b64 = generate_pass(
-                academic_level=attendee.get("academic_level"),
-                full_name=attendee.get("full_name"),
-                stream=attendee.get("stream"),
-                sid=sid,
-                reg_type=reg_type_label
-            )
+            pass_image_b64 = generate_pass({**attendee, "sid": sid})
             background_tasks.add_task(send_pass_email, attendee.get("email"), attendee.get("full_name"), sid, pass_image_b64, reg_type_label)
         return {"message": f"Queued {len(attendees)} emails for sending", "queued": len(attendees)}
     except Exception as e:

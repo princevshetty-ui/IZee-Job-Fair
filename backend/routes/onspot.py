@@ -101,13 +101,15 @@ async def register_onspot(background_tasks: BackgroundTasks, registration: OnSpo
             detail="Failed to register attendee"
         )
 
-    pass_image = generate_pass(
-        academic_level=registration.academic_level,
-        full_name=registration.full_name,
-        stream=registration.stream,
-        sid=sid,
-        reg_type="ON-SPOT"
-    )
+    pass_image = generate_pass({
+        "full_name": registration.full_name,
+        "academic_level": registration.academic_level,
+        "stream": registration.stream,
+        "sid": sid,
+        "reg_type": "ON-SPOT",
+        "attendee_type": registration.attendee_type,
+        "college_name": registration.college_name,
+    })
 
     background_tasks.add_task(
         send_pass_email,
