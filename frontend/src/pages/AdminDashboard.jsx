@@ -68,16 +68,20 @@ const AdminDashboard = () => {
     } finally {
       setLoading(false)
     }
-  }, [token, clearAuth, navigate])
+  // navigate is stable (React Router guarantee); clearAuth is only called on 401 redirect
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token])
 
   useEffect(() => {
     if (!isAuthenticated()) {
       navigate('/admin')
       return
     }
-    const timer = setTimeout(() => { fetchData() }, 0)
-    return () => clearTimeout(timer)
-  }, [token, isAuthenticated, navigate, fetchData])
+    fetchData()
+  // Re-run only when token changes — isAuthenticated/fetchData are intentionally excluded
+  // to prevent the infinite loop caused by useAuth returning new function refs each render
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token])
 
   const downloadFile = async (endpoint, filename) => {
     const API_URL = import.meta.env.VITE_API_URL || ''
