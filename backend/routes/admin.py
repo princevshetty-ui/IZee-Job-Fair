@@ -3,6 +3,10 @@ from fastapi.responses import Response
 from db import supabase
 from auth import get_current_admin
 from utils.csv_export import export_attendees_csv, export_pre_register_zip, export_onspot_csv
+from utils.excel_export import (
+    export_master_excel, export_pre_excel, export_onspot_excel,
+    export_volunteers_excel, export_attended_excel,
+)
 from utils.csv_import import map_gforms_row
 from pass_generator import generate_pass
 from email_service import send_pass_email
@@ -404,6 +408,72 @@ async def export_by_type(attendee_type: str, admin: dict = Depends(get_current_a
             writer.writerows(rows)
         return Response(content=out.getvalue(), media_type="text/csv", headers={
             "Content-Disposition": f"attachment; filename={attendee_type}s.csv"
+        })
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ─── Excel Exports ───
+
+XLSX_MIME = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+
+
+@router.get("/admin/export/excel/master")
+async def export_excel_master(admin: dict = Depends(get_current_admin)):
+    try:
+        att_res = supabase.table("attendees").select("*").execute()
+        vol_res = supabase.table("volunteers").select("*").execute()
+        data = export_master_excel(att_res.data or [], vol_res.data or [])
+        return Response(content=data, media_type=XLSX_MIME, headers={
+            "Content-Disposition": "attachment; filename=IZee_Job_Fair_2026_Master.xlsx"
+        })
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/admin/export/excel/pre")
+async def export_excel_pre(admin: dict = Depends(get_current_admin)):
+    try:
+        res = supabase.table("attendees").select("*").eq("reg_type", "pre").execute()
+        data = export_pre_excel(res.data or [])
+        return Response(content=data, media_type=XLSX_MIME, headers={
+            "Content-Disposition": "attachment; filename=Pre_Registrations.xlsx"
+        })
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/admin/export/excel/onspot")
+async def export_excel_onspot(admin: dict = Depends(get_current_admin)):
+    try:
+        res = supabase.table("attendees").select("*").eq("reg_type", "onspot").execute()
+        data = export_onspot_excel(res.data or [])
+        return Response(content=data, media_type=XLSX_MIME, headers={
+            "Content-Disposition": "attachment; filename=OnSpot_Registrations.xlsx"
+        })
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/admin/export/excel/volunteers")
+async def export_excel_volunteers(admin: dict = Depends(get_current_admin)):
+    try:
+        res = supabase.table("volunteers").select("*").execute()
+        data = export_volunteers_excel(res.data or [])
+        return Response(content=data, media_type=XLSX_MIME, headers={
+            "Content-Disposition": "attachment; filename=Volunteers.xlsx"
+        })
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/admin/export/excel/attended")
+async def export_excel_attended(admin: dict = Depends(get_current_admin)):
+    try:
+        res = supabase.table("attendees").select("*").eq("attended", True).execute()
+        data = export_attended_excel(res.data or [])
+        return Response(content=data, media_type=XLSX_MIME, headers={
+            "Content-Disposition": "attachment; filename=Attendance.xlsx"
         })
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

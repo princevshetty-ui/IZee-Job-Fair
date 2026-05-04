@@ -280,28 +280,111 @@ const AdminDashboard = () => {
             )}
             {activeTab === 'import' && (
               <motion.div key="import" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+
+                  {/* Import */}
                   <div className="admin-card rounded-xl p-6">
-                    <p style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.2em', fontWeight: '600', color: '#e5c87a', marginBottom: '4px' }}>Import</p>
-                    <p style={{ fontSize: '14px', color: '#64748B', marginBottom: '20px' }}>Upload a Google Forms CSV to bulk-import pre-registrations.</p>
-                    <button onClick={() => setShowImportModal(true)} className="admin-button gold px-5 py-2.5 text-xs uppercase tracking-[0.12em]">Choose CSV File</button>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>
+                      <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#e5c87a', boxShadow: '0 0 6px #e5c87a', display: 'inline-block' }} />
+                      <p style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.2em', fontWeight: '600', color: '#e5c87a', margin: 0 }}>Import</p>
+                    </div>
+                    <p style={{ fontSize: '13px', color: '#64748B', marginBottom: '16px', marginTop: '8px' }}>Upload a Google Forms CSV to bulk-import pre-registrations.</p>
+                    <button onClick={() => setShowImportModal(true)} className="admin-button gold px-5 py-2.5 text-xs uppercase tracking-[0.12em]">
+                      Choose CSV File
+                    </button>
                   </div>
+
+                  {/* Excel Exports */}
                   <div className="admin-card rounded-xl p-6">
-                    <p style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.2em', fontWeight: '600', color: '#818CF8', marginBottom: '4px' }}>Export</p>
-                    <p style={{ fontSize: '14px', color: '#64748B', marginBottom: '20px' }}>Download registration data as spreadsheet or CSV.</p>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>
+                      <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#34d399', boxShadow: '0 0 6px #34d399', display: 'inline-block' }} />
+                      <p style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.2em', fontWeight: '600', color: '#34d399', margin: 0 }}>Excel Export (.xlsx)</p>
+                    </div>
+                    <p style={{ fontSize: '13px', color: '#64748B', marginBottom: '16px', marginTop: '8px' }}>Download formatted spreadsheets. Each file opens directly in Excel / Google Sheets.</p>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: '10px' }}>
                       {[
-                        { label: 'Excel Pre-Reg', endpoint: '/api/admin/export/pre', filename: 'pre_registrations.zip' },
-                        { label: 'Excel On-Spot', endpoint: '/api/admin/export/onspot', filename: 'onspot_registrations.csv' },
-                        { label: 'Excel Volunteers', endpoint: '/api/admin/export/volunteers', filename: 'volunteers.csv' },
-                        { label: 'CSV Students', endpoint: '/api/admin/export/attendee-type/student', filename: 'students.csv' },
-                        { label: 'CSV Freshers', endpoint: '/api/admin/export/attendee-type/fresher', filename: 'freshers.csv' },
-                        { label: 'CSV Professionals', endpoint: '/api/admin/export/attendee-type/professional', filename: 'professionals.csv' },
-                      ].map(({ label, endpoint, filename }) => (
-                        <button key={label} type="button" onClick={() => downloadFile(endpoint, filename)} className="admin-button px-4 py-2.5 text-xs uppercase tracking-[0.1em] text-left">{label}</button>
+                        { label: 'Master Export', sub: 'All sheets + Volunteers', endpoint: '/api/admin/export/excel/master', filename: 'IZee_Job_Fair_2026_Master.xlsx', accent: '#818CF8' },
+                        { label: 'Pre-Registrations', sub: 'Students / Freshers / Professionals tabs', endpoint: '/api/admin/export/excel/pre', filename: 'Pre_Registrations.xlsx', accent: '#38bdf8' },
+                        { label: 'On-Spot', sub: 'All on-spot registrations', endpoint: '/api/admin/export/excel/onspot', filename: 'OnSpot_Registrations.xlsx', accent: '#34d399' },
+                        { label: 'Attendance', sub: 'Only scanned / attended', endpoint: '/api/admin/export/excel/attended', filename: 'Attendance.xlsx', accent: '#2dd4bf' },
+                        { label: 'Volunteers', sub: 'All volunteer records', endpoint: '/api/admin/export/excel/volunteers', filename: 'Volunteers.xlsx', accent: '#fbbf24' },
+                      ].map(({ label, sub, endpoint, filename, accent }) => (
+                        <button
+                          key={label}
+                          type="button"
+                          onClick={() => downloadFile(endpoint, filename)}
+                          style={{
+                            background: 'rgba(255,255,255,0.02)',
+                            border: `1px solid rgba(${accent === '#818CF8' ? '129,140,248' : accent === '#38bdf8' ? '56,189,248' : accent === '#34d399' ? '52,211,153' : accent === '#2dd4bf' ? '45,212,191' : '251,191,36'},0.2)`,
+                            borderRadius: '10px',
+                            padding: '14px 16px',
+                            textAlign: 'left',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s ease',
+                          }}
+                          onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; e.currentTarget.style.transform = 'translateY(-1px)' }}
+                          onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.02)'; e.currentTarget.style.transform = 'translateY(0)' }}
+                        >
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={accent} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
+                            </svg>
+                            <span style={{ fontSize: '11px', fontWeight: '600', color: 'white', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{label}</span>
+                            <span style={{ marginLeft: 'auto', fontSize: '9px', background: 'rgba(52,211,153,0.12)', color: '#34d399', border: '1px solid rgba(52,211,153,0.25)', borderRadius: '4px', padding: '1px 6px', fontWeight: '600' }}>XLSX</span>
+                          </div>
+                          <p style={{ fontSize: '10px', color: '#475569', margin: 0 }}>{sub}</p>
+                        </button>
                       ))}
                     </div>
                   </div>
+
+                  {/* CSV Exports */}
+                  <div className="admin-card rounded-xl p-6">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>
+                      <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#818CF8', boxShadow: '0 0 6px #818CF8', display: 'inline-block' }} />
+                      <p style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.2em', fontWeight: '600', color: '#818CF8', margin: 0 }}>CSV Export (.csv)</p>
+                    </div>
+                    <p style={{ fontSize: '13px', color: '#64748B', marginBottom: '16px', marginTop: '8px' }}>Lightweight flat-file exports for scripting, analysis, or backup.</p>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '8px' }}>
+                      {[
+                        { label: 'All Registrations', endpoint: '/api/admin/export/all', filename: 'all_registrations.csv' },
+                        { label: 'Pre-Registered', endpoint: '/api/admin/export/pre', filename: 'pre_registrations.zip' },
+                        { label: 'On-Spot', endpoint: '/api/admin/export/onspot', filename: 'onspot_registrations.csv' },
+                        { label: 'Attended', endpoint: '/api/admin/export/attended', filename: 'attended.csv' },
+                        { label: 'Students', endpoint: '/api/admin/export/attendee-type/student', filename: 'students.csv' },
+                        { label: 'Freshers', endpoint: '/api/admin/export/attendee-type/fresher', filename: 'freshers.csv' },
+                        { label: 'Professionals', endpoint: '/api/admin/export/attendee-type/professional', filename: 'professionals.csv' },
+                        { label: 'Volunteers', endpoint: '/api/admin/export/volunteers', filename: 'volunteers.csv' },
+                      ].map(({ label, endpoint, filename }) => (
+                        <button
+                          key={label}
+                          type="button"
+                          onClick={() => downloadFile(endpoint, filename)}
+                          style={{
+                            background: 'rgba(255,255,255,0.02)',
+                            border: '1px solid rgba(129,140,248,0.15)',
+                            borderRadius: '8px',
+                            padding: '10px 14px',
+                            textAlign: 'left',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            transition: 'all 0.2s ease',
+                          }}
+                          onMouseEnter={e => { e.currentTarget.style.background = 'rgba(129,140,248,0.06)'; e.currentTarget.style.borderColor = 'rgba(129,140,248,0.3)' }}
+                          onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.02)'; e.currentTarget.style.borderColor = 'rgba(129,140,248,0.15)' }}
+                        >
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#818CF8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+                          </svg>
+                          <span style={{ fontSize: '11px', color: '#CBD5E1', fontWeight: '500' }}>{label}</span>
+                          <span style={{ marginLeft: 'auto', fontSize: '9px', background: 'rgba(129,140,248,0.1)', color: '#818CF8', border: '1px solid rgba(129,140,248,0.2)', borderRadius: '3px', padding: '1px 5px', fontWeight: '600' }}>CSV</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
                 </div>
               </motion.div>
             )}
