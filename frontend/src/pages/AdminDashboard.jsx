@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../hooks/useAuth';
@@ -35,11 +35,12 @@ const AdminDashboard = () => {
     rejected: 0
   });
 
-  const fetchData = useCallback(async () => {
-    if (!token) return
+  const fetchData = async () => {
+    const t = localStorage.getItem('token')
+    if (!t) return
     setLoading(true)
     try {
-      const headers = { 'Authorization': `Bearer ${token}` }
+      const headers = { 'Authorization': `Bearer ${t}` }
       const API = import.meta.env.VITE_API_URL || ''
 
       const [metricsRes, preRes, onspotRes, attendanceRes] = await Promise.all([
@@ -68,9 +69,7 @@ const AdminDashboard = () => {
     } finally {
       setLoading(false)
     }
-  // navigate is stable (React Router guarantee); clearAuth is only called on 401 redirect
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token])
+  }
 
   useEffect(() => {
     if (!isAuthenticated()) {
@@ -78,10 +77,8 @@ const AdminDashboard = () => {
       return
     }
     fetchData()
-  // Re-run only when token changes — isAuthenticated/fetchData are intentionally excluded
-  // to prevent the infinite loop caused by useAuth returning new function refs each render
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token])
+  }, [])
 
   const downloadFile = async (endpoint, filename) => {
     const API_URL = import.meta.env.VITE_API_URL || ''
