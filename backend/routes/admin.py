@@ -183,8 +183,7 @@ async def approve_attendee(attendee_id: str, background_tasks: BackgroundTasks, 
         reg_type = attendee.get("reg_type", "pre")
 
         if not sid:
-            academic_level = attendee.get("academic_level", "UG")
-            sid = generate_sid(academic_level)
+            sid = generate_sid(attendee.get("attendee_type", "student"), attendee.get("academic_level", "UG"), supabase)
             supabase.table("attendees").update({"sid": sid}).eq("id", attendee_id).execute()
 
         reg_type_label = "ON-SPOT" if reg_type == "onspot" else "PRE-REGISTERED"
@@ -223,8 +222,7 @@ async def resend_pass(attendee_id: str, background_tasks: BackgroundTasks, admin
 
         sid = attendee.get("sid")
         if not sid:
-            academic_level = attendee.get("academic_level", "UG")
-            sid = generate_sid(academic_level)
+            sid = generate_sid(attendee.get("attendee_type", "student"), attendee.get("academic_level", "UG"), supabase)
             supabase.table("attendees").update({"sid": sid}).eq("id", attendee_id).execute()
 
         reg_type = attendee.get("reg_type", "pre")
@@ -256,7 +254,7 @@ async def bulk_approve(req: BulkActionRequest, background_tasks: BackgroundTasks
             attendee = r.data[0]
             sid = attendee.get("sid")
             if not sid:
-                sid = generate_sid(attendee.get("academic_level", "UG"))
+                sid = generate_sid(attendee.get("attendee_type", "student"), attendee.get("academic_level", "UG"), supabase)
                 supabase.table("attendees").update({"sid": sid}).eq("id", attendee_id).execute()
 
             pass_image = generate_pass({**attendee, "sid": sid})
@@ -291,7 +289,7 @@ async def bulk_resend(req: BulkActionRequest, background_tasks: BackgroundTasks,
 
             sid = attendee.get("sid")
             if not sid:
-                sid = generate_sid(attendee.get("academic_level", "UG"))
+                sid = generate_sid(attendee.get("attendee_type", "student"), attendee.get("academic_level", "UG"), supabase)
                 supabase.table("attendees").update({"sid": sid}).eq("id", attendee_id).execute()
 
             reg_type = attendee.get("reg_type", "pre")
@@ -316,7 +314,7 @@ async def resend_all_passes(background_tasks: BackgroundTasks, admin: dict = Dep
         for attendee in attendees:
             sid = attendee.get("sid")
             if not sid:
-                sid = generate_sid(attendee.get("academic_level", "UG"))
+                sid = generate_sid(attendee.get("attendee_type", "student"), attendee.get("academic_level", "UG"), supabase)
                 supabase.table("attendees").update({"sid": sid}).eq("id", attendee.get("id")).execute()
             reg_type = attendee.get("reg_type", "pre")
             reg_type_label = "ON-SPOT" if reg_type == "onspot" else "PRE-REGISTERED"
@@ -325,6 +323,20 @@ async def resend_all_passes(background_tasks: BackgroundTasks, admin: dict = Dep
         return {"message": f"Queued {len(attendees)} emails for sending", "queued": len(attendees)}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.delete("/admin/attendees/{attendee_id}")
+async def delete_attendee(attendee_id: str, admin=Depends(get_current_admin)):
+    supabase.table("attendees").delete().eq("id", attendee_id).execute()
+    return {"deleted": True}
+
+
+@router.post("/admin/bulk-delete")
+async def bulk_delete(body: dict, admin=Depends(get_current_admin)):
+    ids = body.get("ids", [])
+    for id in ids:
+        supabase.table("attendees").delete().eq("id", id).execute()
+    return {"deleted": len(ids)}
 
 
 # ─── Exports ───
@@ -527,7 +539,7 @@ async def import_registrations(
             continue
 
         try:
-            mapped["sid"] = generate_sid(mapped["academic_level"])
+            mapped["sid"] = generate_sid(mapped.get("attendee_type", "student"), mapped["academic_level"], supabase)
             response = supabase.table("attendees").insert(mapped).execute()
             if not response.data:
                 skipped_errors += 1

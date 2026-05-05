@@ -41,7 +41,7 @@ async def register_attendee(registration: RegistrationRequest):
         # stream comes from form
     
     # Generate a unique SID
-    sid = generate_sid(registration.academic_level)
+    sid = generate_sid(registration.attendee_type, registration.academic_level, supabase)
 
     # Insert the registration data
     registration_data = {
