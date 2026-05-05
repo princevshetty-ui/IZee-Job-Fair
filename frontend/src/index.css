@@ -830,3 +830,19 @@ h6 {
 .stats-strip-animated {
   animation: border-glow-pulse 3s ease-in-out infinite;
 }
+
+/* ─── Stats Shimmer (pill border) ─── */
+@keyframes border-shimmer {
+  0%, 100% { border-color: rgba(99,102,241,0.3); box-shadow: 0 0 8px rgba(99,102,241,0.2); }
+  50% { border-color: rgba(34,211,238,0.6); box-shadow: 0 0 20px rgba(34,211,238,0.3); }
+}
+
+.stats-shimmer {
+  animation: border-shimmer 3s ease-in-out infinite;
+  border: 1px solid rgba(99,102,241,0.3);
+  border-radius: 999px;
+}
+
+/* ─── QR Scanner Fix ─── */
+#qr-reader canvas { display: none !important; }
+#qr-reader video { width: 100% !important; display: block; border-radius: 8px; }
