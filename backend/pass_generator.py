@@ -16,29 +16,32 @@ ACADEMIC_DISPLAY = {
     "Professional": "WORKING PROFESSIONAL",
 }
 
-NEVARA_PATH = os.path.join(BASE_DIR, "assets", "fonts", "Nevarademo-6YXEY.otf")
-BOLD_PATH = os.path.join(BASE_DIR, "assets", "fonts", "DejaVuSans-Bold.ttf")
-REGULAR_PATH = os.path.join(BASE_DIR, "assets", "fonts", "DejaVuSans.ttf")
+NEVARA_PATH  = os.path.join(BASE_DIR, "assets", "fonts", "Nevarademo-6YXEY.otf")
+BOLD_PATH    = os.path.join(BASE_DIR, "assets", "fonts", "DejaVuSans-Bold.ttf")
 TEMPLATE_PATH = os.path.join(BASE_DIR, "assets", "templates", "jobfair_template.png")
 
 TW, TH = 1536, 1024
 
-NAME_X = 109
-NAME_Y = 389
+# ── Text placement ──
+NAME_X         = 109
+NAME_Y         = 389
 NAME_MAX_WIDTH = 700
-NAME_FONT_MAX = 84
-NAME_FONT_MIN = 48
+NAME_FONT_MAX  = 72     # primary size; shrinks to fit
+NAME_FONT_MIN  = 42
 
-QR_CENTER_X = 1029
-QR_CENTER_Y = 297
-QR_SIZE = 300
-QR_PLATE_PAD = 14
+# ── QR placement — top-left corner ──
+QR_X    = 1029
+QR_Y    = 297
+QR_SIZE = 280
 
-COLOR_NAME = (0, 207, 255)       # #00CFFF cyan
-COLOR_LABEL = (255, 255, 255)    # white
-COLOR_DETAIL = (224, 224, 224)   # #E0E0E0
-COLOR_SID = (0, 207, 255)        # cyan
+# ── Colours ──
+COLOR_NAME   = (255, 255, 255)   # white
+COLOR_LABEL  = (0, 207, 255)     # #00CFFF cyan
+COLOR_DETAIL = (176, 212, 255)   # #B0D4FF light-blue
+COLOR_SID    = (0, 207, 255)     # cyan
 
+
+# ── Font helpers ──
 
 def _load(path: str, size: int):
     try:
@@ -63,6 +66,7 @@ def _tsz(draw, text, font):
 
 
 def _fit_name(draw, text: str):
+    """Word-wrap name into ≤2 lines, shrinking from NAME_FONT_MAX to NAME_FONT_MIN."""
     text = " ".join(str(text or "").split()) or "N/A"
     for size in range(NAME_FONT_MAX, NAME_FONT_MIN - 1, -2):
         font = _name_font(size)
@@ -88,7 +92,7 @@ def _fit_name(draw, text: str):
     return [text[:30] + ("..." if len(text) > 30 else "")], font
 
 
-def generate_qr_image(sid: str, size: int = 300) -> Image.Image:
+def generate_qr_image(sid: str, size: int = 280) -> Image.Image:
     import qrcode
     qr = qrcode.QRCode(
         version=1,
@@ -104,11 +108,11 @@ def generate_qr_image(sid: str, size: int = 300) -> Image.Image:
 
 def generate_pass(attendee: dict) -> str:
     """
-    Generate a job fair pass.
+    Generate a job fair pass image.
 
     Args:
-        attendee: dict with keys: full_name, academic_level, stream, sid,
-                  reg_type, attendee_type, college_name, city, year (optional)
+        attendee: dict with keys — full_name, academic_level, stream, sid,
+                  reg_type, attendee_type, college_name (city optional)
 
     Returns:
         Base64-encoded JPEG string.
@@ -123,20 +127,23 @@ def generate_pass(attendee: dict) -> str:
 
         draw = ImageDraw.Draw(img, "RGBA")
 
-        full_name = str(attendee.get("full_name") or "N/A")
+        full_name     = str(attendee.get("full_name") or "N/A")
         academic_level = str(attendee.get("academic_level") or "UG")
-        stream = str(attendee.get("stream") or "")
-        sid = str(attendee.get("sid") or "")
+        stream        = str(attendee.get("stream") or "")
+        sid           = str(attendee.get("sid") or "")
         attendee_type = str(attendee.get("attendee_type") or "student").lower()
-        college_name = str(attendee.get("college_name") or "")
-        year = str(attendee.get("year") or attendee.get("year_of_study") or "")
+        college_name  = str(attendee.get("college_name") or "")
+
+        is_professional = attendee_type == "professional"
 
         if attendee_type == "fresher":
             category_label = "FRESHER"
+        elif is_professional:
+            category_label = "WORKING PROFESSIONAL"
         else:
             category_label = ACADEMIC_DISPLAY.get(academic_level, academic_level.upper())
 
-        # ── NAME ──
+        # ── NAME  (white, Nevara/DejaVuSans-Bold, 72→42) ──
         name_lines, name_font = _fit_name(draw, full_name)
         cursor_y = NAME_Y
         for idx, line in enumerate(name_lines):
@@ -145,50 +152,37 @@ def generate_pass(attendee: dict) -> str:
             cursor_y += lh + (6 if idx < len(name_lines) - 1 else 0)
         name_bottom = cursor_y
 
-        # ── CATEGORY LABEL ──
-        cat_font = _bold_font(32)
-        cat_y = name_bottom + 12
+        # ── CATEGORY LABEL  (cyan #00CFFF, 28pt bold) ──
+        cat_font = _bold_font(28)
+        cat_y = name_bottom + 10
         draw.text((NAME_X, cat_y), category_label, font=cat_font, fill=COLOR_LABEL)
         _, cat_h = _tsz(draw, category_label, cat_font)
 
-        # ── STREAM / COLLEGE / PROFESSIONAL ──
-        detail_font = _bold_font(26)
-        detail_y = cat_y + cat_h + 10
+        # ── STREAM · COLLEGE  (light-blue #B0D4FF, 22pt) — skipped for professionals ──
+        if not is_professional:
+            detail_font = _bold_font(22)
+            detail_y = cat_y + cat_h + 10
 
-        if attendee_type in ("student", "fresher"):
-            stream_clean = stream if stream and stream.upper() != "N/A" else ""
-            if stream_clean and year:
-                detail_text = f"{stream_clean}  ·  {year}"
-            elif stream_clean:
-                detail_text = stream_clean
-            else:
-                detail_text = ""
+            stream_clean  = stream if stream and stream.upper() not in ("N/A", "") else ""
+            college_clean = college_name if college_name and college_name.upper() != "N/A" else ""
+
+            parts = [p for p in [stream_clean, college_clean] if p]
+            detail_text = "  ·  ".join(parts) if parts else ""
 
             if detail_text:
                 draw.text((NAME_X, detail_y), detail_text, font=detail_font, fill=COLOR_DETAIL)
-                _, dh = _tsz(draw, detail_text, detail_font)
-                detail_y += dh + 8
 
-            if college_name and college_name.upper() != "N/A":
-                draw.text((NAME_X, detail_y), college_name, font=detail_font, fill=COLOR_DETAIL)
-        else:
-            draw.text((NAME_X, detail_y), "Working Professional", font=detail_font, fill=COLOR_DETAIL)
-
-        # ── QR WHITE PLATE ──
-        half = QR_SIZE // 2 + QR_PLATE_PAD
-        px1, py1 = QR_CENTER_X - half, QR_CENTER_Y - half
-        px2, py2 = QR_CENTER_X + half, QR_CENTER_Y + half
-        draw.rectangle([px1, py1, px2, py2], fill=(255, 255, 255, 255))
-
-        # ── QR CODE ──
+        # ── QR CODE  (pasted directly — no white plate, QR already has white bg) ──
         qr_img = generate_qr_image(sid or "N/A", size=QR_SIZE)
-        img.alpha_composite(qr_img, (QR_CENTER_X - QR_SIZE // 2, QR_CENTER_Y - QR_SIZE // 2))
+        img.alpha_composite(qr_img, (QR_X, QR_Y))
 
-        # ── SID BELOW QR ──
-        sid_font = _bold_font(28)
+        # ── SID  (cyan, 32pt bold, centered under QR) ──
+        sid_font = _bold_font(32)
         sid_text = sid.upper() if sid else "N/A"
         sw, _ = _tsz(draw, sid_text, sid_font)
-        draw.text((QR_CENTER_X - sw // 2, py2 + 14), sid_text, font=sid_font, fill=COLOR_SID)
+        sid_center_x = QR_X + QR_SIZE // 2
+        sid_y = QR_Y + QR_SIZE + 20
+        draw.text((sid_center_x - sw // 2, sid_y), sid_text, font=sid_font, fill=COLOR_SID)
 
         # ── OUTPUT ──
         rgb = img.convert("RGB")
