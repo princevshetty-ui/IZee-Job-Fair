@@ -54,7 +54,7 @@ async def register_onspot(background_tasks: BackgroundTasks, registration: OnSpo
             detail="Email already registered"
         )
 
-    sid = generate_sid(registration.academic_level)
+    sid = generate_sid(registration.attendee_type, registration.academic_level, supabase)
     registration_data = {
         "full_name": registration.full_name,
         "phone": registration.phone,
