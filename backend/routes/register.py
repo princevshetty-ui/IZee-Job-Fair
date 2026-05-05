@@ -40,30 +40,6 @@ async def register_attendee(registration: RegistrationRequest):
         registration.academic_level = 'Graduate'
         # stream comes from form
     
-    # Block only when all three fields match an existing record
-    exact_check = (
-        supabase.table("attendees")
-        .select("id")
-        .eq("full_name", registration.full_name)
-        .eq("phone", registration.phone)
-        .eq("email", registration.email)
-        .execute()
-    )
-    if exact_check.data:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="You have already registered with these details."
-        )
-
-    # Soft warnings — phone or email alone overlap but are not blocked
-    phone_check = supabase.table("attendees").select("id").eq("phone", registration.phone).execute()
-    if phone_check.data:
-        print(f"[WARN] Phone {registration.phone} already exists but name/email differ — allowing registration")
-
-    email_check = supabase.table("attendees").select("id").eq("email", registration.email).execute()
-    if email_check.data:
-        print(f"[WARN] Email {registration.email} already exists but name/phone differ — allowing registration")
-    
     # Generate a unique SID
     sid = generate_sid(registration.academic_level)
 
@@ -97,16 +73,23 @@ async def register_attendee(registration: RegistrationRequest):
     try:
         response = supabase.table("attendees").insert(registration_data).execute()
     except Exception as e:
-        print(f"Error inserting attendee: {e}")
-        if "row-level security" in str(e) or "42501" in str(e):
+        err_str = str(e)
+        if "attendees_phone_key" in err_str or ("duplicate key" in err_str and "phone" in err_str):
+            raise HTTPException(
+                status_code=409,
+                detail="A registration with this phone number already exists. If you have already registered, please check your email for your pass."
+            )
+        if "attendees_email_key" in err_str or ("duplicate key" in err_str and "email" in err_str):
+            raise HTTPException(
+                status_code=409,
+                detail="A registration with this email already exists. If you have already registered, please check your email for your pass."
+            )
+        if "row-level security" in err_str or "42501" in err_str:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Supabase RLS Policy Error: Please use the service_role key as your SUPABASE_KEY in the backend/.env, or add the INSERT policy on the attendees table in Supabase."
             )
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Database error: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=str(e))
 
     if not response.data:
         raise HTTPException(
