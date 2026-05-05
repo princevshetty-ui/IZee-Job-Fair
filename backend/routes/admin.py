@@ -484,45 +484,84 @@ async def export_excel_attended(admin: dict = Depends(get_current_admin)):
 # ─── Import ───
 
 @router.post("/admin/import")
-async def import_registrations(file: UploadFile = File(...), _: dict = Depends(get_current_admin)):
+async def import_registrations(
+    background_tasks: BackgroundTasks,
+    file: UploadFile = File(...),
+    _: dict = Depends(get_current_admin),
+):
     content = await file.read()
-    decoded = content.decode("utf-8", errors="ignore")
+    # utf-8-sig strips the BOM Google Forms sometimes prepends
+    decoded = content.decode("utf-8-sig", errors="ignore")
     reader = csv.DictReader(io.StringIO(decoded))
 
-    inserted = 0
-    skipped = 0
+    # Pre-load existing (name, phone, email) triples for O(1) duplicate checks
+    existing_resp = supabase.table("attendees").select("full_name, phone, email").execute()
+    existing_set: set[tuple] = set()
+    for r in (existing_resp.data or []):
+        existing_set.add((
+            (r.get("full_name") or "").strip().lower(),
+            (r.get("phone") or "").strip(),
+            (r.get("email") or "").strip().lower(),
+        ))
+
+    imported = 0
+    skipped_duplicates = 0
+    skipped_errors = 0
     errors = []
 
     for row_index, row in enumerate(reader, start=2):
         mapped = map_gforms_row(row)
         if not mapped:
-            missing_fields = []
-            if not row.get("Name") and not row.get("Full Name"):
-                missing_fields.append("Name/Full Name")
-            if not row.get("Contact No") and not row.get("Phone") and not row.get("Phone Number"):
-                missing_fields.append("Phone")
-            if not row.get("Email"):
-                missing_fields.append("Email")
-            if not row.get("College Name") and not row.get("College"):
-                missing_fields.append("College")
-            if not row.get("Academic Details") and not row.get("Academic Level"):
-                missing_fields.append("Academic Level")
-            if not row.get("Graduation Stream") and not row.get("Stream"):
-                missing_fields.append("Stream")
-            errors.append({"row": row_index, "message": f"Missing required fields: {', '.join(missing_fields)}"})
-            skipped += 1
+            skipped_errors += 1
+            errors.append({"row": row_index, "message": "Row skipped: name, phone, and email all missing"})
+            continue
+
+        # Block only if all three identity fields match an existing record
+        dup_key = (
+            mapped["full_name"].lower(),
+            mapped["phone"],
+            mapped["email"].lower(),
+        )
+        if dup_key in existing_set:
+            skipped_duplicates += 1
             continue
 
         try:
             mapped["sid"] = generate_sid(mapped["academic_level"])
             response = supabase.table("attendees").insert(mapped).execute()
-            if response.data:
-                inserted += 1
-            else:
+            if not response.data:
+                skipped_errors += 1
                 errors.append({"row": row_index, "message": "Database insert returned no data"})
-                skipped += 1
-        except Exception as exc:
-            errors.append({"row": row_index, "message": str(exc)})
-            skipped += 1
+                continue
 
-    return {"message": "Registrations imported", "count": inserted, "skipped": skipped, "errors": errors}
+            attendee = response.data[0]
+            existing_set.add(dup_key)  # guard against same duplicate appearing later in batch
+
+            pass_image = generate_pass(attendee)
+            background_tasks.add_task(
+                send_pass_email,
+                attendee.get("email"),
+                attendee.get("full_name"),
+                attendee.get("sid"),
+                pass_image,
+                "PRE-REGISTERED",
+            )
+            imported += 1
+        except Exception as exc:
+            skipped_errors += 1
+            errors.append({"row": row_index, "message": str(exc)})
+
+    all_ok = skipped_errors == 0
+    note = (
+        "All valid rows imported. Passes queued for email delivery."
+        if all_ok
+        else f"{imported} rows imported. {skipped_errors} row(s) had errors."
+    )
+
+    return {
+        "imported": imported,
+        "skipped_duplicates": skipped_duplicates,
+        "skipped_errors": skipped_errors,
+        "errors": errors,
+        "note": note,
+    }
