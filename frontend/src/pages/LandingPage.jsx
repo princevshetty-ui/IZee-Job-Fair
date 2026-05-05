@@ -17,12 +17,6 @@ const WHAT_TO_EXPECT = [
   { title: 'Networking Opportunities', desc: 'Connect with HR leaders, recruiters, and fellow high-potential candidates from across the country.' }
 ]
 
-const STATS = [
-  { value: '80+', label: 'Companies Hiring' },
-  { value: '1', label: 'Day Event' },
-  { value: '8th May', label: '2026' },
-]
-
 const containerVariants = {
   hidden: {},
   visible: { transition: { staggerChildren: 0.12 } }
@@ -59,6 +53,18 @@ const Divider = () => (
   </FI>
 )
 
+const PARTICLES = [
+  { size: 3, top: '18%', left: '8%',  dur: '6s',  delay: '0s' },
+  { size: 2, top: '32%', left: '15%', dur: '8s',  delay: '1.2s' },
+  { size: 4, top: '60%', left: '6%',  dur: '5s',  delay: '0.4s' },
+  { size: 2, top: '75%', left: '22%', dur: '9s',  delay: '2s' },
+  { size: 3, top: '14%', right: '9%', dur: '7s',  delay: '0.8s' },
+  { size: 2, top: '40%', right: '7%', dur: '6s',  delay: '1.8s' },
+  { size: 4, top: '68%', right: '14%',dur: '5.5s',delay: '0.3s' },
+  { size: 2, top: '85%', right: '28%',dur: '8s',  delay: '2.5s' },
+  { size: 3, top: '50%', left: '48%', dur: '10s', delay: '1s' },
+]
+
 const LandingPage = () => {
   const heroRef = useRef(null)
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] })
@@ -74,7 +80,8 @@ const LandingPage = () => {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-end h-16">
               <Link to="/register" className="group">
-                <div className="px-6 py-2.5 rounded-full text-xs font-semibold tracking-[0.1em] uppercase transition-all duration-300"
+                <div
+                  className="px-6 py-2.5 rounded-full text-xs font-semibold tracking-[0.1em] uppercase transition-all duration-300"
                   style={{
                     background: 'rgba(99,102,241,0.1)',
                     border: '1px solid rgba(99,102,241,0.35)',
@@ -82,12 +89,14 @@ const LandingPage = () => {
                     boxShadow: '0 0 16px rgba(99,102,241,0.15)'
                   }}
                   onMouseEnter={e => {
-                    e.currentTarget.style.background = 'rgba(99,102,241,0.2)'
-                    e.currentTarget.style.boxShadow = '0 0 28px rgba(99,102,241,0.3)'
+                    e.currentTarget.style.background = 'rgba(99,102,241,0.22)'
+                    e.currentTarget.style.boxShadow = '0 0 32px rgba(99,102,241,0.4), 0 0 8px rgba(34,211,238,0.15)'
+                    e.currentTarget.style.borderColor = 'rgba(99,102,241,0.6)'
                   }}
                   onMouseLeave={e => {
                     e.currentTarget.style.background = 'rgba(99,102,241,0.1)'
                     e.currentTarget.style.boxShadow = '0 0 16px rgba(99,102,241,0.15)'
+                    e.currentTarget.style.borderColor = 'rgba(99,102,241,0.35)'
                   }}
                 >
                   Register Now
@@ -99,6 +108,37 @@ const LandingPage = () => {
 
         {/* ── Hero ── */}
         <section ref={heroRef} className="relative min-h-[100dvh] flex flex-col items-center justify-center px-4 pt-20 pb-24 overflow-hidden">
+
+          {/* Animated orbs */}
+          <div className="absolute inset-0 pointer-events-none overflow-hidden">
+            <div className="orb-1 absolute rounded-full blur-[140px]"
+              style={{ width: 700, height: 700, background: 'radial-gradient(circle, rgba(99,102,241,0.12) 0%, transparent 70%)', top: '10%', left: '-15%' }} />
+            <div className="orb-2 absolute rounded-full blur-[160px]"
+              style={{ width: 600, height: 600, background: 'radial-gradient(circle, rgba(139,92,246,0.1) 0%, transparent 70%)', top: '30%', right: '-10%' }} />
+            <div className="orb-3 absolute rounded-full blur-[120px]"
+              style={{ width: 500, height: 500, background: 'radial-gradient(circle, rgba(34,211,238,0.07) 0%, transparent 70%)', bottom: '15%', left: '35%' }} />
+          </div>
+
+          {/* Floating particle dots */}
+          <div className="absolute inset-0 pointer-events-none overflow-hidden">
+            {PARTICLES.map((p, i) => (
+              <div
+                key={i}
+                className="particle absolute rounded-full"
+                style={{
+                  width: p.size,
+                  height: p.size,
+                  top: p.top,
+                  left: p.left,
+                  right: p.right,
+                  background: i % 3 === 0 ? '#818CF8' : i % 3 === 1 ? '#22D3EE' : '#A78BFA',
+                  '--dur': p.dur,
+                  '--delay': p.delay,
+                }}
+              />
+            ))}
+          </div>
+
           <motion.div
             style={{ opacity: heroOpacity, y: heroY }}
             className="text-center w-full max-w-5xl mx-auto relative z-10"
@@ -106,13 +146,12 @@ const LandingPage = () => {
             initial="hidden"
             animate="visible"
           >
-            {/* Logo */}
+            {/* Logo with shimmer */}
             <motion.div variants={childVariants} className="mb-10">
               <img
                 src={collegeLogo}
                 alt="IZEE"
-                className="h-20 md:h-28 w-auto mx-auto object-contain"
-                style={{ filter: 'drop-shadow(0 0 24px rgba(99,102,241,0.25))' }}
+                className="logo-shimmer h-20 md:h-28 w-auto mx-auto object-contain"
               />
             </motion.div>
 
@@ -126,14 +165,12 @@ const LandingPage = () => {
               <span className="text-[11px] tracking-[0.22em] font-semibold uppercase" style={{ color: '#94a3b8' }}>Registration Open</span>
             </motion.div>
 
-            {/* Main heading */}
+            {/* Main heading with shimmer */}
             <motion.h1
               variants={childVariants}
               className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold mb-5 leading-[1.05] tracking-tight font-heading-art"
             >
-              <span className="text-gradient-hero">IZee Job Fair</span>
-              <br />
-              <span className="text-gradient-hero">2026</span>
+              <span className="text-shimmer">IZee Job Fair 2026</span>
             </motion.h1>
 
             {/* Subheading */}
@@ -145,42 +182,43 @@ const LandingPage = () => {
               8th May 2026&nbsp;&nbsp;·&nbsp;&nbsp;Placement Drive&nbsp;&nbsp;·&nbsp;&nbsp;IZEE Business School, Bangalore
             </motion.p>
 
-            {/* CTA Buttons */}
-            <motion.div variants={childVariants} className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
-              <Link to="/register" className="group w-full sm:w-auto">
-                <div className="relative overflow-hidden px-10 py-4 rounded-xl font-semibold text-sm tracking-[0.06em] uppercase text-white flex items-center justify-center gap-2.5 transition-all duration-300"
+            {/* CTA Button */}
+            <motion.div variants={childVariants} className="flex items-center justify-center mb-14">
+              <Link to="/register" className="group">
+                <div
+                  className="relative overflow-hidden px-12 py-4 rounded-xl font-semibold text-sm tracking-[0.06em] uppercase text-white flex items-center gap-2.5 transition-all duration-300"
                   style={{
                     background: 'linear-gradient(135deg, #6146b3ff, #2177daff)',
                     boxShadow: '0 4px 24px rgba(99,102,241,0.4)',
                   }}
                   onMouseEnter={e => {
                     e.currentTarget.style.transform = 'translateY(-2px)'
-                    e.currentTarget.style.boxShadow = '0 8px 40px rgba(99,102,241,0.55)'
+                    e.currentTarget.style.boxShadow = '0 8px 40px rgba(99,102,241,0.6), 0 0 60px rgba(34,211,238,0.15)'
                   }}
                   onMouseLeave={e => {
                     e.currentTarget.style.transform = 'translateY(0)'
                     e.currentTarget.style.boxShadow = '0 4px 24px rgba(99,102,241,0.4)'
                   }}
                 >
-                  Secure Your Pass
-                  <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
+                  Register Now
+                  <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
                 </div>
               </Link>
             </motion.div>
 
-            {/* Stats Strip */}
+            {/* Stats strip with animated border */}
             <motion.div
               variants={childVariants}
-              className="flex flex-wrap items-center justify-center gap-0 mx-auto max-w-2xl rounded-2xl overflow-hidden"
-              style={{ background: 'rgba(13,13,26,0.9)', border: '1px solid #1a1a2e' }}
+              className="stats-strip-animated inline-flex items-center gap-3 mx-auto px-8 py-4 rounded-2xl"
+              style={{ background: 'rgba(13,13,26,0.9)', border: '1px solid rgba(99,102,241,0.25)' }}
             >
-              {STATS.map((stat, i) => (
-                <div key={i} className={`flex-1 min-w-[120px] py-4 px-6 text-center ${i < STATS.length - 1 ? 'border-r' : ''}`}
-                  style={{ borderColor: '#1a1a2e' }}>
-                  <div className="text-xl md:text-2xl font-bold text-gradient-hero leading-tight">{stat.value}</div>
-                  <div className="text-[10px] uppercase tracking-[0.18em] mt-1" style={{ color: '#475569' }}>{stat.label}</div>
-                </div>
-              ))}
+              <span className="text-sm font-semibold" style={{ color: '#e2e8f0' }}>80+ Companies</span>
+              <span style={{ color: '#334155' }}>·</span>
+              <span className="text-sm font-semibold" style={{ color: '#e2e8f0' }}>8th May 2026</span>
+              <span style={{ color: '#334155' }}>·</span>
+              <span className="text-sm font-semibold" style={{ color: '#e2e8f0' }}>IZEE Business School</span>
             </motion.div>
           </motion.div>
 
@@ -189,14 +227,20 @@ const LandingPage = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1.5, duration: 1 }}
-            className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+            className="absolute bottom-16 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
             style={{ color: '#334155' }}
           >
             <span className="text-[10px] uppercase tracking-[0.2em]">Scroll</span>
             <motion.div animate={{ y: [0, 6, 0] }} transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}>
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 9l-7 7-7-7" /></svg>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 9l-7 7-7-7" />
+              </svg>
             </motion.div>
           </motion.div>
+
+          {/* Bottom gradient fade */}
+          <div className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none"
+            style={{ background: 'linear-gradient(to bottom, transparent, #020208)' }} />
         </section>
 
         <Divider />
@@ -313,11 +357,12 @@ const LandingPage = () => {
                   Your next opportunity is one registration away.
                 </p>
                 <Link to="/register" className="group inline-block">
-                  <div className="relative overflow-hidden px-12 py-4 rounded-xl font-semibold text-sm tracking-[0.06em] uppercase text-white inline-flex items-center gap-2.5 transition-all duration-300"
-                    style={{ background: 'linear-gradient(135deg, #6146b3ff, #2177daff)', boxShadow: '0 4px 24px rgba(61, 64, 240, 0.4)' }}
+                  <div
+                    className="relative overflow-hidden px-12 py-4 rounded-xl font-semibold text-sm tracking-[0.06em] uppercase text-white inline-flex items-center gap-2.5 transition-all duration-300"
+                    style={{ background: 'linear-gradient(135deg, #6146b3ff, #2177daff)', boxShadow: '0 4px 24px rgba(61,64,240,0.4)' }}
                     onMouseEnter={e => {
                       e.currentTarget.style.transform = 'translateY(-2px)'
-                      e.currentTarget.style.boxShadow = '0 10px 40px rgba(99,102,241,0.55)'
+                      e.currentTarget.style.boxShadow = '0 10px 40px rgba(99,102,241,0.6), 0 0 60px rgba(34,211,238,0.15)'
                     }}
                     onMouseLeave={e => {
                       e.currentTarget.style.transform = 'translateY(0)'
@@ -325,7 +370,9 @@ const LandingPage = () => {
                     }}
                   >
                     Claim Your Spot
-                    <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
+                    <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    </svg>
                   </div>
                 </Link>
               </div>
@@ -347,6 +394,7 @@ const LandingPage = () => {
             </div>
           </div>
         </footer>
+
       </div>
     </div>
   )

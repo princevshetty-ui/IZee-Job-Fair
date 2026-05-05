@@ -775,3 +775,58 @@ h6 {
 .step-line.done {
   background: linear-gradient(90deg, #10B981, #0d9488);
 }
+
+/* ─── Text Shimmer ─── */
+@keyframes shimmer-slide {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.text-shimmer {
+  background: linear-gradient(
+    90deg,
+    #818CF8 0%,
+    #A78BFA 25%,
+    #ffffff 45%,
+    #22D3EE 55%,
+    #A78BFA 75%,
+    #818CF8 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer-slide 3s linear infinite;
+}
+
+/* ─── Logo Shimmer ─── */
+@keyframes logo-shimmer {
+  0% { filter: drop-shadow(0 0 8px rgba(99,102,241,0.3)); }
+  50% { filter: drop-shadow(0 0 20px rgba(34,211,238,0.6)) drop-shadow(0 0 40px rgba(139,92,246,0.4)); }
+  100% { filter: drop-shadow(0 0 8px rgba(99,102,241,0.3)); }
+}
+
+.logo-shimmer {
+  animation: logo-shimmer 3s ease-in-out infinite;
+}
+
+/* ─── Floating Particles ─── */
+@keyframes particle-rise {
+  0%, 100% { transform: translateY(0) scale(1); opacity: 0.25; }
+  50% { transform: translateY(-28px) scale(1.4); opacity: 0.6; }
+}
+
+.particle {
+  animation: particle-rise var(--dur, 5s) ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+/* ─── Stats Strip Animated Border ─── */
+@keyframes border-glow-pulse {
+  0%, 100% { border-color: rgba(99,102,241,0.25); box-shadow: 0 0 0 0 transparent; }
+  50% { border-color: rgba(34,211,238,0.5); box-shadow: 0 0 28px rgba(99,102,241,0.18); }
+}
+
+.stats-strip-animated {
+  animation: border-glow-pulse 3s ease-in-out infinite;
+}
