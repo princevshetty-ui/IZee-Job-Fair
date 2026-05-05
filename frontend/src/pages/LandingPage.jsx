@@ -109,6 +109,42 @@ const LandingPage = () => {
         {/* ── Hero ── */}
         <section ref={heroRef} className="relative min-h-[100dvh] flex flex-col items-center justify-center px-4 pt-20 pb-24 overflow-hidden">
 
+          {/* ── Aurora Background Layer ── */}
+          <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0, overflow: 'hidden' }}>
+            {/* Diagonal light beams */}
+            <div className="aurora-beam" style={{ left: '35%', top: '-10vh', animation: 'aurora-move 12s ease-in-out infinite' }} />
+            <div className="aurora-beam" style={{ left: '65%', top: '-10vh', animation: 'aurora-move-2 14s ease-in-out infinite', animationDelay: '2s' }} />
+
+            {/* Floating aurora particles */}
+            {[
+              { size: 3, left: '12%',  color: '#818CF8', dur: '8s',  delay: '0s'   },
+              { size: 2, left: '5%',   color: '#22D3EE', dur: '10s', delay: '1.5s' },
+              { size: 4, left: '28%',  color: '#A78BFA', dur: '7s',  delay: '0.7s' },
+              { size: 2, left: '55%',  color: '#818CF8', dur: '9s',  delay: '2.2s' },
+              { size: 3, left: '72%',  color: '#22D3EE', dur: '11s', delay: '0.3s' },
+              { size: 4, left: '85%',  color: '#A78BFA', dur: '6s',  delay: '1.8s' },
+              { size: 2, left: '40%',  color: '#818CF8', dur: '8s',  delay: '3s'   },
+              { size: 3, left: '92%',  color: '#22D3EE', dur: '12s', delay: '1s'   },
+            ].map((p, i) => (
+              <div key={`af-${i}`} style={{
+                position: 'absolute', bottom: 0,
+                width: p.size, height: p.size,
+                borderRadius: '50%',
+                background: p.color,
+                left: p.left,
+                animation: `particle-float ${p.dur} linear infinite`,
+                animationDelay: p.delay,
+              }} />
+            ))}
+
+            {/* Radial gradient orbs */}
+            <div style={{ position: 'absolute', top: '-10%', left: '5%',  width: 500, height: 500, borderRadius: '50%', background: 'radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 70%)', filter: 'blur(60px)', animation: 'aurora-move 20s ease-in-out infinite' }} />
+            <div style={{ position: 'absolute', top: '-10%', left: '70%', width: 450, height: 450, borderRadius: '50%', background: 'radial-gradient(circle, rgba(139,92,246,0.12) 0%, transparent 70%)', filter: 'blur(60px)', animation: 'aurora-move-2 24s ease-in-out infinite', animationDelay: '3s' }} />
+            <div style={{ position: 'absolute', bottom: '5%', left: '-5%', width: 400, height: 400, borderRadius: '50%', background: 'radial-gradient(circle, rgba(99,102,241,0.10) 0%, transparent 70%)', filter: 'blur(80px)', animation: 'aurora-move 18s ease-in-out infinite', animationDelay: '6s' }} />
+            <div style={{ position: 'absolute', bottom: '5%', left: '75%', width: 500, height: 500, borderRadius: '50%', background: 'radial-gradient(circle, rgba(139,92,246,0.13) 0%, transparent 70%)', filter: 'blur(70px)', animation: 'aurora-move-2 22s ease-in-out infinite', animationDelay: '1.5s' }} />
+            <div style={{ position: 'absolute', top: '35%',  left: '40%', width: 600, height: 400, borderRadius: '50%', background: 'radial-gradient(circle, rgba(34,211,238,0.06) 0%, transparent 70%)',  filter: 'blur(80px)', animation: 'aurora-move 26s ease-in-out infinite', animationDelay: '4s' }} />
+          </div>
+
           {/* Animated orbs */}
           <div className="absolute inset-0 pointer-events-none overflow-hidden">
             <div className="orb-1 absolute rounded-full blur-[140px]"
@@ -151,7 +187,7 @@ const LandingPage = () => {
               <img
                 src={collegeLogo}
                 alt="IZEE"
-                className="logo-shimmer h-20 md:h-28 w-auto mx-auto object-contain"
+                className="logo-shimmer h-20 md:h-28 w-auto mx-auto md:ml-0 object-contain"
               />
             </motion.div>
 
