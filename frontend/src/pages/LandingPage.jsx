@@ -1,32 +1,44 @@
-import { useRef } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import { COMPANIES } from '../utils/constants'
 import collegeLogo from '../assets/images/college-logo.png'
 
+/* ── Data ── */
 const WHO_SHOULD_ATTEND = [
-  'Final-year UG & PG students looking for placements',
-  'MBA graduates seeking leadership roles',
-  'Working professionals exploring better opportunities',
-  'Recent graduates aspiring to join top tech firms'
+  { text: 'Final-year UG & PG students looking for placements', accent: '#6366F1', num: '01' },
+  { text: 'MBA graduates seeking leadership roles', accent: '#8B5CF6', num: '02' },
+  { text: 'Working professionals exploring better opportunities', accent: '#06B6D4', num: '03' },
+  { text: 'Recent graduates aspiring to join top tech firms', accent: '#10B981', num: '04' },
 ]
 
-const WHAT_TO_EXPECT = [
-  { title: '100+ Hiring Companies', desc: 'Direct recruitment drives from India\'s leading corporations across IT, finance, marketing, and operations.' },
-  { title: 'Direct Access to Hiring Managers', desc: 'Interview decision-makers face-to-face and make a lasting impression that no resume can convey.' },
-  { title: 'Networking Opportunities', desc: 'Connect with HR leaders, recruiters, and fellow high-potential candidates from across the country.' }
+const HIGHLIGHTS = [
+  { icon: '👥', title: 'Meet Top Recruiters', desc: 'Face-to-face with hiring managers from top firms', accent: '#6366F1', glow: 'rgba(99,102,241,0.22)' },
+  { icon: '💼', title: 'Explore Career Paths', desc: 'IT, Finance, Marketing, Operations & more', accent: '#8B5CF6', glow: 'rgba(139,92,246,0.22)' },
+  { icon: '⚡', title: 'On-the-Spot Offers', desc: 'Walk in and walk out with an offer letter', accent: '#06B6D4', glow: 'rgba(6,182,212,0.22)' },
+  { icon: '🎯', title: 'Career Guidance', desc: 'Expert counselling & skill development sessions', accent: '#F59E0B', glow: 'rgba(245,158,11,0.20)' },
+  { icon: '🤝', title: 'Networking Hub', desc: 'Connect with 1000+ professionals & peers', accent: '#10B981', glow: 'rgba(16,185,129,0.20)' },
+  { icon: '📋', title: 'Internships & Jobs', desc: 'Full-time roles and internship opportunities', accent: '#EC4899', glow: 'rgba(236,72,153,0.20)' },
 ]
 
+const EVENT_DETAILS = [
+  { icon: '📅', label: 'Date', value: '8th May 2026', accent: '#6366F1', glow: 'rgba(99,102,241,0.25)' },
+  { icon: '🕘', label: 'Time', value: '9:00 AM Onwards', accent: '#8B5CF6', glow: 'rgba(139,92,246,0.25)' },
+  { icon: '📍', label: 'Venue', value: 'IZEE Business School', accent: '#06B6D4', glow: 'rgba(6,182,212,0.25)' },
+  { icon: '🏙️', label: 'City', value: 'Bangalore, Karnataka', accent: '#10B981', glow: 'rgba(16,185,129,0.25)' },
+]
+
+/* ── Animation Variants ── */
 const containerVariants = {
   hidden: {},
-  visible: { transition: { staggerChildren: 0.12 } }
+  visible: { transition: { staggerChildren: 0.12 } },
 }
-
 const childVariants = {
   hidden: { opacity: 0, y: 28 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.85, ease: [0.16, 1, 0.3, 1] } }
+  visible: { opacity: 1, y: 0, transition: { duration: 0.85, ease: [0.16, 1, 0.3, 1] } },
 }
 
+/* ── Helpers ── */
 const SR = ({ children, delay = 0, y = 40, className = '' }) => (
   <motion.div
     initial={{ opacity: 0, y }}
@@ -49,22 +61,170 @@ const FI = ({ children, className = '' }) => (
 
 const Divider = () => (
   <FI className="px-4">
-    <div className="max-w-5xl mx-auto h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(99,102,241,0.15), transparent)' }} />
+    <div className="max-w-5xl mx-auto h-px"
+      style={{ background: 'linear-gradient(90deg, transparent, rgba(99,102,241,0.18), transparent)' }} />
   </FI>
 )
 
-const PARTICLES = [
-  { size: 3, top: '18%', left: '8%',  dur: '6s',  delay: '0s' },
-  { size: 2, top: '32%', left: '15%', dur: '8s',  delay: '1.2s' },
-  { size: 4, top: '60%', left: '6%',  dur: '5s',  delay: '0.4s' },
-  { size: 2, top: '75%', left: '22%', dur: '9s',  delay: '2s' },
-  { size: 3, top: '14%', right: '9%', dur: '7s',  delay: '0.8s' },
-  { size: 2, top: '40%', right: '7%', dur: '6s',  delay: '1.8s' },
-  { size: 4, top: '68%', right: '14%',dur: '5.5s',delay: '0.3s' },
-  { size: 2, top: '85%', right: '28%',dur: '8s',  delay: '2.5s' },
-  { size: 3, top: '50%', left: '48%', dur: '10s', delay: '1s' },
-]
+/* ── Countdown ── */
+const CountdownTimer = () => {
+  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, mins: 0, secs: 0 })
+  useEffect(() => {
+    const target = new Date('2026-05-08T09:00:00+05:30')
+    const tick = () => {
+      const diff = target - new Date()
+      if (diff <= 0) { setTimeLeft({ days: 0, hours: 0, mins: 0, secs: 0 }); return }
+      setTimeLeft({
+        days: Math.floor(diff / 86400000),
+        hours: Math.floor((diff % 86400000) / 3600000),
+        mins: Math.floor((diff % 3600000) / 60000),
+        secs: Math.floor((diff % 60000) / 1000),
+      })
+    }
+    tick()
+    const id = setInterval(tick, 1000)
+    return () => clearInterval(id)
+  }, [])
+  const blocks = [
+    { label: 'Days', value: timeLeft.days },
+    { label: 'Hours', value: timeLeft.hours },
+    { label: 'Mins', value: timeLeft.mins },
+    { label: 'Secs', value: timeLeft.secs },
+  ]
+  return (
+    <div className="flex items-end gap-2 md:gap-3 justify-center">
+      {blocks.map(({ label, value }, i) => (
+        <div key={label} className="flex items-end gap-2 md:gap-3">
+          <div className="flex flex-col items-center">
+            <div style={{
+              width: '4rem', height: '4rem',
+              background: 'linear-gradient(135deg, rgba(13,13,26,0.92), rgba(19,19,31,0.92))',
+              border: '1px solid rgba(99,102,241,0.38)',
+              boxShadow: '0 0 22px rgba(99,102,241,0.14), inset 0 1px 0 rgba(255,255,255,0.06)',
+              borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: '1.375rem', fontWeight: 800, color: 'white', fontFamily: 'Montserrat, Inter, sans-serif',
+            }}>
+              {String(value ?? 0).padStart(2, '0')}
+            </div>
+            <span style={{ fontSize: '9px', textTransform: 'uppercase', letterSpacing: '0.15em', marginTop: '6px', color: '#475569' }}>
+              {label}
+            </span>
+          </div>
+          {i < 3 && <span style={{ color: 'rgba(99,102,241,0.7)', fontSize: '1.25rem', fontWeight: 800, marginBottom: '1.5rem' }}>:</span>}
+        </div>
+      ))}
+    </div>
+  )
+}
 
+/* ════════════════════════════════════════
+   FULL PAGE ORB LAYER
+   Key insight: pixel-based top values so orbs
+   are truly spread across the whole document.
+   We use a tall absolute div (min-height set
+   via JS after mount to match document height).
+════════════════════════════════════════ */
+const FullPageOrbs = () => {
+  const ref = useRef(null)
+
+  // Make the orb container exactly as tall as the document
+  useEffect(() => {
+    const resize = () => {
+      if (ref.current) {
+        ref.current.style.height = document.documentElement.scrollHeight + 'px'
+      }
+    }
+    resize()
+    window.addEventListener('resize', resize)
+    // Also resize after images/fonts load
+    window.addEventListener('load', resize)
+    const t = setInterval(resize, 500)
+    setTimeout(() => clearInterval(t), 4000)
+    return () => {
+      window.removeEventListener('resize', resize)
+      window.removeEventListener('load', resize)
+      clearInterval(t)
+    }
+  }, [])
+
+  // Orbs defined with pixel top values
+  // Spread across ~4000px typical page height
+  const orbs = [
+    // ── Hero zone (0–900px) ──
+    { cls: 'orb-1', top: 50, left: -180, w: 700, h: 700, bg: 'radial-gradient(circle, rgba(99,102,241,0.32) 0%, rgba(99,102,241,0.08) 45%, transparent 70%)', blur: 80 },
+    { cls: 'orb-2', top: 0, right: -160, w: 680, h: 680, bg: 'radial-gradient(circle, rgba(139,92,246,0.30) 0%, rgba(139,92,246,0.08) 45%, transparent 70%)', blur: 85 },
+    { cls: 'orb-3', top: 200, left: '30%', w: 860, h: 460, bg: 'radial-gradient(ellipse, rgba(99,102,241,0.22) 0%, rgba(6,182,212,0.08) 45%, transparent 70%)', blur: 95 },
+    { cls: 'orb-2', top: 500, left: -120, w: 560, h: 500, bg: 'radial-gradient(circle, rgba(6,182,212,0.22) 0%, rgba(6,182,212,0.06) 45%, transparent 70%)', blur: 75 },
+    { cls: 'orb-1', top: 500, right: -140, w: 580, h: 520, bg: 'radial-gradient(circle, rgba(139,92,246,0.22) 0%, rgba(139,92,246,0.06) 45%, transparent 70%)', blur: 80 },
+
+    // ── Event details / marquee zone (900–1600px) ──
+    { cls: 'orb-3', top: 900, left: -160, w: 660, h: 620, bg: 'radial-gradient(circle, rgba(99,102,241,0.26) 0%, rgba(99,102,241,0.07) 45%, transparent 70%)', blur: 85 },
+    { cls: 'orb-1', top: 950, right: -150, w: 640, h: 600, bg: 'radial-gradient(circle, rgba(6,182,212,0.24) 0%, rgba(6,182,212,0.06) 45%, transparent 70%)', blur: 80 },
+    { cls: 'orb-2', top: 1100, left: '25%', w: 800, h: 440, bg: 'radial-gradient(ellipse, rgba(139,92,246,0.20) 0%, transparent 70%)', blur: 100 },
+    { cls: 'orb-3', top: 1300, left: -100, w: 580, h: 540, bg: 'radial-gradient(circle, rgba(6,182,212,0.20) 0%, rgba(6,182,212,0.05) 45%, transparent 70%)', blur: 78 },
+    { cls: 'orb-1', top: 1350, right: -120, w: 600, h: 560, bg: 'radial-gradient(circle, rgba(99,102,241,0.22) 0%, rgba(99,102,241,0.06) 45%, transparent 70%)', blur: 82 },
+
+    // ── Highlights grid zone (1600–2400px) ──
+    { cls: 'orb-2', top: 1600, left: -180, w: 700, h: 650, bg: 'radial-gradient(circle, rgba(139,92,246,0.28) 0%, rgba(139,92,246,0.07) 45%, transparent 70%)', blur: 88 },
+    { cls: 'orb-3', top: 1650, right: -160, w: 680, h: 630, bg: 'radial-gradient(circle, rgba(6,182,212,0.26) 0%, rgba(6,182,212,0.07) 45%, transparent 70%)', blur: 85 },
+    { cls: 'orb-1', top: 1850, left: '20%', w: 840, h: 460, bg: 'radial-gradient(ellipse, rgba(99,102,241,0.22) 0%, rgba(139,92,246,0.08) 45%, transparent 70%)', blur: 100 },
+    { cls: 'orb-2', top: 2050, left: -140, w: 640, h: 580, bg: 'radial-gradient(circle, rgba(99,102,241,0.24) 0%, rgba(99,102,241,0.06) 45%, transparent 70%)', blur: 82 },
+    { cls: 'orb-3', top: 2100, right: -150, w: 660, h: 600, bg: 'radial-gradient(circle, rgba(139,92,246,0.22) 0%, rgba(139,92,246,0.06) 45%, transparent 70%)', blur: 86 },
+
+    // ── Who should attend zone (2400–3100px) ──
+    { cls: 'orb-1', top: 2400, left: -160, w: 700, h: 660, bg: 'radial-gradient(circle, rgba(6,182,212,0.26) 0%, rgba(6,182,212,0.07) 45%, transparent 70%)', blur: 88 },
+    { cls: 'orb-2', top: 2450, right: -170, w: 720, h: 680, bg: 'radial-gradient(circle, rgba(99,102,241,0.28) 0%, rgba(99,102,241,0.07) 45%, transparent 70%)', blur: 90 },
+    { cls: 'orb-3', top: 2650, left: '30%', w: 820, h: 450, bg: 'radial-gradient(ellipse, rgba(139,92,246,0.20) 0%, rgba(6,182,212,0.07) 45%, transparent 70%)', blur: 105 },
+    { cls: 'orb-1', top: 2850, left: -130, w: 620, h: 580, bg: 'radial-gradient(circle, rgba(99,102,241,0.24) 0%, rgba(99,102,241,0.06) 45%, transparent 70%)', blur: 84 },
+    { cls: 'orb-2', top: 2900, right: -140, w: 640, h: 600, bg: 'radial-gradient(circle, rgba(139,92,246,0.22) 0%, rgba(139,92,246,0.06) 45%, transparent 70%)', blur: 87 },
+
+    // ── CTA / Footer zone (3100–4200px) ──
+    { cls: 'orb-3', top: 3100, left: -170, w: 680, h: 640, bg: 'radial-gradient(circle, rgba(6,182,212,0.24) 0%, rgba(6,182,212,0.06) 45%, transparent 70%)', blur: 86 },
+    { cls: 'orb-1', top: 3150, right: -160, w: 700, h: 660, bg: 'radial-gradient(circle, rgba(99,102,241,0.26) 0%, rgba(99,102,241,0.07) 45%, transparent 70%)', blur: 90 },
+    { cls: 'orb-2', top: 3350, left: '22%', w: 860, h: 480, bg: 'radial-gradient(ellipse, rgba(139,92,246,0.22) 0%, rgba(99,102,241,0.08) 45%, transparent 70%)', blur: 108 },
+    { cls: 'orb-3', top: 3600, left: -150, w: 660, h: 620, bg: 'radial-gradient(circle, rgba(99,102,241,0.24) 0%, rgba(99,102,241,0.06) 45%, transparent 70%)', blur: 85 },
+    { cls: 'orb-1', top: 3650, right: -140, w: 640, h: 600, bg: 'radial-gradient(circle, rgba(6,182,212,0.22) 0%, rgba(6,182,212,0.06) 45%, transparent 70%)', blur: 88 },
+    { cls: 'orb-2', top: 3900, left: '35%', w: 800, h: 460, bg: 'radial-gradient(ellipse, rgba(139,92,246,0.20) 0%, transparent 70%)', blur: 100 },
+  ]
+
+  return (
+    <div
+      ref={ref}
+      style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        minHeight: '100%',
+        pointerEvents: 'none',
+        zIndex: 1,
+        overflow: 'hidden',
+      }}
+    >
+      {orbs.map((o, i) => (
+        <div
+          key={i}
+          className={o.cls}
+          style={{
+            position: 'absolute',
+            top: o.top,
+            left: o.left,
+            right: o.right,
+            width: o.w,
+            height: o.h,
+            borderRadius: '50%',
+            background: o.bg,
+            filter: `blur(${o.blur}px)`,
+          }}
+        />
+      ))}
+    </div>
+  )
+}
+
+/* ════════════════════════════════════════
+   MAIN COMPONENT
+════════════════════════════════════════ */
 const LandingPage = () => {
   const heroRef = useRef(null)
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] })
@@ -72,31 +232,68 @@ const LandingPage = () => {
   const heroY = useTransform(scrollYProgress, [0, 0.8], [0, -60])
 
   return (
-    <div className="min-h-screen text-white overflow-x-hidden" style={{ backgroundColor: 'transparent' }}>
-      <div className="relative z-10 w-full">
+    <div
+      className="min-h-screen text-white overflow-x-hidden"
+      style={{ background: '#020208', position: 'relative' }}
+    >
+      {/* ════ FIXED base layer (grid + colour wash, always visible) ════ */}
+      <div style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none', overflow: 'hidden' }}>
+        <div style={{
+          position: 'absolute', inset: 0,
+          background: `
+            radial-gradient(ellipse 70% 55% at 18% 12%, rgba(99,102,241,0.16) 0%, transparent 60%),
+            radial-gradient(ellipse 62% 50% at 82% 14%, rgba(139,92,246,0.14) 0%, transparent 58%),
+            radial-gradient(ellipse 80% 50% at 50% 92%, rgba(6,182,212,0.10) 0%, transparent 68%),
+            #020208
+          `,
+        }} />
+        <div style={{
+          position: 'absolute', inset: 0,
+          backgroundImage: `
+            linear-gradient(rgba(99,102,241,0.05) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(99,102,241,0.05) 1px, transparent 1px)
+          `,
+          backgroundSize: '80px 80px',
+          maskImage: 'radial-gradient(ellipse 90% 70% at 50% 40%, black 18%, transparent 100%)',
+          WebkitMaskImage: 'radial-gradient(ellipse 90% 70% at 50% 40%, black 18%, transparent 100%)',
+        }} />
+        <div style={{
+          position: 'absolute', top: 0, left: '50%',
+          transform: 'translateX(-50%)',
+          width: '980px', height: '760px',
+          background: 'conic-gradient(from 254deg at 50% 0%, transparent 0deg, rgba(99,102,241,0.16) 28deg, transparent 56deg, transparent 124deg, rgba(139,92,246,0.13) 152deg, transparent 180deg)',
+          filter: 'blur(28px)',
+        }} />
+      </div>
 
-        {/* ── Minimal Navbar ── */}
+      {/* ════ SCROLLING orb layer — spans full document height ════ */}
+      <FullPageOrbs />
+
+      {/* ════ PAGE CONTENT ════ */}
+      <div className="relative" style={{ zIndex: 2 }}>
+
+        {/* Navbar */}
         <nav className="absolute top-0 w-full z-50 pt-4 pointer-events-auto">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-end h-16">
-              <Link to="/register" className="group">
+              <Link to="/register">
                 <div
                   className="px-6 py-2.5 rounded-full text-xs font-semibold tracking-[0.1em] uppercase transition-all duration-300"
                   style={{
-                    background: 'rgba(99,102,241,0.1)',
-                    border: '1px solid rgba(99,102,241,0.35)',
+                    background: 'rgba(99,102,241,0.12)',
+                    border: '1px solid rgba(99,102,241,0.40)',
                     color: '#a5b4fc',
-                    boxShadow: '0 0 16px rgba(99,102,241,0.15)'
+                    boxShadow: '0 0 20px rgba(99,102,241,0.18)',
                   }}
                   onMouseEnter={e => {
-                    e.currentTarget.style.background = 'rgba(99,102,241,0.22)'
-                    e.currentTarget.style.boxShadow = '0 0 32px rgba(99,102,241,0.4), 0 0 8px rgba(34,211,238,0.15)'
-                    e.currentTarget.style.borderColor = 'rgba(99,102,241,0.6)'
+                    e.currentTarget.style.background = 'rgba(99,102,241,0.25)'
+                    e.currentTarget.style.boxShadow = '0 0 34px rgba(99,102,241,0.45)'
+                    e.currentTarget.style.borderColor = 'rgba(99,102,241,0.70)'
                   }}
                   onMouseLeave={e => {
-                    e.currentTarget.style.background = 'rgba(99,102,241,0.1)'
-                    e.currentTarget.style.boxShadow = '0 0 16px rgba(99,102,241,0.15)'
-                    e.currentTarget.style.borderColor = 'rgba(99,102,241,0.35)'
+                    e.currentTarget.style.background = 'rgba(99,102,241,0.12)'
+                    e.currentTarget.style.boxShadow = '0 0 20px rgba(99,102,241,0.18)'
+                    e.currentTarget.style.borderColor = 'rgba(99,102,241,0.40)'
                   }}
                 >
                   Register Now
@@ -106,134 +303,59 @@ const LandingPage = () => {
           </div>
         </nav>
 
-        {/* ── Hero ── */}
-        <section ref={heroRef} className="relative min-h-[100dvh] flex flex-col items-center justify-center px-4 pt-20 pb-24 overflow-hidden">
-
-          {/* ── Aurora Background Layer ── */}
-          <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0, overflow: 'hidden' }}>
-            {/* Diagonal light beams */}
-            <div className="aurora-beam" style={{ left: '35%', top: '-10vh', animation: 'aurora-move 12s ease-in-out infinite' }} />
-            <div className="aurora-beam" style={{ left: '65%', top: '-10vh', animation: 'aurora-move-2 14s ease-in-out infinite', animationDelay: '2s' }} />
-
-            {/* Floating aurora particles */}
-            {[
-              { size: 3, left: '12%',  color: '#818CF8', dur: '8s',  delay: '0s'   },
-              { size: 2, left: '5%',   color: '#22D3EE', dur: '10s', delay: '1.5s' },
-              { size: 4, left: '28%',  color: '#A78BFA', dur: '7s',  delay: '0.7s' },
-              { size: 2, left: '55%',  color: '#818CF8', dur: '9s',  delay: '2.2s' },
-              { size: 3, left: '72%',  color: '#22D3EE', dur: '11s', delay: '0.3s' },
-              { size: 4, left: '85%',  color: '#A78BFA', dur: '6s',  delay: '1.8s' },
-              { size: 2, left: '40%',  color: '#818CF8', dur: '8s',  delay: '3s'   },
-              { size: 3, left: '92%',  color: '#22D3EE', dur: '12s', delay: '1s'   },
-            ].map((p, i) => (
-              <div key={`af-${i}`} style={{
-                position: 'absolute', bottom: 0,
-                width: p.size, height: p.size,
-                borderRadius: '50%',
-                background: p.color,
-                left: p.left,
-                animation: `particle-float ${p.dur} linear infinite`,
-                animationDelay: p.delay,
-              }} />
-            ))}
-
-            {/* Radial gradient orbs */}
-            <div style={{ position: 'absolute', top: '-10%', left: '5%',  width: 500, height: 500, borderRadius: '50%', background: 'radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 70%)', filter: 'blur(60px)', animation: 'aurora-move 20s ease-in-out infinite' }} />
-            <div style={{ position: 'absolute', top: '-10%', left: '70%', width: 450, height: 450, borderRadius: '50%', background: 'radial-gradient(circle, rgba(139,92,246,0.12) 0%, transparent 70%)', filter: 'blur(60px)', animation: 'aurora-move-2 24s ease-in-out infinite', animationDelay: '3s' }} />
-            <div style={{ position: 'absolute', bottom: '5%', left: '-5%', width: 400, height: 400, borderRadius: '50%', background: 'radial-gradient(circle, rgba(99,102,241,0.10) 0%, transparent 70%)', filter: 'blur(80px)', animation: 'aurora-move 18s ease-in-out infinite', animationDelay: '6s' }} />
-            <div style={{ position: 'absolute', bottom: '5%', left: '75%', width: 500, height: 500, borderRadius: '50%', background: 'radial-gradient(circle, rgba(139,92,246,0.13) 0%, transparent 70%)', filter: 'blur(70px)', animation: 'aurora-move-2 22s ease-in-out infinite', animationDelay: '1.5s' }} />
-            <div style={{ position: 'absolute', top: '35%',  left: '40%', width: 600, height: 400, borderRadius: '50%', background: 'radial-gradient(circle, rgba(34,211,238,0.06) 0%, transparent 70%)',  filter: 'blur(80px)', animation: 'aurora-move 26s ease-in-out infinite', animationDelay: '4s' }} />
-          </div>
-
-          {/* Animated orbs */}
-          <div className="absolute inset-0 pointer-events-none overflow-hidden">
-            <div className="orb-1 absolute rounded-full blur-[140px]"
-              style={{ width: 700, height: 700, background: 'radial-gradient(circle, rgba(99,102,241,0.12) 0%, transparent 70%)', top: '10%', left: '-15%' }} />
-            <div className="orb-2 absolute rounded-full blur-[160px]"
-              style={{ width: 600, height: 600, background: 'radial-gradient(circle, rgba(139,92,246,0.1) 0%, transparent 70%)', top: '30%', right: '-10%' }} />
-            <div className="orb-3 absolute rounded-full blur-[120px]"
-              style={{ width: 500, height: 500, background: 'radial-gradient(circle, rgba(34,211,238,0.07) 0%, transparent 70%)', bottom: '15%', left: '35%' }} />
-          </div>
-
-          {/* Floating particle dots */}
-          <div className="absolute inset-0 pointer-events-none overflow-hidden">
-            {PARTICLES.map((p, i) => (
-              <div
-                key={i}
-                className="particle absolute rounded-full"
-                style={{
-                  width: p.size,
-                  height: p.size,
-                  top: p.top,
-                  left: p.left,
-                  right: p.right,
-                  background: i % 3 === 0 ? '#818CF8' : i % 3 === 1 ? '#22D3EE' : '#A78BFA',
-                  '--dur': p.dur,
-                  '--delay': p.delay,
-                }}
-              />
-            ))}
-          </div>
-
+        {/* ══ HERO ══ */}
+        <section ref={heroRef} className="relative flex flex-col items-center justify-center px-4 pt-28 pb-12 overflow-hidden">
           <motion.div
             style={{ opacity: heroOpacity, y: heroY }}
-            className="text-center w-full max-w-5xl mx-auto relative z-10"
+            className="text-center w-full max-w-5xl mx-auto relative"
             variants={containerVariants}
             initial="hidden"
             animate="visible"
           >
-            {/* Logo with shimmer */}
-            <motion.div variants={childVariants} className="mb-10">
-              <img
-                src={collegeLogo}
-                alt="IZEE"
-                className="logo-shimmer h-20 md:h-28 w-auto mx-auto md:ml-0 object-contain"
-              />
+            <motion.div variants={childVariants} className="mb-7">
+              <img src={collegeLogo} alt="IZEE" className="logo-shimmer h-20 md:h-24 w-auto mx-auto object-contain" />
             </motion.div>
 
-            {/* Live badge */}
-            <motion.div variants={childVariants} className="inline-flex items-center gap-2.5 mb-8 px-4 py-2 rounded-full"
-              style={{ background: 'rgba(99,102,241,0.08)', border: '1px solid rgba(99,102,241,0.2)' }}>
+            <motion.div variants={childVariants}
+              className="inline-flex items-center gap-2.5 mb-6 px-4 py-2 rounded-full"
+              style={{ background: 'rgba(99,102,241,0.10)', border: '1px solid rgba(99,102,241,0.25)' }}
+            >
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75" />
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-400" />
               </span>
-              <span className="text-[11px] tracking-[0.22em] font-semibold uppercase" style={{ color: '#94a3b8' }}>Registration Open</span>
+              <span className="text-[11px] tracking-[0.22em] font-semibold uppercase" style={{ color: '#94a3b8' }}>
+                Registration Open
+              </span>
             </motion.div>
 
-            {/* Main heading with shimmer */}
-            <motion.h1
-              variants={childVariants}
-              className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold mb-5 leading-[1.05] tracking-tight font-heading-art"
+            <motion.h1 variants={childVariants}
+              className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold mb-4 leading-[1.05] tracking-tight font-heading-art"
             >
               <span className="text-shimmer">IZee Job Fair 2026</span>
             </motion.h1>
 
-            {/* Subheading */}
-            <motion.p
-              variants={childVariants}
-              className="text-lg md:text-xl mb-10 font-light"
-              style={{ color: '#64748B' }}
-            >
-              8th May 2026&nbsp;&nbsp;·&nbsp;&nbsp;Placement Drive&nbsp;&nbsp;·&nbsp;&nbsp;IZEE Business School, Bangalore
+            <motion.p variants={childVariants} className="text-base md:text-lg mb-8 font-light" style={{ color: '#64748b' }}>
+              8th May 2026 · Placement Drive · IZEE Business School, Bangalore
             </motion.p>
 
-            {/* CTA Button */}
-            <motion.div variants={childVariants} className="flex items-center justify-center mb-14">
+            <motion.div variants={childVariants} className="mb-8">
+              <p className="text-[10px] uppercase tracking-[0.2em] mb-4" style={{ color: '#475569' }}>Event starts in</p>
+              <CountdownTimer />
+            </motion.div>
+
+            <motion.div variants={childVariants} className="flex items-center justify-center mb-10">
               <Link to="/register" className="group">
                 <div
                   className="relative overflow-hidden px-12 py-4 rounded-xl font-semibold text-sm tracking-[0.06em] uppercase text-white flex items-center gap-2.5 transition-all duration-300"
-                  style={{
-                    background: 'linear-gradient(135deg, #6146b3ff, #2177daff)',
-                    boxShadow: '0 4px 24px rgba(99,102,241,0.4)',
-                  }}
+                  style={{ background: 'linear-gradient(135deg, #6146b3, #2177da)', boxShadow: '0 4px 30px rgba(99,102,241,0.50)' }}
                   onMouseEnter={e => {
                     e.currentTarget.style.transform = 'translateY(-2px)'
-                    e.currentTarget.style.boxShadow = '0 8px 40px rgba(99,102,241,0.6), 0 0 60px rgba(34,211,238,0.15)'
+                    e.currentTarget.style.boxShadow = '0 10px 44px rgba(99,102,241,0.70)'
                   }}
                   onMouseLeave={e => {
                     e.currentTarget.style.transform = 'translateY(0)'
-                    e.currentTarget.style.boxShadow = '0 4px 24px rgba(99,102,241,0.4)'
+                    e.currentTarget.style.boxShadow = '0 4px 30px rgba(99,102,241,0.50)'
                   }}
                 >
                   Register Now
@@ -244,11 +366,9 @@ const LandingPage = () => {
               </Link>
             </motion.div>
 
-            {/* Stats strip with animated border */}
-            <motion.div
-              variants={childVariants}
+            <motion.div variants={childVariants}
               className="stats-shimmer inline-flex items-center gap-3 mx-auto px-8 py-4"
-              style={{ background: 'rgba(13,13,26,0.9)' }}
+              style={{ background: 'rgba(13,13,26,0.80)' }}
             >
               <span className="text-sm font-semibold" style={{ color: '#e2e8f0' }}>80+ Companies</span>
               <span style={{ color: '#334155' }}>·</span>
@@ -257,46 +377,68 @@ const LandingPage = () => {
               <span className="text-sm font-semibold" style={{ color: '#e2e8f0' }}>IZEE Business School</span>
             </motion.div>
           </motion.div>
+        </section>
 
-          {/* Scroll indicator */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1.5, duration: 1 }}
-            className="absolute bottom-16 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
-            style={{ color: '#334155' }}
-          >
-            <span className="text-[10px] uppercase tracking-[0.2em]">Scroll</span>
-            <motion.div animate={{ y: [0, 6, 0] }} transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}>
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 9l-7 7-7-7" />
-              </svg>
-            </motion.div>
-          </motion.div>
-
-          {/* Bottom gradient fade */}
-          <div className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none"
-            style={{ background: 'linear-gradient(to bottom, transparent, #020208)' }} />
+        {/* ══ EVENT DETAILS ══ */}
+        <section className="px-4 pt-8 pb-14">
+          <div className="max-w-5xl mx-auto">
+            <SR>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {EVENT_DETAILS.map((item, i) => (
+                  <div key={i}
+                    className="flex flex-col items-center text-center p-5 rounded-2xl transition-all duration-300 cursor-default"
+                    style={{
+                      background: 'linear-gradient(135deg, rgba(13,13,26,0.88) 0%, rgba(19,19,31,0.88) 100%)',
+                      border: `1px solid ${item.accent}30`,
+                      backdropFilter: 'blur(16px)',
+                      boxShadow: '0 4px 24px rgba(0,0,0,0.30), inset 0 1px 0 rgba(255,255,255,0.05)',
+                    }}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.borderColor = item.accent + '70'
+                      e.currentTarget.style.boxShadow = `0 10px 34px ${item.glow}, inset 0 1px 0 rgba(255,255,255,0.08)`
+                      e.currentTarget.style.transform = 'translateY(-3px)'
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.borderColor = item.accent + '30'
+                      e.currentTarget.style.boxShadow = '0 4px 24px rgba(0,0,0,0.30), inset 0 1px 0 rgba(255,255,255,0.05)'
+                      e.currentTarget.style.transform = 'translateY(0)'
+                    }}
+                  >
+                    <div className="w-11 h-11 rounded-xl flex items-center justify-center text-xl mb-3"
+                      style={{ background: `radial-gradient(circle, ${item.glow} 0%, rgba(0,0,0,0) 70%)`, border: `1px solid ${item.accent}30` }}>
+                      {item.icon}
+                    </div>
+                    <span className="text-[9px] uppercase tracking-[0.18em] mb-1 font-semibold" style={{ color: item.accent + 'cc' }}>
+                      {item.label}
+                    </span>
+                    <span className="text-sm font-bold text-white leading-tight">{item.value}</span>
+                  </div>
+                ))}
+              </div>
+            </SR>
+          </div>
         </section>
 
         <Divider />
 
-        {/* ── Company Marquee ── */}
-        <section className="py-20 md:py-28 px-4 relative overflow-hidden">
-          <div className="max-w-7xl mx-auto relative z-10">
+        {/* ══ COMPANY MARQUEE ══ */}
+        <section className="py-16 md:py-20 px-4 overflow-hidden">
+          <div className="max-w-7xl mx-auto">
             <FI>
-              <p className="text-center font-light tracking-[0.22em] uppercase text-[10px] mb-10" style={{ color: '#334155' }}>
-                Trusted by industry leaders
+              <p className="text-center font-light tracking-[0.22em] uppercase text-[10px] mb-10" style={{ color: '#4a5568' }}>
+                Hiring companies include
               </p>
             </FI>
             <div className="marquee-container">
-              <div className="overflow-hidden whitespace-nowrap" style={{ maskImage: 'linear-gradient(to right, transparent, black 8%, black 92%, transparent)' }}>
+              <div className="overflow-hidden whitespace-nowrap"
+                style={{ maskImage: 'linear-gradient(to right, transparent, black 8%, black 92%, transparent)' }}>
                 <div className="animate-marquee inline-flex gap-14 md:gap-20 items-center">
                   {COMPANIES.concat(COMPANIES).map((c, i) => (
-                    <span key={`m-${i}`} className="text-sm md:text-base font-heading-art font-medium cursor-default transition-colors duration-500"
-                      style={{ color: '#334155' }}
-                      onMouseEnter={e => e.currentTarget.style.color = '#94a3b8'}
-                      onMouseLeave={e => e.currentTarget.style.color = '#334155'}
+                    <span key={`m-${i}`}
+                      className="text-sm md:text-base font-heading-art font-medium cursor-default transition-colors duration-500"
+                      style={{ color: '#4a5568' }}
+                      onMouseEnter={e => (e.currentTarget.style.color = '#94a3b8')}
+                      onMouseLeave={e => (e.currentTarget.style.color = '#4a5568')}
                     >{c}</span>
                   ))}
                 </div>
@@ -307,34 +449,56 @@ const LandingPage = () => {
 
         <Divider />
 
-        {/* ── Who Should Attend ── */}
-        <section className="py-24 md:py-32 px-4 relative">
-          <div className="max-w-5xl mx-auto relative z-10">
-            <SR className="text-center mb-16 md:mb-20">
-              <p className="text-[10px] uppercase tracking-[0.28em] font-semibold mb-4" style={{ color: 'rgba(99,102,241,0.5)' }}>Who should attend</p>
-              <h2 className="text-3xl md:text-5xl font-bold tracking-tight font-heading-art"><span className="text-shimmer">Perfect For</span></h2>
+        {/* ══ HIGHLIGHTS ══ */}
+        <section className="py-20 md:py-28 px-4">
+          <div className="max-w-6xl mx-auto">
+            <SR className="text-center mb-14 md:mb-16">
+              <p className="text-[10px] uppercase tracking-[0.28em] font-semibold mb-4" style={{ color: 'rgba(6,182,212,0.7)' }}>
+                What's in store
+              </p>
+              <h2 className="text-3xl md:text-5xl font-bold tracking-tight font-heading-art">
+                <span className="text-shimmer">Everything You Need</span>
+              </h2>
+              <p className="mt-4 text-sm md:text-base max-w-xl mx-auto" style={{ color: '#64748b' }}>
+                One day. One venue. Thousands of opportunities.
+              </p>
             </SR>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
-              {WHO_SHOULD_ATTEND.map((item, i) => (
-                <SR key={i} delay={i * 0.08} y={25}>
-                  <div className="p-7 rounded-2xl transition-all duration-500 group cursor-default"
-                    style={{ background: '#0D0D1A', border: '1px solid #1a1a2e' }}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-5">
+              {HIGHLIGHTS.map((item, i) => (
+                <SR key={i} delay={i * 0.07} y={20}>
+                  <div
+                    className="relative p-6 rounded-2xl transition-all duration-300 cursor-default h-full overflow-hidden"
+                    style={{
+                      background: 'linear-gradient(135deg, rgba(13,13,26,0.92) 0%, rgba(19,19,31,0.88) 100%)',
+                      border: '1px solid rgba(255,255,255,0.06)',
+                      backdropFilter: 'blur(16px)',
+                      boxShadow: '0 4px 24px rgba(0,0,0,0.30), inset 0 1px 0 rgba(255,255,255,0.04)',
+                    }}
                     onMouseEnter={e => {
-                      e.currentTarget.style.borderColor = 'rgba(99,102,241,0.3)'
-                      e.currentTarget.style.boxShadow = '0 0 0 1px rgba(99,102,241,0.1), 0 8px 32px rgba(0,0,0,0.3)'
+                      e.currentTarget.style.borderColor = item.accent + '50'
+                      e.currentTarget.style.boxShadow = `0 12px 40px ${item.glow}, 0 4px 16px rgba(0,0,0,0.40), inset 0 1px 0 rgba(255,255,255,0.07)`
+                      e.currentTarget.style.transform = 'translateY(-4px)'
                     }}
                     onMouseLeave={e => {
-                      e.currentTarget.style.borderColor = '#1a1a2e'
-                      e.currentTarget.style.boxShadow = 'none'
+                      e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)'
+                      e.currentTarget.style.boxShadow = '0 4px 24px rgba(0,0,0,0.30), inset 0 1px 0 rgba(255,255,255,0.04)'
+                      e.currentTarget.style.transform = 'translateY(0)'
                     }}
                   >
-                    <div className="flex items-start gap-4">
-                      <div className="flex-shrink-0 w-9 h-9 rounded-lg flex items-center justify-center text-white/60 text-xs font-bold"
-                        style={{ background: 'linear-gradient(135deg, rgba(99,102,241,0.2), rgba(139,92,246,0.2))', border: '1px solid rgba(99,102,241,0.15)' }}>
-                        {String(i + 1).padStart(2, '0')}
-                      </div>
-                      <p className="text-[0.95rem] leading-relaxed mt-0.5" style={{ color: '#F8FAFC' }}>{item}</p>
+                    <div className="absolute top-0 left-0 right-0 rounded-t-2xl"
+                      style={{ height: '2px', background: `linear-gradient(90deg, transparent, ${item.accent}, transparent)` }} />
+                    <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl mb-4"
+                      style={{
+                        background: `linear-gradient(135deg, ${item.glow.replace('0.22', '0.18')}, rgba(0,0,0,0))`,
+                        border: `1px solid ${item.accent}30`,
+                        boxShadow: `0 0 20px ${item.glow}`,
+                      }}>
+                      {item.icon}
                     </div>
+                    <h3 className="text-base font-bold text-white mb-2 font-heading-art">{item.title}</h3>
+                    <p className="text-sm leading-relaxed" style={{ color: '#64748b' }}>{item.desc}</p>
+                    <div className="absolute bottom-0 right-0 rounded-full pointer-events-none"
+                      style={{ width: 96, height: 96, background: `radial-gradient(circle, ${item.glow} 0%, transparent 70%)`, filter: 'blur(16px)', transform: 'translate(30%, 30%)' }} />
                   </div>
                 </SR>
               ))}
@@ -344,31 +508,57 @@ const LandingPage = () => {
 
         <Divider />
 
-        {/* ── What to Expect ── */}
-        <section className="py-24 md:py-32 px-4 relative">
-          <div className="max-w-6xl mx-auto relative z-10">
-            <SR className="text-center mb-16 md:mb-20">
-              <p className="text-[10px] uppercase tracking-[0.28em] font-semibold mb-4" style={{ color: 'rgba(6,182,212,0.5)' }}>The experience</p>
-              <h2 className="text-3xl md:text-5xl font-bold tracking-tight font-heading-art"><span className="text-shimmer">What Awaits You</span></h2>
+        {/* ══ WHO SHOULD ATTEND ══ */}
+        <section className="py-20 md:py-28 px-4">
+          <div className="max-w-5xl mx-auto">
+            <SR className="text-center mb-14 md:mb-16">
+              <p className="text-[10px] uppercase tracking-[0.28em] font-semibold mb-4" style={{ color: 'rgba(99,102,241,0.6)' }}>
+                Who should attend
+              </p>
+              <h2 className="text-3xl md:text-5xl font-bold tracking-tight font-heading-art">
+                <span className="text-shimmer">Perfect For</span>
+              </h2>
             </SR>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6">
-              {WHAT_TO_EXPECT.map((item, i) => (
-                <SR key={i} delay={i * 0.1}>
-                  <div className="p-8 rounded-2xl transition-all duration-500 h-full flex flex-col group"
-                    style={{ background: '#0D0D1A', border: '1px solid #1a1a2e' }}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
+              {WHO_SHOULD_ATTEND.map((item, i) => (
+                <SR key={i} delay={i * 0.08} y={25}>
+                  <div
+                    className="relative p-6 rounded-2xl transition-all duration-300 cursor-default overflow-hidden"
+                    style={{
+                      background: 'linear-gradient(135deg, rgba(13,13,26,0.92) 0%, rgba(19,19,31,0.88) 100%)',
+                      border: '1px solid rgba(255,255,255,0.06)',
+                      backdropFilter: 'blur(16px)',
+                      boxShadow: '0 4px 24px rgba(0,0,0,0.30), inset 0 1px 0 rgba(255,255,255,0.04)',
+                    }}
                     onMouseEnter={e => {
-                      e.currentTarget.style.borderColor = 'rgba(99,102,241,0.3)'
-                      e.currentTarget.style.boxShadow = '0 0 0 1px rgba(99,102,241,0.08), 0 16px 40px rgba(0,0,0,0.4)'
+                      e.currentTarget.style.borderColor = item.accent + '45'
+                      e.currentTarget.style.boxShadow = `0 12px 36px rgba(0,0,0,0.40), 0 0 0 1px ${item.accent}25, inset 0 1px 0 rgba(255,255,255,0.07)`
+                      e.currentTarget.style.transform = 'translateY(-3px)'
                     }}
                     onMouseLeave={e => {
-                      e.currentTarget.style.borderColor = '#1a1a2e'
-                      e.currentTarget.style.boxShadow = 'none'
+                      e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)'
+                      e.currentTarget.style.boxShadow = '0 4px 24px rgba(0,0,0,0.30), inset 0 1px 0 rgba(255,255,255,0.04)'
+                      e.currentTarget.style.transform = 'translateY(0)'
                     }}
                   >
-                    <div className="w-8 h-[2px] mb-7 rounded-full transition-all duration-700 group-hover:w-14"
-                      style={{ background: 'linear-gradient(90deg, #6366F1, #06B6D4)' }} />
-                    <h3 className="text-lg font-bold text-white mb-3 font-heading-art tracking-tight">{item.title}</h3>
-                    <p className="leading-relaxed text-[0.9rem] flex-1" style={{ color: '#F8FAFC' }}>{item.desc}</p>
+                    <div className="absolute left-0 top-4 bottom-4 rounded-full"
+                      style={{ width: '3px', background: `linear-gradient(to bottom, ${item.accent}, ${item.accent}40)` }} />
+                    <div className="flex items-center gap-4 pl-4">
+                      <div className="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center text-xs font-bold"
+                        style={{
+                          background: `linear-gradient(135deg, ${item.accent}22, ${item.accent}08)`,
+                          border: `1px solid ${item.accent}35`,
+                          color: item.accent,
+                          boxShadow: `0 0 16px ${item.accent}20`,
+                        }}>
+                        {item.num}
+                      </div>
+                      <p className="text-[0.95rem] leading-relaxed font-medium" style={{ color: '#cbd5e1' }}>
+                        {item.text}
+                      </p>
+                    </div>
+                    <div className="absolute top-0 right-0 rounded-full pointer-events-none"
+                      style={{ width: 80, height: 80, background: `radial-gradient(circle, ${item.accent}18 0%, transparent 70%)`, filter: 'blur(12px)', transform: 'translate(30%, -30%)' }} />
                   </div>
                 </SR>
               ))}
@@ -376,31 +566,46 @@ const LandingPage = () => {
           </div>
         </section>
 
-        {/* ── Final CTA ── */}
+        <Divider />
+
+        {/* ══ FINAL CTA ══ */}
         <section className="py-24 md:py-32 px-4 relative overflow-hidden">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl h-80 pointer-events-none rounded-full"
-            style={{ background: 'rgba(99,102,241,0.08)', filter: 'blur(100px)' }} />
+            style={{ background: 'rgba(99,102,241,0.10)', filter: 'blur(110px)' }} />
           <div className="max-w-4xl mx-auto relative z-10">
             <SR y={30}>
-              <div className="p-10 sm:p-14 md:p-16 text-center rounded-3xl"
-                style={{ background: '#0D0D1A', border: '1px solid rgba(99,102,241,0.2)', boxShadow: '0 0 60px rgba(99,102,241,0.08)' }}>
-                <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-5 tracking-tight font-heading-art">
+              <div
+                className="p-10 sm:p-14 md:p-16 text-center rounded-3xl relative overflow-hidden"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(13,13,26,0.92) 0%, rgba(19,19,31,0.88) 100%)',
+                  border: '1px solid rgba(99,102,241,0.25)',
+                  boxShadow: '0 0 90px rgba(99,102,241,0.10), inset 0 1px 0 rgba(255,255,255,0.05)',
+                  backdropFilter: 'blur(16px)',
+                }}
+              >
+                <div className="absolute top-0 left-0 right-0 rounded-t-3xl"
+                  style={{ height: '2px', background: 'linear-gradient(90deg, transparent, #6366F1 30%, #8B5CF6 50%, #06B6D4 70%, transparent)' }} />
+                <div className="absolute top-0 left-0 w-40 h-40 rounded-full pointer-events-none"
+                  style={{ background: 'radial-gradient(circle, rgba(99,102,241,0.12) 0%, transparent 70%)', filter: 'blur(20px)', transform: 'translate(-30%, -30%)' }} />
+                <div className="absolute bottom-0 right-0 w-40 h-40 rounded-full pointer-events-none"
+                  style={{ background: 'radial-gradient(circle, rgba(6,182,212,0.10) 0%, transparent 70%)', filter: 'blur(20px)', transform: 'translate(30%, 30%)' }} />
+                <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-5 tracking-tight font-heading-art relative z-10">
                   <span className="text-shimmer">Ready to Transform Your Career?</span>
                 </h2>
-                <p className="text-base md:text-lg mb-10 max-w-xl mx-auto leading-relaxed" style={{ color: '#F8FAFC' }}>
-                  Your next opportunity is one registration away.
+                <p className="text-base md:text-lg mb-10 max-w-xl mx-auto leading-relaxed relative z-10" style={{ color: '#94a3b8' }}>
+                  Your next opportunity is one registration away. Seats are limited.
                 </p>
-                <Link to="/register" className="group inline-block">
+                <Link to="/register" className="group inline-block relative z-10">
                   <div
                     className="relative overflow-hidden px-12 py-4 rounded-xl font-semibold text-sm tracking-[0.06em] uppercase text-white inline-flex items-center gap-2.5 transition-all duration-300"
-                    style={{ background: 'linear-gradient(135deg, #6146b3ff, #2177daff)', boxShadow: '0 4px 24px rgba(61,64,240,0.4)' }}
+                    style={{ background: 'linear-gradient(135deg, #6146b3, #2177da)', boxShadow: '0 4px 30px rgba(99,102,241,0.50)' }}
                     onMouseEnter={e => {
                       e.currentTarget.style.transform = 'translateY(-2px)'
-                      e.currentTarget.style.boxShadow = '0 10px 40px rgba(99,102,241,0.6), 0 0 60px rgba(34,211,238,0.15)'
+                      e.currentTarget.style.boxShadow = '0 10px 40px rgba(99,102,241,0.65)'
                     }}
                     onMouseLeave={e => {
                       e.currentTarget.style.transform = 'translateY(0)'
-                      e.currentTarget.style.boxShadow = '0 4px 24px rgba(99,102,241,0.4)'
+                      e.currentTarget.style.boxShadow = '0 4px 30px rgba(99,102,241,0.50)'
                     }}
                   >
                     Claim Your Spot
@@ -414,17 +619,18 @@ const LandingPage = () => {
           </div>
         </section>
 
-        {/* ── Footer ── */}
-        <footer className="pt-12 md:pt-16 pb-8 px-4 relative">
-          <div className="max-w-7xl mx-auto relative z-10 flex flex-col items-center justify-center gap-8">
+        {/* ══ FOOTER ══ */}
+        <footer className="pt-12 md:pt-16 pb-8 px-4">
+          <div className="max-w-7xl mx-auto flex flex-col items-center justify-center gap-8">
             <FI>
-              <img src={collegeLogo} alt="IZEE College Logo" className="h-14 md:h-16 object-contain opacity-50 hover:opacity-80 transition-opacity duration-500" />
+              <img src={collegeLogo} alt="IZEE" className="h-14 md:h-16 object-contain opacity-50 hover:opacity-80 transition-opacity duration-500" />
             </FI>
-            <div className="w-full max-w-3xl h-px" style={{ background: 'linear-gradient(90deg, transparent, #1a1a2e, transparent)' }} />
-            <div className="flex flex-col md:flex-row items-center justify-between w-full max-w-5xl text-xs font-light tracking-wide gap-3 text-center md:text-left"
-              style={{ color: '#334155' }}>
+            <div className="w-full max-w-3xl h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(99,102,241,0.2), transparent)' }} />
+            <div className="flex flex-col md:flex-row items-center justify-between w-full max-w-5xl text-xs font-light tracking-wide gap-3" style={{ color: '#334155' }}>
               <p>&copy; {new Date().getFullYear()} IZEE Job Fair. All rights reserved.</p>
-              <span>IZEE Business School, Bangalore</span>
+              <a href="https://izeeinstitutions.com" target="_blank" rel="noopener noreferrer" className="hover:text-indigo-400 transition-colors duration-200">
+                izeeinstitutions.com
+              </a>
             </div>
           </div>
         </footer>
