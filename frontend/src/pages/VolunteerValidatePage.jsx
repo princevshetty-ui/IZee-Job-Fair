@@ -1,9 +1,21 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { Html5Qrcode } from 'html5-qrcode'
 import { motion, AnimatePresence } from 'framer-motion'
-import Navbar from '../components/shared/Navbar'
+import collegeLogo from '../assets/images/college-logo.png'
 import FormField from '../components/forms/FormField'
 import Toast from '../components/shared/Toast'
+
+const LogoFixed = () => (
+  <img
+    src={collegeLogo}
+    alt="IZEE"
+    style={{
+      position: 'fixed', top: 16, left: 20, zIndex: 50,
+      height: 40, width: 'auto', objectFit: 'contain',
+      filter: 'drop-shadow(0 0 8px rgba(99,102,241,0.2))',
+    }}
+  />
+)
 
 const ResultOverlay = ({ result, onDismiss }) => {
   if (!result) return null
@@ -243,7 +255,7 @@ const VolunteerValidatePage = () => {
     return (
       <div className="min-h-screen text-white overflow-x-hidden" style={{ backgroundColor: '#020208' }}>
         <div className="relative z-10">
-          <Navbar />
+          <LogoFixed />
           <div className="container mx-auto px-4 py-24">
             <motion.div
               initial={{ opacity: 0, y: 24 }}
@@ -298,7 +310,7 @@ const VolunteerValidatePage = () => {
   return (
     <div className="min-h-screen text-white overflow-x-hidden" style={{ backgroundColor: '#020208' }}>
       <div className="relative z-10">
-        <Navbar />
+        <LogoFixed />
         <div className="container mx-auto px-4 py-24">
           <motion.div
             initial={{ opacity: 0, y: 20 }}

@@ -14,30 +14,7 @@ const Navbar = () => {
               style={{ filter: 'drop-shadow(0 0 12px rgba(99,102,241,0.2))' }}
             />
           </Link>
-          <div className="flex items-center gap-3">
-            <Link to="/register">
-              <div
-                className="px-6 py-2.5 rounded-full text-xs font-semibold tracking-[0.1em] uppercase transition-all duration-300 cursor-pointer"
-                style={{
-                  background: 'rgba(99,102,241,0.08)',
-                  border: '1px solid rgba(99,102,241,0.25)',
-                  color: '#a5b4fc',
-                }}
-                onMouseEnter={e => {
-                  e.currentTarget.style.background = 'rgba(99,102,241,0.18)'
-                  e.currentTarget.style.borderColor = 'rgba(99,102,241,0.5)'
-                  e.currentTarget.style.boxShadow = '0 0 24px rgba(99,102,241,0.25)'
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.background = 'rgba(99,102,241,0.08)'
-                  e.currentTarget.style.borderColor = 'rgba(99,102,241,0.25)'
-                  e.currentTarget.style.boxShadow = 'none'
-                }}
-              >
-                Register Now
-              </div>
-            </Link>
-          </div>
+          <div />
         </div>
       </div>
     </nav>

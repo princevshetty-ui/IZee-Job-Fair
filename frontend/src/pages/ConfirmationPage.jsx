@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import { Link, useSearchParams } from 'react-router-dom'
+import collegeLogo from '../assets/images/college-logo.png'
 
 const ConfirmationPage = () => {
   const [searchParams] = useSearchParams()
@@ -7,6 +8,7 @@ const ConfirmationPage = () => {
 
   return (
     <div className="min-h-screen text-white overflow-x-hidden" style={{ backgroundColor: '#020208' }}>
+      <img src={collegeLogo} alt="IZEE" style={{ position: 'fixed', top: 16, left: 20, zIndex: 50, height: 40, width: 'auto', objectFit: 'contain', filter: 'drop-shadow(0 0 8px rgba(99,102,241,0.2))' }} />
       {/* Ambient glow */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
         <div className="absolute rounded-full blur-[160px]"

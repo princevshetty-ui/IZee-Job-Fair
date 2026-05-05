@@ -211,8 +211,8 @@ const LandingPage = () => {
             {/* Stats strip with animated border */}
             <motion.div
               variants={childVariants}
-              className="stats-strip-animated inline-flex items-center gap-3 mx-auto px-8 py-4 rounded-2xl"
-              style={{ background: 'rgba(13,13,26,0.9)', border: '1px solid rgba(99,102,241,0.25)' }}
+              className="stats-shimmer inline-flex items-center gap-3 mx-auto px-8 py-4"
+              style={{ background: 'rgba(13,13,26,0.9)' }}
             >
               <span className="text-sm font-semibold" style={{ color: '#e2e8f0' }}>80+ Companies</span>
               <span style={{ color: '#334155' }}>·</span>
@@ -276,7 +276,7 @@ const LandingPage = () => {
           <div className="max-w-5xl mx-auto relative z-10">
             <SR className="text-center mb-16 md:mb-20">
               <p className="text-[10px] uppercase tracking-[0.28em] font-semibold mb-4" style={{ color: 'rgba(99,102,241,0.5)' }}>Who should attend</p>
-              <h2 className="text-3xl md:text-5xl font-bold text-white tracking-tight font-heading-art">Perfect For</h2>
+              <h2 className="text-3xl md:text-5xl font-bold tracking-tight font-heading-art"><span className="text-shimmer">Perfect For</span></h2>
             </SR>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
               {WHO_SHOULD_ATTEND.map((item, i) => (
@@ -297,7 +297,7 @@ const LandingPage = () => {
                         style={{ background: 'linear-gradient(135deg, rgba(99,102,241,0.2), rgba(139,92,246,0.2))', border: '1px solid rgba(99,102,241,0.15)' }}>
                         {String(i + 1).padStart(2, '0')}
                       </div>
-                      <p className="text-[0.95rem] leading-relaxed mt-0.5" style={{ color: '#64748B' }}>{item}</p>
+                      <p className="text-[0.95rem] leading-relaxed mt-0.5" style={{ color: '#F8FAFC' }}>{item}</p>
                     </div>
                   </div>
                 </SR>
@@ -313,7 +313,7 @@ const LandingPage = () => {
           <div className="max-w-6xl mx-auto relative z-10">
             <SR className="text-center mb-16 md:mb-20">
               <p className="text-[10px] uppercase tracking-[0.28em] font-semibold mb-4" style={{ color: 'rgba(6,182,212,0.5)' }}>The experience</p>
-              <h2 className="text-3xl md:text-5xl font-bold text-white tracking-tight font-heading-art">What Awaits You</h2>
+              <h2 className="text-3xl md:text-5xl font-bold tracking-tight font-heading-art"><span className="text-shimmer">What Awaits You</span></h2>
             </SR>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6">
               {WHAT_TO_EXPECT.map((item, i) => (
@@ -332,7 +332,7 @@ const LandingPage = () => {
                     <div className="w-8 h-[2px] mb-7 rounded-full transition-all duration-700 group-hover:w-14"
                       style={{ background: 'linear-gradient(90deg, #6366F1, #06B6D4)' }} />
                     <h3 className="text-lg font-bold text-white mb-3 font-heading-art tracking-tight">{item.title}</h3>
-                    <p className="leading-relaxed text-[0.9rem] flex-1" style={{ color: '#475569' }}>{item.desc}</p>
+                    <p className="leading-relaxed text-[0.9rem] flex-1" style={{ color: '#F8FAFC' }}>{item.desc}</p>
                   </div>
                 </SR>
               ))}
@@ -348,12 +348,10 @@ const LandingPage = () => {
             <SR y={30}>
               <div className="p-10 sm:p-14 md:p-16 text-center rounded-3xl"
                 style={{ background: '#0D0D1A', border: '1px solid rgba(99,102,241,0.2)', boxShadow: '0 0 60px rgba(99,102,241,0.08)' }}>
-                <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-5 text-white tracking-tight font-heading-art">
-                  Ready to{' '}
-                  <span className="text-gradient-hero">Transform</span>
-                  {' '}Your Career?
+                <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-5 tracking-tight font-heading-art">
+                  <span className="text-shimmer">Ready to Transform Your Career?</span>
                 </h2>
-                <p className="text-base md:text-lg mb-10 max-w-xl mx-auto leading-relaxed" style={{ color: '#475569' }}>
+                <p className="text-base md:text-lg mb-10 max-w-xl mx-auto leading-relaxed" style={{ color: '#F8FAFC' }}>
                   Your next opportunity is one registration away.
                 </p>
                 <Link to="/register" className="group inline-block">

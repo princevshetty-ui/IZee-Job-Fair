@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import RegistrationForm from '../components/forms/RegistrationForm'
 import Toast from '../components/shared/Toast'
 import { apiCall } from '../utils/api'
+import collegeLogo from '../assets/images/college-logo.png'
 
 const RegisterPage = () => {
   const navigate = useNavigate()
@@ -51,6 +52,7 @@ const RegisterPage = () => {
   if (!regOpen) {
     return (
       <div className="min-h-screen text-white flex items-center justify-center px-4" style={{ backgroundColor: '#020208' }}>
+        <img src={collegeLogo} alt="IZEE" style={{ position: 'fixed', top: 16, left: 20, zIndex: 50, height: 40, width: 'auto', objectFit: 'contain', filter: 'drop-shadow(0 0 8px rgba(99,102,241,0.2))' }} />
         <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
           <div className="absolute rounded-full blur-[160px]"
             style={{ width: 500, height: 500, background: 'radial-gradient(circle, rgba(99,102,241,0.06) 0%, transparent 70%)', top: '50%', left: '50%', transform: 'translate(-50%,-50%)' }} />
@@ -96,6 +98,7 @@ const RegisterPage = () => {
 
   return (
     <div className="min-h-screen text-white overflow-x-hidden" style={{ backgroundColor: '#020208' }}>
+      <img src={collegeLogo} alt="IZEE" style={{ position: 'fixed', top: 16, left: 20, zIndex: 50, height: 40, width: 'auto', objectFit: 'contain', filter: 'drop-shadow(0 0 8px rgba(99,102,241,0.2))' }} />
       {/* Background glow */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
         <div className="absolute rounded-full blur-[150px]"
