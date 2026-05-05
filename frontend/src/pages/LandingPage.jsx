@@ -147,44 +147,40 @@ const FullPageOrbs = () => {
     }
   }, [])
 
-  // Orbs defined with pixel top values
-  // Spread across ~4000px typical page height
+  // 20 vivid orbs spread across the full page.
+  // Blur 40–55px (was 80–108) + opacity 0.55–0.70 (was 0.20–0.32) = actually visible.
+  // Positions use percentages so nothing gets clipped.
   const orbs = [
-    // ── Hero zone (0–900px) ──
-    { cls: 'orb-1', top: 50, left: -180, w: 700, h: 700, bg: 'radial-gradient(circle, rgba(99,102,241,0.32) 0%, rgba(99,102,241,0.08) 45%, transparent 70%)', blur: 80 },
-    { cls: 'orb-2', top: 0, right: -160, w: 680, h: 680, bg: 'radial-gradient(circle, rgba(139,92,246,0.30) 0%, rgba(139,92,246,0.08) 45%, transparent 70%)', blur: 85 },
-    { cls: 'orb-3', top: 200, left: '30%', w: 860, h: 460, bg: 'radial-gradient(ellipse, rgba(99,102,241,0.22) 0%, rgba(6,182,212,0.08) 45%, transparent 70%)', blur: 95 },
-    { cls: 'orb-2', top: 500, left: -120, w: 560, h: 500, bg: 'radial-gradient(circle, rgba(6,182,212,0.22) 0%, rgba(6,182,212,0.06) 45%, transparent 70%)', blur: 75 },
-    { cls: 'orb-1', top: 500, right: -140, w: 580, h: 520, bg: 'radial-gradient(circle, rgba(139,92,246,0.22) 0%, rgba(139,92,246,0.06) 45%, transparent 70%)', blur: 80 },
+    // ── Hero (0–800px) ──
+    { cls: 'orb-1', top: 40,   left: '2%',  w: 520, h: 520, bg: 'radial-gradient(circle, rgba(99,102,241,0.65) 0%, rgba(99,102,241,0.18) 45%, transparent 70%)', blur: 48 },
+    { cls: 'orb-2', top: 20,   left: '68%', w: 500, h: 500, bg: 'radial-gradient(circle, rgba(139,92,246,0.60) 0%, rgba(139,92,246,0.16) 45%, transparent 70%)', blur: 50 },
+    { cls: 'orb-3', top: 300,  left: '28%', w: 580, h: 360, bg: 'radial-gradient(ellipse, rgba(99,102,241,0.50) 0%, rgba(6,182,212,0.14) 50%, transparent 70%)', blur: 55 },
+    { cls: 'orb-1', top: 550,  left: '5%',  w: 420, h: 400, bg: 'radial-gradient(circle, rgba(6,182,212,0.55) 0%, rgba(6,182,212,0.12) 45%, transparent 70%)', blur: 45 },
+    { cls: 'orb-2', top: 580,  left: '72%', w: 440, h: 420, bg: 'radial-gradient(circle, rgba(139,92,246,0.55) 0%, rgba(139,92,246,0.12) 45%, transparent 70%)', blur: 48 },
 
-    // ── Event details / marquee zone (900–1600px) ──
-    { cls: 'orb-3', top: 900, left: -160, w: 660, h: 620, bg: 'radial-gradient(circle, rgba(99,102,241,0.26) 0%, rgba(99,102,241,0.07) 45%, transparent 70%)', blur: 85 },
-    { cls: 'orb-1', top: 950, right: -150, w: 640, h: 600, bg: 'radial-gradient(circle, rgba(6,182,212,0.24) 0%, rgba(6,182,212,0.06) 45%, transparent 70%)', blur: 80 },
-    { cls: 'orb-2', top: 1100, left: '25%', w: 800, h: 440, bg: 'radial-gradient(ellipse, rgba(139,92,246,0.20) 0%, transparent 70%)', blur: 100 },
-    { cls: 'orb-3', top: 1300, left: -100, w: 580, h: 540, bg: 'radial-gradient(circle, rgba(6,182,212,0.20) 0%, rgba(6,182,212,0.05) 45%, transparent 70%)', blur: 78 },
-    { cls: 'orb-1', top: 1350, right: -120, w: 600, h: 560, bg: 'radial-gradient(circle, rgba(99,102,241,0.22) 0%, rgba(99,102,241,0.06) 45%, transparent 70%)', blur: 82 },
+    // ── Event details / Marquee (800–1600px) ──
+    { cls: 'orb-3', top: 820,  left: '3%',  w: 480, h: 460, bg: 'radial-gradient(circle, rgba(99,102,241,0.58) 0%, rgba(99,102,241,0.14) 45%, transparent 70%)', blur: 50 },
+    { cls: 'orb-1', top: 860,  left: '70%', w: 460, h: 440, bg: 'radial-gradient(circle, rgba(6,182,212,0.55) 0%, rgba(6,182,212,0.12) 45%, transparent 70%)', blur: 46 },
+    { cls: 'orb-2', top: 1150, left: '22%', w: 560, h: 340, bg: 'radial-gradient(ellipse, rgba(139,92,246,0.52) 0%, transparent 65%)', blur: 52 },
+    { cls: 'orb-3', top: 1380, left: '6%',  w: 440, h: 420, bg: 'radial-gradient(circle, rgba(6,182,212,0.55) 0%, rgba(6,182,212,0.12) 45%, transparent 70%)', blur: 44 },
+    { cls: 'orb-1', top: 1420, left: '66%', w: 460, h: 440, bg: 'radial-gradient(circle, rgba(99,102,241,0.56) 0%, rgba(99,102,241,0.12) 45%, transparent 70%)', blur: 48 },
 
-    // ── Highlights grid zone (1600–2400px) ──
-    { cls: 'orb-2', top: 1600, left: -180, w: 700, h: 650, bg: 'radial-gradient(circle, rgba(139,92,246,0.28) 0%, rgba(139,92,246,0.07) 45%, transparent 70%)', blur: 88 },
-    { cls: 'orb-3', top: 1650, right: -160, w: 680, h: 630, bg: 'radial-gradient(circle, rgba(6,182,212,0.26) 0%, rgba(6,182,212,0.07) 45%, transparent 70%)', blur: 85 },
-    { cls: 'orb-1', top: 1850, left: '20%', w: 840, h: 460, bg: 'radial-gradient(ellipse, rgba(99,102,241,0.22) 0%, rgba(139,92,246,0.08) 45%, transparent 70%)', blur: 100 },
-    { cls: 'orb-2', top: 2050, left: -140, w: 640, h: 580, bg: 'radial-gradient(circle, rgba(99,102,241,0.24) 0%, rgba(99,102,241,0.06) 45%, transparent 70%)', blur: 82 },
-    { cls: 'orb-3', top: 2100, right: -150, w: 660, h: 600, bg: 'radial-gradient(circle, rgba(139,92,246,0.22) 0%, rgba(139,92,246,0.06) 45%, transparent 70%)', blur: 86 },
+    // ── Highlights (1600–2400px) ──
+    { cls: 'orb-2', top: 1620, left: '4%',  w: 500, h: 480, bg: 'radial-gradient(circle, rgba(139,92,246,0.60) 0%, rgba(139,92,246,0.15) 45%, transparent 70%)', blur: 52 },
+    { cls: 'orb-3', top: 1660, left: '68%', w: 480, h: 460, bg: 'radial-gradient(circle, rgba(6,182,212,0.58) 0%, rgba(6,182,212,0.14) 45%, transparent 70%)', blur: 50 },
+    { cls: 'orb-1', top: 1940, left: '25%', w: 600, h: 360, bg: 'radial-gradient(ellipse, rgba(99,102,241,0.50) 0%, rgba(139,92,246,0.14) 50%, transparent 70%)', blur: 55 },
+    { cls: 'orb-2', top: 2180, left: '5%',  w: 460, h: 440, bg: 'radial-gradient(circle, rgba(99,102,241,0.56) 0%, rgba(99,102,241,0.12) 45%, transparent 70%)', blur: 46 },
+    { cls: 'orb-3', top: 2220, left: '67%', w: 480, h: 460, bg: 'radial-gradient(circle, rgba(139,92,246,0.55) 0%, rgba(139,92,246,0.12) 45%, transparent 70%)', blur: 50 },
 
-    // ── Who should attend zone (2400–3100px) ──
-    { cls: 'orb-1', top: 2400, left: -160, w: 700, h: 660, bg: 'radial-gradient(circle, rgba(6,182,212,0.26) 0%, rgba(6,182,212,0.07) 45%, transparent 70%)', blur: 88 },
-    { cls: 'orb-2', top: 2450, right: -170, w: 720, h: 680, bg: 'radial-gradient(circle, rgba(99,102,241,0.28) 0%, rgba(99,102,241,0.07) 45%, transparent 70%)', blur: 90 },
-    { cls: 'orb-3', top: 2650, left: '30%', w: 820, h: 450, bg: 'radial-gradient(ellipse, rgba(139,92,246,0.20) 0%, rgba(6,182,212,0.07) 45%, transparent 70%)', blur: 105 },
-    { cls: 'orb-1', top: 2850, left: -130, w: 620, h: 580, bg: 'radial-gradient(circle, rgba(99,102,241,0.24) 0%, rgba(99,102,241,0.06) 45%, transparent 70%)', blur: 84 },
-    { cls: 'orb-2', top: 2900, right: -140, w: 640, h: 600, bg: 'radial-gradient(circle, rgba(139,92,246,0.22) 0%, rgba(139,92,246,0.06) 45%, transparent 70%)', blur: 87 },
+    // ── Who should attend (2400–3200px) ──
+    { cls: 'orb-1', top: 2420, left: '3%',  w: 500, h: 480, bg: 'radial-gradient(circle, rgba(6,182,212,0.58) 0%, rgba(6,182,212,0.14) 45%, transparent 70%)', blur: 52 },
+    { cls: 'orb-2', top: 2460, left: '69%', w: 520, h: 500, bg: 'radial-gradient(circle, rgba(99,102,241,0.60) 0%, rgba(99,102,241,0.15) 45%, transparent 70%)', blur: 54 },
+    { cls: 'orb-3', top: 2720, left: '26%', w: 580, h: 360, bg: 'radial-gradient(ellipse, rgba(139,92,246,0.50) 0%, rgba(6,182,212,0.12) 50%, transparent 70%)', blur: 55 },
 
-    // ── CTA / Footer zone (3100–4200px) ──
-    { cls: 'orb-3', top: 3100, left: -170, w: 680, h: 640, bg: 'radial-gradient(circle, rgba(6,182,212,0.24) 0%, rgba(6,182,212,0.06) 45%, transparent 70%)', blur: 86 },
-    { cls: 'orb-1', top: 3150, right: -160, w: 700, h: 660, bg: 'radial-gradient(circle, rgba(99,102,241,0.26) 0%, rgba(99,102,241,0.07) 45%, transparent 70%)', blur: 90 },
-    { cls: 'orb-2', top: 3350, left: '22%', w: 860, h: 480, bg: 'radial-gradient(ellipse, rgba(139,92,246,0.22) 0%, rgba(99,102,241,0.08) 45%, transparent 70%)', blur: 108 },
-    { cls: 'orb-3', top: 3600, left: -150, w: 660, h: 620, bg: 'radial-gradient(circle, rgba(99,102,241,0.24) 0%, rgba(99,102,241,0.06) 45%, transparent 70%)', blur: 85 },
-    { cls: 'orb-1', top: 3650, right: -140, w: 640, h: 600, bg: 'radial-gradient(circle, rgba(6,182,212,0.22) 0%, rgba(6,182,212,0.06) 45%, transparent 70%)', blur: 88 },
-    { cls: 'orb-2', top: 3900, left: '35%', w: 800, h: 460, bg: 'radial-gradient(ellipse, rgba(139,92,246,0.20) 0%, transparent 70%)', blur: 100 },
+    // ── CTA / Footer (3200–4200px) ──
+    { cls: 'orb-1', top: 3200, left: '4%',  w: 480, h: 460, bg: 'radial-gradient(circle, rgba(99,102,241,0.58) 0%, rgba(99,102,241,0.14) 45%, transparent 70%)', blur: 50 },
+    { cls: 'orb-2', top: 3240, left: '67%', w: 500, h: 480, bg: 'radial-gradient(circle, rgba(139,92,246,0.56) 0%, rgba(139,92,246,0.13) 45%, transparent 70%)', blur: 52 },
+    { cls: 'orb-3', top: 3500, left: '28%', w: 560, h: 340, bg: 'radial-gradient(ellipse, rgba(6,182,212,0.52) 0%, transparent 65%)', blur: 50 },
   ]
 
   return (
@@ -198,7 +194,7 @@ const FullPageOrbs = () => {
         minHeight: '100%',
         pointerEvents: 'none',
         zIndex: 1,
-        overflow: 'hidden',
+        overflow: 'visible',
       }}
     >
       {orbs.map((o, i) => (
