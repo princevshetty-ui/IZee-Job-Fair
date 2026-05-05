@@ -14,10 +14,24 @@ from sid_generator import generate_sid
 import csv
 import io
 import os
+import json
 from pydantic import BaseModel
 from auth import create_token
 
 router = APIRouter()
+
+_SETTINGS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'settings.json')
+
+def _load_settings() -> dict:
+    try:
+        with open(_SETTINGS_FILE, 'r') as f:
+            return json.load(f)
+    except Exception:
+        return {"registration_open": True}
+
+def _save_settings(data: dict):
+    with open(_SETTINGS_FILE, 'w') as f:
+        json.dump(data, f)
 
 
 class AdminLogin(BaseModel):
@@ -27,6 +41,10 @@ class AdminLogin(BaseModel):
 
 class BulkActionRequest(BaseModel):
     ids: list[str]
+
+
+class RegistrationStatusRequest(BaseModel):
+    open: bool
 
 
 @router.post("/admin/login")
@@ -40,6 +58,20 @@ async def admin_login(login_data: AdminLogin):
         return {"access_token": token, "token_type": "bearer"}
     print(f"Login failed: Expected '{admin_email}', got '{received_email}'")
     raise HTTPException(status_code=401, detail="Invalid credentials")
+
+
+@router.get("/admin/registration-status")
+async def get_registration_status():
+    settings = _load_settings()
+    return {"open": settings.get("registration_open", True)}
+
+
+@router.put("/admin/registration-status")
+async def set_registration_status(body: RegistrationStatusRequest, admin: dict = Depends(get_current_admin)):
+    settings = _load_settings()
+    settings["registration_open"] = body.open
+    _save_settings(settings)
+    return {"open": body.open}
 
 
 @router.get("/admin/stats")
