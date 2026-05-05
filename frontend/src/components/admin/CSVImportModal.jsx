@@ -26,7 +26,7 @@ const CSVImportModal = ({ show, onClose, onImportSuccess }) => {
 
       const data = await response.json();
       setResult(data);
-      if (!data.error && !data.errors?.length) {
+      if (data.imported > 0) {
         onImportSuccess();
       }
     } catch (error) {
@@ -67,8 +67,9 @@ const CSVImportModal = ({ show, onClose, onImportSuccess }) => {
                 <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-4">
                   <p className="text-emerald-400 font-medium mb-1">Import Complete</p>
                   <p className="text-emerald-300 text-sm">
-                    Successfully imported <strong>{result.count}</strong> record{result.count !== 1 ? 's' : ''}.
-                    {result.skipped > 0 && ` ${result.skipped} row${result.skipped !== 1 ? 's' : ''} skipped.`}
+                    Successfully imported <strong>{result.imported}</strong> record{result.imported !== 1 ? 's' : ''}.
+                    {result.skipped_duplicates > 0 && ` ${result.skipped_duplicates} duplicate${result.skipped_duplicates !== 1 ? 's' : ''} skipped.`}
+                    {result.skipped_errors > 0 && ` ${result.skipped_errors} row${result.skipped_errors !== 1 ? 's' : ''} had errors.`}
                   </p>
                 </div>
               )}

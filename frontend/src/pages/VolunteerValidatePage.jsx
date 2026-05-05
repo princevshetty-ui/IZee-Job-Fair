@@ -254,6 +254,11 @@ const VolunteerValidatePage = () => {
   if (!token) {
     return (
       <div className="min-h-screen text-white overflow-x-hidden" style={{ backgroundColor: '#020208' }}>
+        <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+          <div className="absolute rounded-full blur-[150px]"
+            style={{ width: 600, height: 600, background: 'radial-gradient(circle, rgba(6,182,212,0.07) 0%, transparent 70%)', top: '20%', left: '50%', transform: 'translateX(-50%)' }} />
+          <div style={{ position: 'absolute', inset: 0, backgroundImage: 'linear-gradient(rgba(99,102,241,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(99,102,241,0.04) 1px, transparent 1px)', backgroundSize: '80px 80px', maskImage: 'radial-gradient(ellipse 90% 70% at 50% 40%, black 10%, transparent 100%)', WebkitMaskImage: 'radial-gradient(ellipse 90% 70% at 50% 40%, black 10%, transparent 100%)' }} />
+        </div>
         <div className="relative z-10">
           <LogoFixed />
           <div className="container mx-auto px-4 py-24">
@@ -309,6 +314,11 @@ const VolunteerValidatePage = () => {
   // ── Scanner view ──
   return (
     <div className="min-h-screen text-white overflow-x-hidden" style={{ backgroundColor: '#020208' }}>
+      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+        <div className="absolute rounded-full blur-[150px]"
+          style={{ width: 600, height: 600, background: 'radial-gradient(circle, rgba(6,182,212,0.07) 0%, transparent 70%)', top: '20%', left: '50%', transform: 'translateX(-50%)' }} />
+        <div style={{ position: 'absolute', inset: 0, backgroundImage: 'linear-gradient(rgba(99,102,241,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(99,102,241,0.04) 1px, transparent 1px)', backgroundSize: '80px 80px', maskImage: 'radial-gradient(ellipse 90% 70% at 50% 40%, black 10%, transparent 100%)', WebkitMaskImage: 'radial-gradient(ellipse 90% 70% at 50% 40%, black 10%, transparent 100%)' }} />
+      </div>
       <div className="relative z-10">
         <LogoFixed />
         <div className="container mx-auto px-4 py-24">

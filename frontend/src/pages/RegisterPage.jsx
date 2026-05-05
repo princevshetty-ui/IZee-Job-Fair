@@ -99,10 +99,11 @@ const RegisterPage = () => {
   return (
     <div className="min-h-screen text-white overflow-x-hidden" style={{ backgroundColor: '#020208' }}>
       <img src={collegeLogo} alt="IZEE" style={{ position: 'fixed', top: 16, left: 20, zIndex: 50, height: 40, width: 'auto', objectFit: 'contain', filter: 'drop-shadow(0 0 8px rgba(99,102,241,0.2))' }} />
-      {/* Background glow */}
+      {/* Background */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
         <div className="absolute rounded-full blur-[150px]"
           style={{ width: 700, height: 700, background: 'radial-gradient(circle, rgba(99,102,241,0.07) 0%, transparent 70%)', top: '20%', left: '50%', transform: 'translateX(-50%)' }} />
+        <div style={{ position: 'absolute', inset: 0, backgroundImage: 'linear-gradient(rgba(99,102,241,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(99,102,241,0.04) 1px, transparent 1px)', backgroundSize: '80px 80px', maskImage: 'radial-gradient(ellipse 90% 70% at 50% 40%, black 10%, transparent 100%)', WebkitMaskImage: 'radial-gradient(ellipse 90% 70% at 50% 40%, black 10%, transparent 100%)' }} />
       </div>
 
       <div className="relative z-10">
