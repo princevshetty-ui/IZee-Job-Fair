@@ -1,7 +1,8 @@
 import FormField from '../FormField'
-import { PASSED_OUT_YEARS } from '../../../utils/constants'
+import { PASSED_OUT_YEARS, CITIES } from '../../../utils/constants'
 
 const YEAR_OPTIONS = PASSED_OUT_YEARS.map(y => ({ value: String(y), label: String(y) }))
+const CITY_OPTIONS = CITIES.map(c => ({ value: c, label: c }))
 
 const ProfessionalStep = ({ formData, setFormData, errors }) => {
   const handleChange = (event) => {
@@ -43,12 +44,22 @@ const ProfessionalStep = ({ formData, setFormData, errors }) => {
         required
       />
       <FormField
-        label="Graduation College & Location"
+        label="Graduation College"
         name="graduation_college"
         value={formData.graduation_college}
         onChange={handleChange}
         error={errors.graduation_college}
-        placeholder="e.g. ABC College, Bangalore"
+        placeholder="e.g. ABC College of Engineering"
+        required
+      />
+      <FormField
+        label="City"
+        name="city"
+        type="select"
+        value={formData.city}
+        onChange={handleChange}
+        error={errors.city}
+        options={CITY_OPTIONS}
         required
       />
       <FormField

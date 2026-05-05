@@ -41,7 +41,7 @@ const OnSpotRegisterPage = () => {
     return (
       <div className="min-h-screen text-white overflow-x-hidden" style={{ backgroundColor: '#020208' }}>
         <div className="relative z-10">
-          <div className="container mx-auto px-4 py-12">
+          <div className="container mx-auto" style={{ maxWidth: '100%', padding: '16px' }}>
             <motion.div
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
@@ -92,7 +92,7 @@ const OnSpotRegisterPage = () => {
           style={{ width: 600, height: 600, background: 'radial-gradient(circle, rgba(6,182,212,0.07) 0%, transparent 70%)', top: '25%', left: '50%', transform: 'translateX(-50%)' }} />
       </div>
       <div className="relative z-10">
-        <div className="container mx-auto px-4 py-12">
+        <div className="container mx-auto" style={{ maxWidth: '100%', padding: '16px' }}>
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}

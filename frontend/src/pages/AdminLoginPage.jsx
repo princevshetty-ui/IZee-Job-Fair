@@ -75,7 +75,7 @@ const AdminLoginPage = () => {
           </p>
 
           <div className="mt-10 flex items-center justify-center gap-8">
-            {[{ v: '80+', l: 'Companies' }, { v: '2500+', l: 'Candidates' }, { v: '8 May', l: '2026' }].map((s, i) => (
+            {[{ v: '80+', l: 'Companies' }, { v: '8 May', l: '2026' }].map((s, i) => (
               <div key={i} className="text-center">
                 <div className="text-lg font-bold text-gradient-hero">{s.v}</div>
                 <div className="text-[10px] uppercase tracking-[0.15em] mt-0.5" style={{ color: '#475569' }}>{s.l}</div>

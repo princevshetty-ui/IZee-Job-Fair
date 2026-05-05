@@ -3,13 +3,16 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { apiCall } from '../../utils/api'
 import BulkActionBar from './BulkActionBar'
 
+const PAGE_SIZE = 25
+
 const VolunteersTable = ({ volunteers, onRefresh, onToast }) => {
   const [search, setSearch] = useState('')
   const [selectedIds, setSelectedIds] = useState(new Set())
   const [showConfirm, setShowConfirm] = useState(false)
   const [acting, setActing] = useState(false)
+  const [page, setPage] = useState(1)
 
-  useEffect(() => { setSelectedIds(new Set()) }, [search])
+  useEffect(() => { setSelectedIds(new Set()); setPage(1) }, [search])
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase()
@@ -17,6 +20,9 @@ const VolunteersTable = ({ volunteers, onRefresh, onToast }) => {
       !q || (v.full_name || '').toLowerCase().includes(q) || (v.roll_number || '').toLowerCase().includes(q)
     )
   }, [volunteers, search])
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
+  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 
   const allSelected = filtered.length > 0 && selectedIds.size === filtered.length
   const toggleAll = () => setSelectedIds(allSelected ? new Set() : new Set(filtered.map(v => v.id)))
@@ -79,9 +85,9 @@ const VolunteersTable = ({ volunteers, onRefresh, onToast }) => {
             </tr>
           </thead>
           <tbody>
-            {filtered.length === 0 ? (
+            {paginated.length === 0 ? (
               <tr><td colSpan={7} className="text-center py-10" style={{ color: 'rgba(238,230,216,0.25)' }}>No volunteers found</td></tr>
-            ) : filtered.map((v) => (
+            ) : paginated.map((v) => (
               <tr key={v.id} style={selectedIds.has(v.id) ? { background: 'rgba(239,68,68,0.04)', borderLeft: '2px solid rgba(239,68,68,0.3)' } : {}}>
                 <td>
                   <input type="checkbox" checked={selectedIds.has(v.id)} onChange={() => toggleOne(v.id)} className="form-checkbox" />
@@ -97,6 +103,26 @@ const VolunteersTable = ({ volunteers, onRefresh, onToast }) => {
           </tbody>
         </table>
       </div>
+
+      {filtered.length > PAGE_SIZE && (
+        <div className="flex items-center justify-between pt-4">
+          <span className="text-xs" style={{ color: '#475569' }}>
+            Page {page} of {totalPages} · Total: {filtered.length} records
+          </span>
+          <div className="flex gap-2">
+            <button type="button" disabled={page === 1} onClick={() => setPage(p => p - 1)}
+              className="px-3 py-1.5 rounded-lg text-xs font-semibold disabled:opacity-30 transition-all"
+              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid #1a1a2e', color: '#94a3b8' }}>
+              Previous
+            </button>
+            <button type="button" disabled={page === totalPages} onClick={() => setPage(p => p + 1)}
+              className="px-3 py-1.5 rounded-lg text-xs font-semibold disabled:opacity-30 transition-all"
+              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid #1a1a2e', color: '#94a3b8' }}>
+              Next
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Delete Confirm Modal */}
       <AnimatePresence>

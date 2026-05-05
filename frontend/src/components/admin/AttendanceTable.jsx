@@ -1,3 +1,5 @@
+import { useState } from 'react'
+
 const fmt = (dateString) => {
   if (!dateString) return '—'
   return new Intl.DateTimeFormat('en-IN', {
@@ -21,8 +23,14 @@ const RegTypeBadge = ({ regType }) => {
 
 const TYPE_LABEL = { student: 'Student', fresher: 'Fresher', professional: 'Professional' }
 
+const PAGE_SIZE = 25
+
 const AttendanceTable = ({ attendances }) => {
+  const [page, setPage] = useState(1)
   const rows = attendances || []
+  const totalPages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE))
+  const paginated = rows.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
+
   return (
     <div className="space-y-4">
       <div className="text-xs" style={{ color: '#334155' }}>{rows.length} validated attendee{rows.length !== 1 ? 's' : ''}</div>
@@ -35,9 +43,9 @@ const AttendanceTable = ({ attendances }) => {
             </tr>
           </thead>
           <tbody>
-            {rows.length === 0 ? (
+            {paginated.length === 0 ? (
               <tr><td colSpan={6} className="text-center py-10" style={{ color: 'rgba(238,230,216,0.25)' }}>No attendance records yet</td></tr>
-            ) : rows.map((r) => (
+            ) : paginated.map((r) => (
               <tr key={r.id}>
                 <td className="font-medium text-white">{r.full_name || '—'}</td>
                 <td className="font-mono text-xs">{r.sid || '—'}</td>
@@ -50,6 +58,26 @@ const AttendanceTable = ({ attendances }) => {
           </tbody>
         </table>
       </div>
+
+      {rows.length > PAGE_SIZE && (
+        <div className="flex items-center justify-between pt-4">
+          <span className="text-xs" style={{ color: '#475569' }}>
+            Page {page} of {totalPages} · Total: {rows.length} records
+          </span>
+          <div className="flex gap-2">
+            <button type="button" disabled={page === 1} onClick={() => setPage(p => p - 1)}
+              className="px-3 py-1.5 rounded-lg text-xs font-semibold disabled:opacity-30 transition-all"
+              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid #1a1a2e', color: '#94a3b8' }}>
+              Previous
+            </button>
+            <button type="button" disabled={page === totalPages} onClick={() => setPage(p => p + 1)}
+              className="px-3 py-1.5 rounded-lg text-xs font-semibold disabled:opacity-30 transition-all"
+              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid #1a1a2e', color: '#94a3b8' }}>
+              Next
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

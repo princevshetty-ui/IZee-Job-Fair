@@ -97,7 +97,6 @@ const RegistrationForm = ({ onSubmit, submitting = false }) => {
     if (key === 'fresher') {
       if (!formData.college_name) nextErrors.college_name = 'College name is required'
       if (!formData.city) nextErrors.city = 'City is required'
-      if (!formData.graduation_college) nextErrors.graduation_college = 'Graduation college is required'
       if (!formData.graduation_year) nextErrors.graduation_year = 'Passed out year is required'
       if (!formData.stream) nextErrors.stream = 'Stream is required'
     }
@@ -107,6 +106,7 @@ const RegistrationForm = ({ onSubmit, submitting = false }) => {
       if (!formData.designation) nextErrors.designation = 'Designation is required'
       if (!formData.experience_years) nextErrors.experience_years = 'Experience years is required'
       if (!formData.graduation_college) nextErrors.graduation_college = 'Graduation college is required'
+      if (!formData.city) nextErrors.city = 'City is required'
       if (!formData.graduation_year) nextErrors.graduation_year = 'Passed out year is required'
     }
 

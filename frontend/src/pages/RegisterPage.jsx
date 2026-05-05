@@ -106,7 +106,7 @@ const RegisterPage = () => {
       </div>
 
       <div className="relative z-10">
-        <div className="container mx-auto px-4 py-12">
+        <div className="container mx-auto" style={{ maxWidth: '100%', padding: '16px' }}>
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}

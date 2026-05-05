@@ -19,6 +19,8 @@ const StatusBadge = ({ status }) => {
   )
 }
 
+const PAGE_SIZE = 25
+
 const RegistrationsTable = ({ registrations, onRefresh, onToast }) => {
   const [search, setSearch] = useState('')
   const [filterStatus, setFilterStatus] = useState('all')
@@ -26,8 +28,9 @@ const RegistrationsTable = ({ registrations, onRefresh, onToast }) => {
   const [selectedIds, setSelectedIds] = useState(new Set())
   const [viewReg, setViewReg] = useState(null)
   const [acting, setActing] = useState(false)
+  const [page, setPage] = useState(1)
 
-  useEffect(() => { setSelectedIds(new Set()) }, [search, filterStatus, filterLevel])
+  useEffect(() => { setSelectedIds(new Set()); setPage(1) }, [search, filterStatus, filterLevel])
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase()
@@ -38,6 +41,9 @@ const RegistrationsTable = ({ registrations, onRefresh, onToast }) => {
       return matchSearch && matchStatus && matchLevel
     })
   }, [registrations, search, filterStatus, filterLevel])
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
+  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 
   const allSelected = filtered.length > 0 && selectedIds.size === filtered.length
   const toggleAll = () => setSelectedIds(allSelected ? new Set() : new Set(filtered.map(r => r.id)))
@@ -91,10 +97,30 @@ const RegistrationsTable = ({ registrations, onRefresh, onToast }) => {
     await onRefresh()
   })
 
+  const handleDelete = (reg) => withLoading(async () => {
+    if (!confirm(`Delete ${reg.full_name}? This cannot be undone.`)) return
+    await apiCall(`/api/admin/attendees/${reg.id}`, { method: 'DELETE' })
+    onToast(`${reg.full_name} deleted`, 'info')
+    await onRefresh()
+  })
+
+  const handleBulkDelete = () => {
+    if (!confirm('Delete selected records? This cannot be undone.')) return
+    withLoading(async () => {
+      const ids = [...selectedIds]
+      const res = await apiCall('/api/admin/bulk-delete', { method: 'POST', body: JSON.stringify({ ids }) })
+      const data = await res.json()
+      onToast(`${data.deleted} records deleted`, 'info')
+      setSelectedIds(new Set())
+      await onRefresh()
+    })
+  }
+
   const bulkActions = [
     { label: `Approve Selected (${selectedIds.size})`, onClick: handleBulkApprove, bg: 'rgba(16,185,129,0.12)', color: '#34d399', border: 'rgba(16,185,129,0.3)', disabled: acting },
     { label: `Resend Passes (${selectedIds.size})`, onClick: handleBulkResend, bg: 'rgba(99,102,241,0.12)', color: '#a5b4fc', border: 'rgba(99,102,241,0.3)', disabled: acting },
     { label: `Reject Selected (${selectedIds.size})`, onClick: handleBulkReject, bg: 'rgba(239,68,68,0.08)', color: '#f87171', border: 'rgba(239,68,68,0.25)', disabled: acting },
+    { label: `Delete Selected (${selectedIds.size})`, onClick: handleBulkDelete, bg: 'rgba(239,68,68,0.08)', color: '#f87171', border: 'rgba(239,68,68,0.25)', disabled: acting },
   ]
 
   return (
@@ -143,9 +169,9 @@ const RegistrationsTable = ({ registrations, onRefresh, onToast }) => {
             </tr>
           </thead>
           <tbody>
-            {filtered.length === 0 ? (
+            {paginated.length === 0 ? (
               <tr><td colSpan={8} className="text-center py-10" style={{ color: 'rgba(238,230,216,0.25)' }}>No records found</td></tr>
-            ) : filtered.map((reg) => (
+            ) : paginated.map((reg) => (
               <tr key={reg.id}
                 style={selectedIds.has(reg.id) ? { background: 'rgba(99,102,241,0.06)', borderLeft: '2px solid rgba(99,102,241,0.4)' } : {}}
               >
@@ -173,6 +199,10 @@ const RegistrationsTable = ({ registrations, onRefresh, onToast }) => {
                       style={{ background: 'rgba(100,116,139,0.12)', color: '#94a3b8', border: '1px solid rgba(100,116,139,0.2)' }}>
                       View
                     </button>
+                    <button type="button" className="action-btn" disabled={acting} onClick={e => { e.stopPropagation(); handleDelete(reg) }}
+                      style={{ background: 'rgba(239,68,68,0.08)', color: '#f87171', border: '1px solid rgba(239,68,68,0.2)' }}>
+                      Delete
+                    </button>
                   </div>
                 </td>
               </tr>
@@ -180,6 +210,26 @@ const RegistrationsTable = ({ registrations, onRefresh, onToast }) => {
           </tbody>
         </table>
       </div>
+
+      {filtered.length > PAGE_SIZE && (
+        <div className="flex items-center justify-between pt-4">
+          <span className="text-xs" style={{ color: '#475569' }}>
+            Page {page} of {totalPages} · Total: {filtered.length} records
+          </span>
+          <div className="flex gap-2">
+            <button type="button" disabled={page === 1} onClick={() => setPage(p => p - 1)}
+              className="px-3 py-1.5 rounded-lg text-xs font-semibold disabled:opacity-30 transition-all"
+              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid #1a1a2e', color: '#94a3b8' }}>
+              Previous
+            </button>
+            <button type="button" disabled={page === totalPages} onClick={() => setPage(p => p + 1)}
+              className="px-3 py-1.5 rounded-lg text-xs font-semibold disabled:opacity-30 transition-all"
+              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid #1a1a2e', color: '#94a3b8' }}>
+              Next
+            </button>
+          </div>
+        </div>
+      )}
 
       {viewReg && <ProfileModal registration={viewReg} onClose={() => setViewReg(null)} />}
     </div>

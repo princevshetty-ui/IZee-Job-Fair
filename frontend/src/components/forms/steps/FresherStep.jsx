@@ -37,15 +37,6 @@ const FresherStep = ({ formData, setFormData, errors }) => {
       />
 
       <FormField
-        label="Graduation College & Location"
-        name="graduation_college"
-        value={formData.graduation_college}
-        onChange={handleChange}
-        error={errors.graduation_college}
-        placeholder="e.g. ABC College, Bangalore"
-        required
-      />
-      <FormField
         label="Passed Out Year"
         name="graduation_year"
         type="select"
