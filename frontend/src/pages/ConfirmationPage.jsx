@@ -123,7 +123,11 @@ const ConfirmationPage = () => {
                   </div>
                   <div>
                     <p className="text-xs" style={{ color: '#475569' }}>Venue</p>
-                    <p className="text-sm font-semibold text-white">IZEE Business School, Bangalore</p>
+                    <p className="text-sm font-semibold text-white">IZee Business School, Jigani, Bangalore</p>
+                    <a href="https://maps.app.goo.gl/DfyZRwqNwGZ6vSd28" target="_blank" rel="noopener noreferrer"
+                      className="text-xs" style={{ color: '#00CFFF', textDecoration: 'underline' }}>
+                      View on Google Maps
+                    </a>
                   </div>
                 </div>
               </div>

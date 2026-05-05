@@ -1,4 +1,5 @@
 import os
+import textwrap
 from PIL import Image, ImageDraw, ImageFont
 import base64
 from io import BytesIO
@@ -23,15 +24,15 @@ TEMPLATE_PATH = os.path.join(BASE_DIR, "assets", "templates", "jobfair_template.
 TW, TH = 1536, 1024
 
 # ── Text placement ──
-NAME_X         = 109
-NAME_Y         = 389
+NAME_X         = 119
+NAME_Y         = 349
 NAME_MAX_WIDTH = 700
-NAME_FONT_MAX  = 72     # primary size; shrinks to fit
+NAME_FONT_MAX  = 80     # primary size; shrinks to fit
 NAME_FONT_MIN  = 42
 
 # ── QR placement — top-left corner ──
-QR_X    = 1029
-QR_Y    = 297
+QR_X    = 1095
+QR_Y    = 291
 QR_SIZE = 280
 
 # ── Colours ──
@@ -69,7 +70,7 @@ def _fit_name(draw, text: str):
     """Word-wrap name into ≤2 lines, shrinking from NAME_FONT_MAX to NAME_FONT_MIN."""
     text = " ".join(str(text or "").split()) or "N/A"
     for size in range(NAME_FONT_MAX, NAME_FONT_MIN - 1, -2):
-        font = _name_font(size)
+        font = _bold_font(size)
         words = text.split()
         lines, cur = [], ""
         for word in words:
@@ -88,7 +89,7 @@ def _fit_name(draw, text: str):
             continue
         if max(_tsz(draw, ln, font)[0] for ln in lines) <= NAME_MAX_WIDTH and len(lines) <= 2:
             return lines, font
-    font = _name_font(NAME_FONT_MIN)
+    font = _bold_font(NAME_FONT_MIN)
     return [text[:30] + ("..." if len(text) > 30 else "")], font
 
 
@@ -152,15 +153,15 @@ def generate_pass(attendee: dict) -> str:
             cursor_y += lh + (6 if idx < len(name_lines) - 1 else 0)
         name_bottom = cursor_y
 
-        # ── CATEGORY LABEL  (cyan #00CFFF, 28pt bold) ──
-        cat_font = _bold_font(28)
+        # ── CATEGORY LABEL  (cyan #00CFFF, 32pt bold) ──
+        cat_font = _bold_font(32)
         cat_y = name_bottom + 10
         draw.text((NAME_X, cat_y), category_label, font=cat_font, fill=COLOR_LABEL)
         _, cat_h = _tsz(draw, category_label, cat_font)
 
-        # ── STREAM · COLLEGE  (light-blue #B0D4FF, 22pt) — skipped for professionals ──
+        # ── STREAM · COLLEGE  (light-blue #B0D4FF, 26pt) — skipped for professionals ──
         if not is_professional:
-            detail_font = _bold_font(22)
+            detail_font = _bold_font(26)
             detail_y = cat_y + cat_h + 10
 
             stream_clean  = stream if stream and stream.upper() not in ("N/A", "") else ""
@@ -183,6 +184,20 @@ def generate_pass(attendee: dict) -> str:
         sid_center_x = QR_X + QR_SIZE // 2
         sid_y = QR_Y + QR_SIZE + 20
         draw.text((sid_center_x - sw // 2, sid_y), sid_text, font=sid_font, fill=COLOR_SID)
+
+        # ── DESCRIPTION TEXT  (light-blue #B0D4FF, 15pt, wrapped to 580px) ──
+        desc_text = (
+            "Organised in association with the Sub-Regional Employment Exchange "
+            "& Bangalore University, this job fair is designed to give you more "
+            "than just openings — it gives you exposure, interaction, and the "
+            "confidence to present yourself in front of recruiters."
+        )
+        desc_font = _bold_font(15)
+        desc_x, desc_y, desc_max_width = 119, 697, 580
+        desc_lines = textwrap.wrap(desc_text, width=72)
+        _, line_h = _tsz(draw, "Ay", desc_font)
+        for i, line in enumerate(desc_lines):
+            draw.text((desc_x, desc_y + i * (line_h + 4)), line, font=desc_font, fill=COLOR_DETAIL)
 
         # ── OUTPUT ──
         rgb = img.convert("RGB")

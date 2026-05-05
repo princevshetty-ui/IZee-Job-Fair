@@ -88,7 +88,7 @@ async def send_pass_email(email: str, name: str, sid: str, pass_image_b64: str, 
                     <p style="color:#00CFFF;font-size:12px;text-transform:uppercase;letter-spacing:3px;font-weight:700;margin:0 0 14px;">Event Details</p>
                     <table width="100%" cellpadding="0" cellspacing="0" border="0">
                       <tr><td style="padding:4px 0;font-size:13px;color:#94a3b8;"><strong style="color:#e2e8f0;">Date:</strong>&nbsp; 8th May 2026</td></tr>
-                      <tr><td style="padding:4px 0;font-size:13px;color:#94a3b8;"><strong style="color:#e2e8f0;">Venue:</strong>&nbsp; IZEE Business School, Bangalore</td></tr>
+                      <tr><td style="padding:4px 0;font-size:13px;color:#94a3b8;"><strong style="color:#e2e8f0;">Venue:</strong>&nbsp; IZee Business School, Jigani, Bangalore &nbsp;<a href="https://maps.app.goo.gl/DfyZRwqNwGZ6vSd28" style="color:#00CFFF;text-decoration:underline;">View on Google Maps</a></td></tr>
                       <tr><td style="padding:4px 0;font-size:13px;color:#94a3b8;"><strong style="color:#e2e8f0;">Registration Type:</strong>&nbsp; {reg_type}</td></tr>
                     </table>
                   </td>
@@ -144,7 +144,7 @@ async def send_pass_email(email: str, name: str, sid: str, pass_image_b64: str, 
           <!-- FOOTER -->
           <tr>
             <td style="background:#07090f;padding:18px 36px;text-align:center;border-top:1px solid rgba(255,255,255,0.05);">
-              <p style="color:#334155;font-size:12px;margin:0;">IZEE Business School, Bangalore &nbsp;|&nbsp; Job Fair 2026</p>
+              <p style="color:#334155;font-size:12px;margin:0;">IZee Business School, Jigani, Bangalore &nbsp;|&nbsp; Job Fair 2026</p>
             </td>
           </tr>
 
