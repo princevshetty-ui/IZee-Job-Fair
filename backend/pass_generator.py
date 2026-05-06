@@ -17,62 +17,154 @@ ACADEMIC_DISPLAY = {
     "Professional": "WORKING PROFESSIONAL",
 }
 
-NEVARA_PATH  = os.path.join(BASE_DIR, "assets", "fonts", "Nevarademo-6YXEY.otf")
-BOLD_PATH    = os.path.join(BASE_DIR, "assets", "fonts", "DejaVuSans-Bold.ttf")
+# ── Font paths ──
+NEVARA_PATH = os.path.join(BASE_DIR, "assets", "fonts", "Nevarademo-6YXEY.otf")
+BOLD_PATH   = os.path.join(BASE_DIR, "assets", "fonts", "DejaVuSans-Bold.ttf")
+REG_PATH    = os.path.join(BASE_DIR, "assets", "fonts", "DejaVuSans.ttf")
+
 TEMPLATE_PATH = os.path.join(BASE_DIR, "assets", "templates", "jobfair_template.png")
 
+# ── Canvas ──
 TW, TH = 1536, 1024
 
-# ── Text placement ──
-NAME_X         = 119
-NAME_Y         = 349
-NAME_MAX_WIDTH = 700
-NAME_FONT_MAX  = 80     # primary size; shrinks to fit
-NAME_FONT_MIN  = 42
+# ── Text placement (left panel) ──
+NAME_X          = 119
+NAME_Y          = 310          # pushed up a bit to give more room below
+NAME_MAX_WIDTH  = 680
+NAME_FONT_MAX   = 88           # large — shrinks to fit
+NAME_FONT_MIN   = 44
 
-# ── QR placement — top-left corner ──
-QR_X    = 1095
-QR_Y    = 291
-QR_SIZE = 280
+# Category label sits below name with a comfortable gap
+CAT_GAP         = 18           # px below last name line
+
+# Detail line (stream · college) sits below category with gap
+DETAIL_GAP      = 22           # px below category
+
+# Description block
+DESC_X          = 119
+DESC_Y          = 700          # start y for description text
+DESC_MAX_WIDTH  = 580
+DESC_FONT_SIZE  = 22           # was 15 — now much bigger
+DESC_LINE_GAP   = 6            # extra px between wrapped lines
+
+# ── QR placement (right panel, centered) ──
+# You asked QR at pixel 1079, 647 — that will be the TOP-LEFT of the QR image
+QR_X    = 1079
+QR_Y    = 280                  # top of QR box
+QR_SIZE = 310                  # size of QR image
+
+# SID label: centered under QR
+SID_Y_OFFSET = 24              # px below QR bottom
 
 # ── Colours ──
-COLOR_NAME   = (255, 255, 255)   # white
-COLOR_LABEL  = (0, 207, 255)     # #00CFFF cyan
-COLOR_DETAIL = (176, 212, 255)   # #B0D4FF light-blue
-COLOR_SID    = (0, 207, 255)     # cyan
+COLOR_NAME   = (255, 255, 255)          # white
+COLOR_LABEL  = (0,  207, 255)           # #00CFFF cyan
+COLOR_DETAIL = (176, 212, 255)          # #B0D4FF light-blue
+COLOR_SID    = (0,  207, 255)           # cyan
+COLOR_DESC   = (176, 212, 255)          # light-blue for description
 
 
-# ── Font helpers ──
+# ════════════════════════════════════════
+# FONT HELPERS
+# ════════════════════════════════════════
 
 def _load(path: str, size: int):
+    """Try to load a font file; return None on failure."""
     try:
         if os.path.exists(path):
             return ImageFont.truetype(path, size)
-    except Exception:
-        pass
+    except Exception as e:
+        print(f"Font load error ({path}): {e}")
     return None
 
 
 def _name_font(size: int) -> ImageFont.FreeTypeFont:
-    return _load(NEVARA_PATH, size) or _load(BOLD_PATH, size) or ImageFont.load_default()
+    """
+    Load Nevara for the display name.
+    Falls back to DejaVuSans-Bold, then system fonts.
+    Prints which font was actually loaded so you can debug.
+    """
+    # 1. Try Nevara (the nice custom font)
+    f = _load(NEVARA_PATH, size)
+    if f:
+        print(f"[pass_generator] Name font: Nevara @ {size}pt")
+        return f
+
+    # 2. Try bundled DejaVu Bold
+    f = _load(BOLD_PATH, size)
+    if f:
+        print(f"[pass_generator] Name font: DejaVuSans-Bold @ {size}pt (Nevara missing)")
+        return f
+
+    # 3. System font search
+    system_fonts = [
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
+        "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf",
+        "/usr/share/fonts/truetype/ubuntu/Ubuntu-B.ttf",
+        "/usr/share/fonts/truetype/noto/NotoSans-Bold.ttf",
+    ]
+    for fp in system_fonts:
+        f = _load(fp, size)
+        if f:
+            print(f"[pass_generator] Name font: {fp} @ {size}pt (fallback)")
+            return f
+
+    print(f"[pass_generator] WARNING: All fonts failed, using PIL default")
+    return ImageFont.load_default()
 
 
 def _bold_font(size: int) -> ImageFont.FreeTypeFont:
-    return _load(BOLD_PATH, size) or ImageFont.load_default()
+    """Load DejaVuSans-Bold for labels/detail text."""
+    f = _load(BOLD_PATH, size)
+    if f:
+        return f
+    system_fonts = [
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
+        "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf",
+        "/usr/share/fonts/truetype/ubuntu/Ubuntu-B.ttf",
+    ]
+    for fp in system_fonts:
+        f = _load(fp, size)
+        if f:
+            return f
+    return ImageFont.load_default()
 
 
-def _tsz(draw, text, font):
+def _reg_font(size: int) -> ImageFont.FreeTypeFont:
+    """Load regular (non-bold) font for description text."""
+    f = _load(REG_PATH, size)
+    if f:
+        return f
+    system_fonts = [
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+        "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
+        "/usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf",
+    ]
+    for fp in system_fonts:
+        f = _load(fp, size)
+        if f:
+            return f
+    return ImageFont.load_default()
+
+
+def _tsz(draw: ImageDraw.ImageDraw, text: str, font: ImageFont.FreeTypeFont):
+    """Return (width, height) of text rendered with font."""
     b = draw.textbbox((0, 0), text, font=font)
     return b[2] - b[0], b[3] - b[1]
 
 
-def _fit_name(draw, text: str):
-    """Word-wrap name into ≤2 lines, shrinking from NAME_FONT_MAX to NAME_FONT_MIN."""
+def _fit_name(draw: ImageDraw.ImageDraw, text: str):
+    """
+    Word-wrap name into ≤2 lines, shrinking from NAME_FONT_MAX
+    to NAME_FONT_MIN.  Returns (lines, font).
+    """
     text = " ".join(str(text or "").split()) or "N/A"
+
     for size in range(NAME_FONT_MAX, NAME_FONT_MIN - 1, -2):
-        font = _bold_font(size)
+        font = _name_font(size)
         words = text.split()
         lines, cur = [], ""
+
         for word in words:
             candidate = word if not cur else f"{cur} {word}"
             if _tsz(draw, candidate, font)[0] <= NAME_MAX_WIDTH:
@@ -83,14 +175,21 @@ def _fit_name(draw, text: str):
                 cur = word
             if len(lines) >= 2:
                 break
+
         if cur and len(lines) < 2:
             lines.append(cur)
+
         if not lines:
             continue
-        if max(_tsz(draw, ln, font)[0] for ln in lines) <= NAME_MAX_WIDTH and len(lines) <= 2:
+
+        widest = max(_tsz(draw, ln, font)[0] for ln in lines)
+        if widest <= NAME_MAX_WIDTH and len(lines) <= 2:
             return lines, font
-    font = _bold_font(NAME_FONT_MIN)
-    return [text[:30] + ("..." if len(text) > 30 else "")], font
+
+    # Hard fallback
+    font = _name_font(NAME_FONT_MIN)
+    t = text[:28] + ("..." if len(text) > 28 else "")
+    return [t], font
 
 
 def generate_qr_image(sid: str, size: int = 280) -> Image.Image:
@@ -107,18 +206,20 @@ def generate_qr_image(sid: str, size: int = 280) -> Image.Image:
     return qr_img.resize((size, size), Image.Resampling.LANCZOS)
 
 
+# ════════════════════════════════════════
+# MAIN PASS GENERATOR
+# ════════════════════════════════════════
+
 def generate_pass(attendee: dict) -> str:
     """
     Generate a job fair pass image.
 
-    Args:
-        attendee: dict with keys — full_name, academic_level, stream, sid,
-                  reg_type, attendee_type, college_name (city optional)
-
-    Returns:
-        Base64-encoded JPEG string.
+    attendee keys: full_name, academic_level, stream, sid,
+                   attendee_type, college_name
+    Returns: Base64-encoded JPEG string.
     """
     try:
+        # ── Load template ──
         if os.path.exists(TEMPLATE_PATH):
             img = Image.open(TEMPLATE_PATH).convert("RGBA")
             if img.size != (TW, TH):
@@ -128,81 +229,126 @@ def generate_pass(attendee: dict) -> str:
 
         draw = ImageDraw.Draw(img, "RGBA")
 
-        full_name     = str(attendee.get("full_name") or "N/A")
+        # ── Extract data ──
+        full_name      = str(attendee.get("full_name") or "N/A")
         academic_level = str(attendee.get("academic_level") or "UG")
-        stream        = str(attendee.get("stream") or "")
-        sid           = str(attendee.get("sid") or "")
-        attendee_type = str(attendee.get("attendee_type") or "student").lower()
-        college_name  = str(attendee.get("college_name") or "")
+        stream         = str(attendee.get("stream") or "")
+        sid            = str(attendee.get("sid") or "")
+        attendee_type  = str(attendee.get("attendee_type") or "student").lower()
+        college_name   = str(attendee.get("college_name") or "")
 
         is_professional = attendee_type == "professional"
+        is_fresher      = attendee_type == "fresher"
 
-        if attendee_type == "fresher":
+        if is_fresher:
             category_label = "FRESHER"
         elif is_professional:
             category_label = "WORKING PROFESSIONAL"
         else:
             category_label = ACADEMIC_DISPLAY.get(academic_level, academic_level.upper())
 
-        # ── NAME  (white, Nevara/DejaVuSans-Bold, 72→42) ──
+        # ════════════════════════════
+        # STEP 1 — NAME  (Nevara, large, white)
+        # ════════════════════════════
         name_lines, name_font = _fit_name(draw, full_name)
+
         cursor_y = NAME_Y
+        line_gap = 8
+
         for idx, line in enumerate(name_lines):
             draw.text((NAME_X, cursor_y), line, font=name_font, fill=COLOR_NAME)
             _, lh = _tsz(draw, line, name_font)
-            cursor_y += lh + (6 if idx < len(name_lines) - 1 else 0)
+            cursor_y += lh + (line_gap if idx < len(name_lines) - 1 else 0)
+
         name_bottom = cursor_y
 
-        # ── CATEGORY LABEL  (cyan #00CFFF, 32pt bold) ──
-        cat_font = _bold_font(32)
-        cat_y = name_bottom + 10
+        # ════════════════════════════
+        # STEP 2 — CATEGORY LABEL  (cyan, bold, 36pt)
+        # ════════════════════════════
+        cat_font = _bold_font(36)
+        cat_y    = name_bottom + CAT_GAP
         draw.text((NAME_X, cat_y), category_label, font=cat_font, fill=COLOR_LABEL)
         _, cat_h = _tsz(draw, category_label, cat_font)
 
-        # ── STREAM · COLLEGE  (light-blue #B0D4FF, 26pt) — skipped for professionals ──
+        # ════════════════════════════
+        # STEP 3 — DETAIL LINE  (stream · college, light-blue, 28pt)
+        # skipped for professionals
+        # ════════════════════════════
+        detail_bottom = cat_y + cat_h
+
         if not is_professional:
-            detail_font = _bold_font(26)
-            detail_y = cat_y + cat_h + 10
+            detail_font = _bold_font(28)
+            detail_y    = detail_bottom + DETAIL_GAP
 
             stream_clean  = stream if stream and stream.upper() not in ("N/A", "") else ""
             college_clean = college_name if college_name and college_name.upper() != "N/A" else ""
-
             parts = [p for p in [stream_clean, college_clean] if p]
             detail_text = "  ·  ".join(parts) if parts else ""
 
             if detail_text:
                 draw.text((NAME_X, detail_y), detail_text, font=detail_font, fill=COLOR_DETAIL)
+                _, dh = _tsz(draw, detail_text, detail_font)
+                detail_bottom = detail_y + dh
 
-        # ── QR CODE  (pasted directly — no white plate, QR already has white bg) ──
-        qr_img = generate_qr_image(sid or "N/A", size=QR_SIZE)
-        img.alpha_composite(qr_img, (QR_X, QR_Y))
-
-        # ── SID  (cyan, 32pt bold, centered under QR) ──
-        sid_font = _bold_font(32)
-        sid_text = sid.upper() if sid else "N/A"
-        sw, _ = _tsz(draw, sid_text, sid_font)
-        sid_center_x = QR_X + QR_SIZE // 2
-        sid_y = QR_Y + QR_SIZE + 20
-        draw.text((sid_center_x - sw // 2, sid_y), sid_text, font=sid_font, fill=COLOR_SID)
-
-        # ── DESCRIPTION TEXT  (light-blue #B0D4FF, 15pt, wrapped to 580px) ──
+        # ════════════════════════════
+        # STEP 4 — DESCRIPTION TEXT  (light-blue, 22pt, wrapped)
+        # ════════════════════════════
         desc_text = (
             "Organised in association with the Sub-Regional Employment Exchange "
             "& Bangalore University, this job fair is designed to give you more "
             "than just openings — it gives you exposure, interaction, and the "
             "confidence to present yourself in front of recruiters."
         )
-        desc_font = _bold_font(15)
-        desc_x, desc_y, desc_max_width = 119, 697, 580
-        desc_lines = textwrap.wrap(desc_text, width=72)
-        _, line_h = _tsz(draw, "Ay", desc_font)
-        for i, line in enumerate(desc_lines):
-            draw.text((desc_x, desc_y + i * (line_h + 4)), line, font=desc_font, fill=COLOR_DETAIL)
 
-        # ── OUTPUT ──
+        desc_font   = _bold_font(DESC_FONT_SIZE)
+        desc_lines  = textwrap.wrap(desc_text, width=52)
+        _, line_h   = _tsz(draw, "Ay", desc_font)
+
+        # Position description: whichever is lower — fixed DESC_Y or 40px below detail
+        desc_start_y = max(DESC_Y, detail_bottom + 40)
+
+        for i, line in enumerate(desc_lines):
+            draw.text(
+                (DESC_X, desc_start_y + i * (line_h + DESC_LINE_GAP)),
+                line,
+                font=desc_font,
+                fill=COLOR_DESC,
+            )
+
+        # ════════════════════════════
+        # STEP 5 — QR CODE
+        # (top-left at QR_X, QR_Y as requested)
+        # ════════════════════════════
+        qr_img = generate_qr_image(sid or "N/A", size=QR_SIZE)
+
+        # White background plate (4px padding)
+        pad = 10
+        draw.rectangle(
+            [QR_X - pad, QR_Y - pad, QR_X + QR_SIZE + pad, QR_Y + QR_SIZE + pad],
+            fill=(255, 255, 255, 255),
+        )
+        img.alpha_composite(qr_img, (QR_X, QR_Y))
+
+        # ════════════════════════════
+        # STEP 6 — SID  (cyan, bold, 34pt, centered under QR)
+        # ════════════════════════════
+        sid_font = _bold_font(34)
+        sid_text = sid.upper() if sid else "N/A"
+        sid_w, _ = _tsz(draw, sid_text, sid_font)
+
+        # Center SID under the QR box
+        qr_center_x = QR_X + QR_SIZE // 2
+        sid_x = qr_center_x - sid_w // 2
+        sid_y = QR_Y + QR_SIZE + pad + SID_Y_OFFSET
+
+        draw.text((sid_x, sid_y), sid_text, font=sid_font, fill=COLOR_SID)
+
+        # ════════════════════════════
+        # STEP 7 — OUTPUT
+        # ════════════════════════════
         rgb = img.convert("RGB")
         buf = BytesIO()
-        rgb.save(buf, format="JPEG", quality=85)
+        rgb.save(buf, format="JPEG", quality=88)
         buf.seek(0)
         return base64.b64encode(buf.getvalue()).decode()
 
