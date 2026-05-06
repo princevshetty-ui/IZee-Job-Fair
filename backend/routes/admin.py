@@ -157,9 +157,8 @@ async def delete_volunteers_bulk(req: BulkActionRequest, admin: dict = Depends(g
     deleted = 0
     for vid in req.ids:
         try:
-            r = supabase.table("volunteers").delete().eq("id", vid).execute()
-            if r.data:
-                deleted += 1
+            supabase.table("volunteers").delete().eq("id", vid).execute()
+            deleted += 1
         except Exception:
             pass
     return {"deleted": deleted}
