@@ -41,40 +41,40 @@ def _s(val) -> str:
 
 def map_gforms_row(row_data: dict) -> dict | None:
     """
-    Map a Google Forms CSV row to attendee fields.
+    Map a CSV row to attendee fields.
+    Accepts both Google Forms column names and snake_case DB export column names.
     Returns None only if name, phone, and email are all absent (blank row).
     Missing optional fields default to None; missing academic_level → UG; missing stream → N/A.
     """
-    full_name = _s(row_data.get("Name") or row_data.get("Full Name"))
-    phone = _s(row_data.get("Contact No") or row_data.get("Phone") or row_data.get("Phone Number"))
-    email = _s(row_data.get("Email"))
+    full_name = _s(row_data.get("full_name") or row_data.get("Name") or row_data.get("Full Name"))
+    phone = _s(row_data.get("phone") or row_data.get("Contact No") or row_data.get("Phone") or row_data.get("Phone Number"))
+    email = _s(row_data.get("email") or row_data.get("Email"))
 
     # Only skip entirely blank rows
     if not full_name and not phone and not email:
         return None
 
-    college_name = _s(row_data.get("College Name") or row_data.get("College")) or None
+    college_name = _s(row_data.get("college_name") or row_data.get("College Name") or row_data.get("College")) or None
 
     # Optional college-contact fields
-    principal_name = _s(row_data.get("Principal Name")) or None
-    principal_email = _s(row_data.get("Principal email id")) or None
-    coordinator_name = _s(row_data.get("Name - College Co-ordinator/ Placement Head")) or None
-    coordinator_phone = _s(row_data.get("Contact no - College Coordinator/ Placement Head")) or None
-    coordinator_email = _s(row_data.get("Email - College Coordinator/ Placement Head")) or None
+    principal_name = _s(row_data.get("principal_name") or row_data.get("Principal Name")) or None
+    principal_email = _s(row_data.get("principal_email") or row_data.get("Principal email id")) or None
+    coordinator_name = _s(row_data.get("coordinator_name") or row_data.get("Name - College Co-ordinator/ Placement Head")) or None
+    coordinator_phone = _s(row_data.get("coordinator_phone") or row_data.get("Contact no - College Coordinator/ Placement Head")) or None
+    coordinator_email = _s(row_data.get("coordinator_email") or row_data.get("Email - College Coordinator/ Placement Head")) or None
 
-    # Academic level — default UG for missing / unmappable values
-    academic_level = normalize_academic_level(
-        row_data.get("Academic Details") or row_data.get("Academic Level") or ""
-    )
+    # Academic level — use direct value if it's a DB export, otherwise normalize from Google Forms label
+    raw_level = _s(row_data.get("academic_level") or row_data.get("Academic Details") or row_data.get("Academic Level"))
+    academic_level = normalize_academic_level(raw_level)
 
     # Stream — default N/A if missing
-    stream = _s(row_data.get("Graduation Stream") or row_data.get("Stream")) or "N/A"
+    stream = _s(row_data.get("stream") or row_data.get("Graduation Stream") or row_data.get("Stream")) or "N/A"
 
     # Auto-upgrade UG→PG for clearly postgraduate streams
     if stream.upper() in {"MCA", "MCOM", "MBA"} and academic_level == "UG":
         academic_level = "PG"
 
-    mba_raw = _s(row_data.get("MBA Specialization"))
+    mba_raw = _s(row_data.get("mba_specialization") or row_data.get("MBA Specialization"))
     mba_specialization = mba_raw if mba_raw else None
 
     # "I will carry 10 Hard copies of my Resumes" — intentionally ignored
