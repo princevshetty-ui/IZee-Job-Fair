@@ -5,33 +5,46 @@ from io import StringIO, BytesIO
 
 
 HEADERS = [
-    "SID", "Full Name", "Email", "Phone", "College Name",
-    "Academic Level", "Stream", "Attendee Type", "MBA Specialization",
+    "SID", "Full Name", "Email", "Phone", "City", "State",
+    "College Name", "Academic Level", "Stream", "Stream Other", "Attendee Type",
+    "MBA Specialization", "Graduation College", "Graduation Stream", "Graduation Year",
     "Company Name", "Designation", "Experience Years",
+    "Principal Name", "Principal Email",
+    "Coordinator Name", "Coordinator Phone", "Coordinator Email",
     "Registration Type", "Status", "Attended", "Attended At", "Created At"
 ]
 
 
 def _row(attendee: Dict) -> Dict:
-    """Map an attendee record to a CSV row dict."""
     return {
         "SID": attendee.get("sid", ""),
         "Full Name": attendee.get("full_name", ""),
         "Email": attendee.get("email", ""),
         "Phone": attendee.get("phone", ""),
+        "City": attendee.get("city", "") or "",
+        "State": attendee.get("state", "") or "",
         "College Name": attendee.get("college_name", ""),
         "Academic Level": attendee.get("academic_level", ""),
         "Stream": attendee.get("stream", ""),
+        "Stream Other": attendee.get("stream_other", "") or "",
         "Attendee Type": attendee.get("attendee_type", ""),
-        "MBA Specialization": attendee.get("mba_specialization", ""),
-        "Company Name": attendee.get("company_name", ""),
-        "Designation": attendee.get("designation", ""),
-        "Experience Years": attendee.get("experience_years", ""),
+        "MBA Specialization": attendee.get("mba_specialization", "") or "",
+        "Graduation College": attendee.get("graduation_college", "") or "",
+        "Graduation Stream": attendee.get("graduation_stream", "") or "",
+        "Graduation Year": attendee.get("graduation_year", "") or "",
+        "Company Name": attendee.get("company_name", "") or "",
+        "Designation": attendee.get("designation", "") or "",
+        "Experience Years": attendee.get("experience_years", "") or "",
+        "Principal Name": attendee.get("principal_name", "") or "",
+        "Principal Email": attendee.get("principal_email", "") or "",
+        "Coordinator Name": attendee.get("coordinator_name", "") or "",
+        "Coordinator Phone": attendee.get("coordinator_phone", "") or "",
+        "Coordinator Email": attendee.get("coordinator_email", "") or "",
         "Registration Type": attendee.get("reg_type", ""),
         "Status": attendee.get("status", ""),
         "Attended": "Yes" if attendee.get("attended") else "No",
         "Attended At": attendee.get("attended_at", "") or "",
-        "Created At": attendee.get("created_at", "") or ""
+        "Created At": attendee.get("created_at", "") or "",
     }
 
 
