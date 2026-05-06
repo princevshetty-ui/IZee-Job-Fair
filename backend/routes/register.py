@@ -14,6 +14,8 @@ class RegistrationRequest(BaseModel):
     academic_level: str
     stream: str
     attendee_type: str
+    city: Optional[str] = None
+    state: Optional[str] = None
     # Optional fields
     principal_name: Optional[str] = None
     principal_email: Optional[str] = None
@@ -67,7 +69,9 @@ async def register_attendee(registration: RegistrationRequest):
         "experience_years": registration.experience_years,
         "graduation_college": registration.graduation_college,
         "graduation_stream": registration.graduation_stream,
-        "graduation_year": registration.graduation_year
+        "graduation_year": registration.graduation_year,
+        "city": registration.city,
+        "state": registration.state,
     }
     
     try:

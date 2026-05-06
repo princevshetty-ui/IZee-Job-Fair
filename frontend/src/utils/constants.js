@@ -8,6 +8,10 @@ export const CITIES = [
   'Bangalore', 'Mysore', 'Mangalore', 'Hubli', 'Belgaum', 'Tumkur', 'Others'
 ]
 
+export const STATES = [
+  'Karnataka', 'Tamil Nadu', 'Andhra Pradesh', 'Kerala', 'Maharashtra'
+]
+
 export const PASSED_OUT_YEARS = Array.from({ length: 27 }, (_, i) => 2000 + i) // 2000 to 2026
 
 export const STUDENT_ACADEMIC_LEVELS = [

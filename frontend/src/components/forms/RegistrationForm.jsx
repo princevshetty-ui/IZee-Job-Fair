@@ -24,6 +24,7 @@ const RegistrationForm = ({ onSubmit, submitting = false }) => {
     email: '',
     city: '',
     city_other: '',
+    state: '',
     attendee_type: 'student',
     // Student fields
     college_name: '',
@@ -84,6 +85,8 @@ const RegistrationForm = ({ onSubmit, submitting = false }) => {
       if (!formData.stream) nextErrors.stream = 'Stream is required'
       if (!formData.college_name) nextErrors.college_name = 'College name is required'
       if (!formData.city) nextErrors.city = 'College city is required'
+      if (formData.city === 'Others' && !formData.city_other) nextErrors.city_other = 'Please enter your city'
+      if (!formData.state) nextErrors.state = 'State is required'
       if (formData.stream === 'MBA' && !formData.mba_specialization) {
         nextErrors.mba_specialization = 'MBA specialization is required'
       }
@@ -97,6 +100,8 @@ const RegistrationForm = ({ onSubmit, submitting = false }) => {
     if (key === 'fresher') {
       if (!formData.college_name) nextErrors.college_name = 'College name is required'
       if (!formData.city) nextErrors.city = 'City is required'
+      if (formData.city === 'Others' && !formData.city_other) nextErrors.city_other = 'Please enter your city'
+      if (!formData.state) nextErrors.state = 'State is required'
       if (!formData.graduation_year) nextErrors.graduation_year = 'Passed out year is required'
       if (!formData.stream) nextErrors.stream = 'Stream is required'
     }
@@ -107,6 +112,8 @@ const RegistrationForm = ({ onSubmit, submitting = false }) => {
       if (!formData.experience_years) nextErrors.experience_years = 'Experience years is required'
       if (!formData.graduation_college) nextErrors.graduation_college = 'Graduation college is required'
       if (!formData.city) nextErrors.city = 'City is required'
+      if (formData.city === 'Others' && !formData.city_other) nextErrors.city_other = 'Please enter your city'
+      if (!formData.state) nextErrors.state = 'State is required'
       if (!formData.graduation_year) nextErrors.graduation_year = 'Passed out year is required'
     }
 
@@ -133,6 +140,7 @@ const RegistrationForm = ({ onSubmit, submitting = false }) => {
     const { city_other, ...rest } = formData
     const payload = {
       ...rest,
+      city: formData.city === 'Others' ? formData.city_other : formData.city,
       experience_years: formData.experience_years === '' ? null : Number(formData.experience_years),
       graduation_year: formData.graduation_year === '' ? null : Number(formData.graduation_year),
     }

@@ -22,6 +22,8 @@ class OnSpotRegistrationRequest(BaseModel):
     coordinator_name: Optional[str] = None
     coordinator_phone: Optional[str] = None
     coordinator_email: Optional[str] = None
+    city: Optional[str] = None
+    state: Optional[str] = None
     mba_specialization: Optional[str] = None
     stream_other: Optional[str] = None
     company_name: Optional[str] = None
@@ -78,7 +80,9 @@ async def register_onspot(background_tasks: BackgroundTasks, registration: OnSpo
         "experience_years": registration.experience_years,
         "graduation_college": registration.graduation_college,
         "graduation_stream": registration.graduation_stream,
-        "graduation_year": registration.graduation_year
+        "graduation_year": registration.graduation_year,
+        "city": registration.city,
+        "state": registration.state,
     }
 
     try:
