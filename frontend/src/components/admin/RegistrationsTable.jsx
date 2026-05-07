@@ -104,17 +104,16 @@ const RegistrationsTable = ({ registrations, onRefresh, onToast }) => {
     await onRefresh()
   })
 
-  const handleBulkDelete = () => {
-    if (!confirm('Delete selected records? This cannot be undone.')) return
-    withLoading(async () => {
-      const ids = [...selectedIds]
-      const res = await apiCall('/api/admin/bulk-delete', { method: 'POST', body: JSON.stringify({ ids }) })
-      const data = await res.json()
-      onToast(`${data.deleted} records deleted`, 'info')
-      setSelectedIds(new Set())
-      await onRefresh()
-    })
-  }
+  const handleBulkDelete = () => withLoading(async () => {
+    const ids = [...selectedIds]
+    if (!ids.length) return
+    if (!confirm(`Delete ${ids.length} record${ids.length !== 1 ? 's' : ''}? This cannot be undone.`)) return
+    const res = await apiCall('/api/admin/bulk-delete', { method: 'POST', body: JSON.stringify({ ids }) })
+    const data = await res.json()
+    onToast(`${data.deleted} records deleted`, 'info')
+    setSelectedIds(new Set())
+    await onRefresh()
+  })
 
   const bulkActions = [
     { label: `Approve Selected (${selectedIds.size})`, onClick: handleBulkApprove, bg: 'rgba(16,185,129,0.12)', color: '#34d399', border: 'rgba(16,185,129,0.3)', disabled: acting },

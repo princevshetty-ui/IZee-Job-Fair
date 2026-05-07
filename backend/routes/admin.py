@@ -333,9 +333,14 @@ async def delete_attendee(attendee_id: str, admin=Depends(get_current_admin)):
 @router.post("/admin/bulk-delete")
 async def bulk_delete(body: dict, admin=Depends(get_current_admin)):
     ids = body.get("ids", [])
+    deleted = 0
     for id in ids:
-        supabase.table("attendees").delete().eq("id", id).execute()
-    return {"deleted": len(ids)}
+        try:
+            supabase.table("attendees").delete().eq("id", id).execute()
+            deleted += 1
+        except Exception:
+            pass
+    return {"deleted": deleted}
 
 
 # ─── Exports ───
