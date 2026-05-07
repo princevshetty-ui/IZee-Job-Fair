@@ -102,9 +102,10 @@ async def send_pass_email(email: str, name: str, sid: str, pass_image_b64: str, 
                   <td style="padding:20px;">
                     <p style="color:#e2e8f0;font-size:13px;font-weight:700;margin:0 0 12px;">What to bring:</p>
                     <table cellpadding="0" cellspacing="0" border="0">
-                      <tr><td style="padding:4px 0;font-size:13px;color:#94a3b8;">&#8226;&nbsp; 10 sets of updated CVs</td></tr>
-                      <tr><td style="padding:4px 0;font-size:13px;color:#94a3b8;">&#8226;&nbsp; 10 passport-size photographs</td></tr>
+                      <tr><td style="padding:4px 0;font-size:13px;color:#94a3b8;">&#8226;&nbsp; Updated resume (10 copies recommended)</td></tr>
+                      <tr><td style="padding:4px 0;font-size:13px;color:#94a3b8;">&#8226;&nbsp; Passport-sized photographs</td></tr>
                       <tr><td style="padding:4px 0;font-size:13px;color:#94a3b8;">&#8226;&nbsp; Valid government-issued ID proof (Aadhaar / PAN / Passport)</td></tr>
+                      <tr><td style="padding:4px 0;font-size:13px;color:#94a3b8;">&#8226;&nbsp; Academic Certification Copies</td></tr>
                     </table>
                   </td>
                 </tr>
