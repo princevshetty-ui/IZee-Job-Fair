@@ -134,24 +134,13 @@ export const YEARS = [
 ]
 
 export const COMPANIES = [
-  "TCS", "Infosys", "Wipro", "HCL", "Tech Mahindra", "Cognizant", 
-  "Accenture", "IBM", "Microsoft", "Google", "Amazon", "Flipkart", 
-  "Paytm", "Ola", "Zomato", "Swiggy", "Uber", "Byju's", 
-  "OYO", "MakeMyTrip", "Freshworks", "Zoho", "Thoughtworks", 
-  "Hexaware", "LTI", "Mindtree", "Mphasis", "Persistent Systems", 
-  "Cyient", "KPIT Technologies", "Larsen & Toubro", "Siemens", 
-  "Schneider Electric", "SAP", "Oracle", "Adobe", "Salesforce", 
-  "Cisco", "Dell", "HP", "Intel", "Qualcomm", "Texas Instruments", 
-  "Nokia", "Ericsson", "Motorola", "Panasonic", "Sony", "Samsung", 
-  "LG", "Tata Consultancy Services", "Infosys", "Wipro Technologies", 
-  "HCL Technologies", "Tech Mahindra", "Cognizant Technology Solutions", 
-  "Accenture Services", "IBM India", "Microsoft India", "Google India", 
-  "Amazon India", "Flipkart Internet", "Paytm", "Ola", "Zomato", 
-  "Swiggy", "Uber India", "Byju's", "OYO", "MakeMyTrip", 
-  "Freshworks", "Zoho Corporation", "Thoughtworks", "Hexaware Technologies", 
-  "Mindtree", "Mphasis", "Persistent Systems", "Cyient", "KPIT Technologies", 
-  "Larsen & Toubro", "Siemens", "Schneider Electric", "SAP India", 
-  "Oracle India", "Adobe", "Salesforce", "Cisco", "Dell", "HP", 
-  "Intel", "Qualcomm", "Texas Instruments", "Nokia", "Ericsson", 
-  "Motorola", "Panasonic", "Sony", "Samsung", "LG"
+  "Swiggy", "Sagility Health", "Advaith Hyundai", "Dodla Dairy Limited", "Volkswagen", "Aishwarya groups", "HDB Financial Services", "Avsar HR Services", "TVS Motor Company Limited",
+  "Results CX", "Firstsource Solutions", "Bajaj Life Insurance Company", "EMAMI FRANK ROSS", "Magic Bus India Foundation", "Agustya Automobiles Pvt Ltd", "Flipkart",
+  "We Rize", "UPANAL CNC SOLTIONS", "LIC JC Road Bangalore", "LIC of India, Residency road branch", "Advaith Hyundai",
+  "RiseArka Solutions", "Muthoot Finance", "Paychex", "KS WORLD VENTURES", "Sambhav Foundation",
+  "Digital Elite Service", "VST Group", "Vibhinna Events", "Appsndevices Technologies Pvt Ltd", "Pooja ",
+  "SPANDANA BRIGHT FUTURE INNOVATION", "Ezy Ventures", "Indian Edu Hub", "Quess Corp",
+  "Incubenation", "Founding Years Learning Solutions Pvt. LTD", "MUST Company", "TSI ", "Govianu Wealth Management ",
+  "SFJ Business Solutions Private Limited", "Faction Global Infotech pvt ltd", "SPANDANA BRIGHT FUTURE INNOVATION ", "Dynalektric Equipment pvt Itd", "Qualcomm", "Texas Instruments",
+  "Grassroots solutions and services", "Faction Global Infotech pvt ltd", "Pratham Motors Pvt Ltd"
 ]
