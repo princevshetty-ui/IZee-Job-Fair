@@ -152,33 +152,33 @@ const FullPageOrbs = () => {
   // Positions use percentages so nothing gets clipped.
   const orbs = [
     // ── Hero (0–800px) ──
-    { cls: 'orb-1', top: 40,   left: '2%',  w: 520, h: 520, bg: 'radial-gradient(circle, rgba(99,102,241,0.65) 0%, rgba(99,102,241,0.18) 45%, transparent 70%)', blur: 48 },
-    { cls: 'orb-2', top: 20,   left: '68%', w: 500, h: 500, bg: 'radial-gradient(circle, rgba(139,92,246,0.60) 0%, rgba(139,92,246,0.16) 45%, transparent 70%)', blur: 50 },
-    { cls: 'orb-3', top: 300,  left: '28%', w: 580, h: 360, bg: 'radial-gradient(ellipse, rgba(99,102,241,0.50) 0%, rgba(6,182,212,0.14) 50%, transparent 70%)', blur: 55 },
-    { cls: 'orb-1', top: 550,  left: '5%',  w: 420, h: 400, bg: 'radial-gradient(circle, rgba(6,182,212,0.55) 0%, rgba(6,182,212,0.12) 45%, transparent 70%)', blur: 45 },
-    { cls: 'orb-2', top: 580,  left: '72%', w: 440, h: 420, bg: 'radial-gradient(circle, rgba(139,92,246,0.55) 0%, rgba(139,92,246,0.12) 45%, transparent 70%)', blur: 48 },
+    { cls: 'orb-1', top: 40, left: '2%', w: 520, h: 520, bg: 'radial-gradient(circle, rgba(99,102,241,0.65) 0%, rgba(99,102,241,0.18) 45%, transparent 70%)', blur: 48 },
+    { cls: 'orb-2', top: 20, left: '68%', w: 500, h: 500, bg: 'radial-gradient(circle, rgba(139,92,246,0.60) 0%, rgba(139,92,246,0.16) 45%, transparent 70%)', blur: 50 },
+    { cls: 'orb-3', top: 300, left: '28%', w: 580, h: 360, bg: 'radial-gradient(ellipse, rgba(99,102,241,0.50) 0%, rgba(6,182,212,0.14) 50%, transparent 70%)', blur: 55 },
+    { cls: 'orb-1', top: 550, left: '5%', w: 420, h: 400, bg: 'radial-gradient(circle, rgba(6,182,212,0.55) 0%, rgba(6,182,212,0.12) 45%, transparent 70%)', blur: 45 },
+    { cls: 'orb-2', top: 580, left: '72%', w: 440, h: 420, bg: 'radial-gradient(circle, rgba(139,92,246,0.55) 0%, rgba(139,92,246,0.12) 45%, transparent 70%)', blur: 48 },
 
     // ── Event details / Marquee (800–1600px) ──
-    { cls: 'orb-3', top: 820,  left: '3%',  w: 480, h: 460, bg: 'radial-gradient(circle, rgba(99,102,241,0.58) 0%, rgba(99,102,241,0.14) 45%, transparent 70%)', blur: 50 },
-    { cls: 'orb-1', top: 860,  left: '70%', w: 460, h: 440, bg: 'radial-gradient(circle, rgba(6,182,212,0.55) 0%, rgba(6,182,212,0.12) 45%, transparent 70%)', blur: 46 },
+    { cls: 'orb-3', top: 820, left: '3%', w: 480, h: 460, bg: 'radial-gradient(circle, rgba(99,102,241,0.58) 0%, rgba(99,102,241,0.14) 45%, transparent 70%)', blur: 50 },
+    { cls: 'orb-1', top: 860, left: '70%', w: 460, h: 440, bg: 'radial-gradient(circle, rgba(6,182,212,0.55) 0%, rgba(6,182,212,0.12) 45%, transparent 70%)', blur: 46 },
     { cls: 'orb-2', top: 1150, left: '22%', w: 560, h: 340, bg: 'radial-gradient(ellipse, rgba(139,92,246,0.52) 0%, transparent 65%)', blur: 52 },
-    { cls: 'orb-3', top: 1380, left: '6%',  w: 440, h: 420, bg: 'radial-gradient(circle, rgba(6,182,212,0.55) 0%, rgba(6,182,212,0.12) 45%, transparent 70%)', blur: 44 },
+    { cls: 'orb-3', top: 1380, left: '6%', w: 440, h: 420, bg: 'radial-gradient(circle, rgba(6,182,212,0.55) 0%, rgba(6,182,212,0.12) 45%, transparent 70%)', blur: 44 },
     { cls: 'orb-1', top: 1420, left: '66%', w: 460, h: 440, bg: 'radial-gradient(circle, rgba(99,102,241,0.56) 0%, rgba(99,102,241,0.12) 45%, transparent 70%)', blur: 48 },
 
     // ── Highlights (1600–2400px) ──
-    { cls: 'orb-2', top: 1620, left: '4%',  w: 500, h: 480, bg: 'radial-gradient(circle, rgba(139,92,246,0.60) 0%, rgba(139,92,246,0.15) 45%, transparent 70%)', blur: 52 },
+    { cls: 'orb-2', top: 1620, left: '4%', w: 500, h: 480, bg: 'radial-gradient(circle, rgba(139,92,246,0.60) 0%, rgba(139,92,246,0.15) 45%, transparent 70%)', blur: 52 },
     { cls: 'orb-3', top: 1660, left: '68%', w: 480, h: 460, bg: 'radial-gradient(circle, rgba(6,182,212,0.58) 0%, rgba(6,182,212,0.14) 45%, transparent 70%)', blur: 50 },
     { cls: 'orb-1', top: 1940, left: '25%', w: 600, h: 360, bg: 'radial-gradient(ellipse, rgba(99,102,241,0.50) 0%, rgba(139,92,246,0.14) 50%, transparent 70%)', blur: 55 },
-    { cls: 'orb-2', top: 2180, left: '5%',  w: 460, h: 440, bg: 'radial-gradient(circle, rgba(99,102,241,0.56) 0%, rgba(99,102,241,0.12) 45%, transparent 70%)', blur: 46 },
+    { cls: 'orb-2', top: 2180, left: '5%', w: 460, h: 440, bg: 'radial-gradient(circle, rgba(99,102,241,0.56) 0%, rgba(99,102,241,0.12) 45%, transparent 70%)', blur: 46 },
     { cls: 'orb-3', top: 2220, left: '67%', w: 480, h: 460, bg: 'radial-gradient(circle, rgba(139,92,246,0.55) 0%, rgba(139,92,246,0.12) 45%, transparent 70%)', blur: 50 },
 
     // ── Who should attend (2400–3200px) ──
-    { cls: 'orb-1', top: 2420, left: '3%',  w: 500, h: 480, bg: 'radial-gradient(circle, rgba(6,182,212,0.58) 0%, rgba(6,182,212,0.14) 45%, transparent 70%)', blur: 52 },
+    { cls: 'orb-1', top: 2420, left: '3%', w: 500, h: 480, bg: 'radial-gradient(circle, rgba(6,182,212,0.58) 0%, rgba(6,182,212,0.14) 45%, transparent 70%)', blur: 52 },
     { cls: 'orb-2', top: 2460, left: '69%', w: 520, h: 500, bg: 'radial-gradient(circle, rgba(99,102,241,0.60) 0%, rgba(99,102,241,0.15) 45%, transparent 70%)', blur: 54 },
     { cls: 'orb-3', top: 2720, left: '26%', w: 580, h: 360, bg: 'radial-gradient(ellipse, rgba(139,92,246,0.50) 0%, rgba(6,182,212,0.12) 50%, transparent 70%)', blur: 55 },
 
     // ── CTA / Footer (3200–4200px) ──
-    { cls: 'orb-1', top: 3200, left: '4%',  w: 480, h: 460, bg: 'radial-gradient(circle, rgba(99,102,241,0.58) 0%, rgba(99,102,241,0.14) 45%, transparent 70%)', blur: 50 },
+    { cls: 'orb-1', top: 3200, left: '4%', w: 480, h: 460, bg: 'radial-gradient(circle, rgba(99,102,241,0.58) 0%, rgba(99,102,241,0.14) 45%, transparent 70%)', blur: 50 },
     { cls: 'orb-2', top: 3240, left: '67%', w: 500, h: 480, bg: 'radial-gradient(circle, rgba(139,92,246,0.56) 0%, rgba(139,92,246,0.13) 45%, transparent 70%)', blur: 52 },
     { cls: 'orb-3', top: 3500, left: '28%', w: 560, h: 340, bg: 'radial-gradient(ellipse, rgba(6,182,212,0.52) 0%, transparent 65%)', blur: 50 },
   ]
@@ -366,7 +366,7 @@ const LandingPage = () => {
               className="stats-shimmer inline-flex items-center gap-3 mx-auto px-8 py-4"
               style={{ background: 'rgba(13,13,26,0.80)' }}
             >
-              <span className="text-sm font-semibold" style={{ color: '#e2e8f0' }}>80+ Companies</span>
+              <span className="text-sm font-semibold" style={{ color: '#e2e8f0' }}>45+ Companies</span>
               <span style={{ color: '#334155' }}>·</span>
               <span className="text-sm font-semibold" style={{ color: '#e2e8f0' }}>8th May 2026</span>
               <span style={{ color: '#334155' }}>·</span>
