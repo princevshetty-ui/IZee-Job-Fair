@@ -144,9 +144,10 @@ const ConfirmationPage = () => {
               <p className="text-sm font-semibold text-white mb-3">What to bring on event day:</p>
               <ul className="space-y-2">
                 {[
-                  '10 sets of updated CVs',
-                  '10 passport-size photographs',
-                  'Valid government-issued ID (Aadhaar / PAN / Passport)',
+                  'Updated resume (10 copies recommended)',
+                  'Passport-sized photographs',
+                  'Aadhar card/Valid ID proof',
+                  'Academic Certification Copies',
                 ].map((item) => (
                   <li key={item} className="flex items-start gap-2.5">
                     <div className="w-1.5 h-1.5 rounded-full mt-2 flex-shrink-0" style={{ background: '#10B981' }} />
