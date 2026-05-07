@@ -35,10 +35,10 @@ NAME_FONT_MAX   = 88           # large — shrinks to fit
 NAME_FONT_MIN   = 44
 
 # Category label sits below name with a comfortable gap
-CAT_GAP         = 18           # px below last name line
+CAT_GAP         = 20         # px below last name line
 
 # Detail line (stream · college) sits below category with gap
-DETAIL_GAP      = 22           # px below category
+DETAIL_GAP      = 24          # px below category
 
 # Description block
 DESC_X          = 119
