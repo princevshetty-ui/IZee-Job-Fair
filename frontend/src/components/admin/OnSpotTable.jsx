@@ -65,8 +65,20 @@ const OnSpotTable = ({ registrations, onRefresh, onToast }) => {
     setSelectedIds(new Set())
   })
 
+  const handleBulkDelete = () => withLoading(async () => {
+    const ids = [...selectedIds]
+    if (!ids.length) return
+    if (!confirm(`Delete ${ids.length} record${ids.length !== 1 ? 's' : ''}? This cannot be undone.`)) return
+    const res = await apiCall('/api/admin/bulk-delete', { method: 'POST', body: JSON.stringify({ ids }) })
+    const data = await res.json()
+    onToast(`${data.deleted} records deleted`, 'info')
+    setSelectedIds(new Set())
+    await onRefresh()
+  })
+
   const bulkActions = [
     { label: `Resend Passes (${selectedIds.size})`, onClick: handleBulkResend, bg: 'rgba(99,102,241,0.12)', color: '#a5b4fc', border: 'rgba(99,102,241,0.3)', disabled: acting },
+    { label: `Delete Selected (${selectedIds.size})`, onClick: handleBulkDelete, bg: 'rgba(239,68,68,0.08)', color: '#f87171', border: 'rgba(239,68,68,0.25)', disabled: acting },
   ]
 
   return (
