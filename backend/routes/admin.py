@@ -16,6 +16,7 @@ import io
 import os
 import json
 from pydantic import BaseModel
+from typing import Optional
 from auth import create_token
 
 router = APIRouter()
@@ -44,7 +45,8 @@ class BulkActionRequest(BaseModel):
 
 
 class RegistrationStatusRequest(BaseModel):
-    open: bool
+    open: Optional[bool] = None
+    onspot_open: Optional[bool] = None
 
 
 @router.post("/admin/login")
@@ -63,15 +65,24 @@ async def admin_login(login_data: AdminLogin):
 @router.get("/admin/registration-status")
 async def get_registration_status():
     settings = _load_settings()
-    return {"open": settings.get("registration_open", True)}
+    return {
+        "open": settings.get("registration_open", True),
+        "onspot_open": settings.get("onspot_open", True),
+    }
 
 
 @router.put("/admin/registration-status")
 async def set_registration_status(body: RegistrationStatusRequest, admin: dict = Depends(get_current_admin)):
     settings = _load_settings()
-    settings["registration_open"] = body.open
+    if body.open is not None:
+        settings["registration_open"] = body.open
+    if body.onspot_open is not None:
+        settings["onspot_open"] = body.onspot_open
     _save_settings(settings)
-    return {"open": body.open}
+    return {
+        "open": settings.get("registration_open", True),
+        "onspot_open": settings.get("onspot_open", True),
+    }
 
 
 @router.get("/admin/stats")

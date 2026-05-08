@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import RegistrationForm from '../components/forms/RegistrationForm'
 import Toast from '../components/shared/Toast'
@@ -9,6 +9,17 @@ const OnSpotRegisterPage = () => {
   const [submitting, setSubmitting] = useState(false)
   const [passImage, setPassImage] = useState(null)
   const [sid, setSid] = useState(null)
+  const [onspotOpen, setOnspotOpen] = useState(true)
+  const [statusChecked, setStatusChecked] = useState(false)
+
+  useEffect(() => {
+    const API = import.meta.env.VITE_API_URL || ''
+    fetch(`${API}/api/admin/registration-status`)
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d && d.onspot_open === false) setOnspotOpen(false) })
+      .catch(() => {})
+      .finally(() => setStatusChecked(true))
+  }, [])
 
   const handleSubmit = async (formData) => {
     setSubmitting(true)
@@ -35,6 +46,26 @@ const OnSpotRegisterPage = () => {
     } finally {
       setSubmitting(false)
     }
+  }
+
+  if (!statusChecked) {
+    return <div className="min-h-screen" style={{ backgroundColor: '#020208' }} />
+  }
+
+  if (!onspotOpen) {
+    return (
+      <div className="min-h-screen text-white flex items-center justify-center px-4" style={{ backgroundColor: '#020208' }}>
+        <div className="text-center max-w-sm">
+          <div className="w-16 h-16 mx-auto mb-6 rounded-full flex items-center justify-center" style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)' }}>
+            <svg className="w-8 h-8" style={{ color: '#f87171' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+          </div>
+          <h1 className="text-2xl font-bold text-white mb-2">On-Spot Registration Closed</h1>
+          <p className="text-sm" style={{ color: '#475569' }}>On-spot registration is currently unavailable. Please contact the event team for assistance.</p>
+        </div>
+      </div>
+    )
   }
 
   if (passImage) {

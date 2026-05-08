@@ -79,8 +79,11 @@ const AdminDashboard = () => {
   const [toast, setToast] = useState(null)
   const [showImportModal, setShowImportModal] = useState(false)
   const [regOpen, setRegOpen] = useState(true)
+  const [onspotOpen, setOnspotOpen] = useState(true)
   const [regModal, setRegModal] = useState(false)
+  const [onspotModal, setOnspotModal] = useState(false)
   const [regToggling, setRegToggling] = useState(false)
+  const [onspotToggling, setOnspotToggling] = useState(false)
 
   const showToast = (message, type = 'success') => setToast({ message, type })
 
@@ -153,6 +156,7 @@ const AdminDashboard = () => {
       if (r.ok) {
         const d = await r.json()
         setRegOpen(d.open)
+        setOnspotOpen(d.onspot_open ?? true)
       }
     } catch {}
   }
@@ -194,7 +198,7 @@ const AdminDashboard = () => {
       if (r.ok) {
         const d = await r.json()
         setRegOpen(d.open)
-        showToast(`Registration ${d.open ? 'opened' : 'closed'} successfully`)
+        showToast(`Pre-Registration ${d.open ? 'opened' : 'closed'} successfully`)
       } else {
         showToast('Failed to update registration status', 'error')
       }
@@ -203,6 +207,31 @@ const AdminDashboard = () => {
     } finally {
       setRegToggling(false)
       setRegModal(false)
+    }
+  }
+
+  const handleToggleOnspot = async () => {
+    setOnspotToggling(true)
+    const API = import.meta.env.VITE_API_URL || ''
+    const t = localStorage.getItem('token')
+    try {
+      const r = await fetch(`${API}/api/admin/registration-status`, {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${t}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ onspot_open: !onspotOpen }),
+      })
+      if (r.ok) {
+        const d = await r.json()
+        setOnspotOpen(d.onspot_open ?? true)
+        showToast(`On-Spot Registration ${d.onspot_open ? 'opened' : 'closed'} successfully`)
+      } else {
+        showToast('Failed to update on-spot status', 'error')
+      }
+    } catch {
+      showToast('Network error', 'error')
+    } finally {
+      setOnspotToggling(false)
+      setOnspotModal(false)
     }
   }
 
@@ -261,10 +290,10 @@ const AdminDashboard = () => {
           ))}
         </nav>
 
-        {/* Registration Status Toggle */}
+        {/* Registration Status Toggles */}
         <div style={{ padding: '14px 20px', borderTop: '1px solid #1a1a2e' }}>
-          <p style={{ fontSize: 9, textTransform: 'uppercase', letterSpacing: '0.2em', color: '#475569', margin: '0 0 8px', fontWeight: 600 }}>
-            Registration
+          <p style={{ fontSize: 9, textTransform: 'uppercase', letterSpacing: '0.2em', color: '#475569', margin: '0 0 6px', fontWeight: 600 }}>
+            Pre-Registration
           </p>
           <button
             onClick={() => setRegModal(true)}
@@ -272,7 +301,7 @@ const AdminDashboard = () => {
               width: '100%', padding: '8px 12px', borderRadius: 8, cursor: 'pointer',
               display: 'flex', alignItems: 'center', gap: 8, fontSize: 11,
               fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em',
-              transition: 'all 0.2s',
+              transition: 'all 0.2s', marginBottom: 8,
               background: regOpen ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.08)',
               border: regOpen ? '1px solid rgba(16,185,129,0.3)' : '1px solid rgba(239,68,68,0.25)',
               color: regOpen ? '#10B981' : '#f87171',
@@ -285,6 +314,29 @@ const AdminDashboard = () => {
               boxShadow: `0 0 6px ${regOpen ? '#10B981' : '#EF4444'}`,
             }} />
             {regOpen ? 'OPEN' : 'CLOSED'}
+          </button>
+          <p style={{ fontSize: 9, textTransform: 'uppercase', letterSpacing: '0.2em', color: '#475569', margin: '0 0 6px', fontWeight: 600 }}>
+            On-Spot
+          </p>
+          <button
+            onClick={() => setOnspotModal(true)}
+            style={{
+              width: '100%', padding: '8px 12px', borderRadius: 8, cursor: 'pointer',
+              display: 'flex', alignItems: 'center', gap: 8, fontSize: 11,
+              fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em',
+              transition: 'all 0.2s',
+              background: onspotOpen ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.08)',
+              border: onspotOpen ? '1px solid rgba(16,185,129,0.3)' : '1px solid rgba(239,68,68,0.25)',
+              color: onspotOpen ? '#10B981' : '#f87171',
+              outline: 'none',
+            }}
+          >
+            <span style={{
+              width: 6, height: 6, borderRadius: '50%', flexShrink: 0, display: 'inline-block',
+              background: onspotOpen ? '#10B981' : '#EF4444',
+              boxShadow: `0 0 6px ${onspotOpen ? '#10B981' : '#EF4444'}`,
+            }} />
+            {onspotOpen ? 'OPEN' : 'CLOSED'}
           </button>
         </div>
 
@@ -557,6 +609,42 @@ const AdminDashboard = () => {
                 }}
               >
                 {regToggling ? 'Saving…' : regOpen ? 'Close It' : 'Open It'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── On-Spot Toggle Confirmation Modal ── */}
+      {onspotModal && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 60, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)' }}>
+          <div style={{ background: '#0D0D1A', border: '1px solid #1a1a2e', borderRadius: 16, padding: 28, maxWidth: 380, width: '100%', boxShadow: '0 24px 60px rgba(0,0,0,0.6)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+              <div style={{ width: 40, height: 40, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, background: onspotOpen ? 'rgba(239,68,68,0.1)' : 'rgba(16,185,129,0.1)', border: onspotOpen ? '1px solid rgba(239,68,68,0.25)' : '1px solid rgba(16,185,129,0.25)' }}>
+                <svg className="w-5 h-5" style={{ color: onspotOpen ? '#f87171' : '#10B981' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={onspotOpen ? 'M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z' : 'M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z'} />
+                </svg>
+              </div>
+              <div>
+                <p style={{ fontSize: 14, fontWeight: 600, color: 'white', margin: 0 }}>
+                  {onspotOpen ? 'Close On-Spot Registration?' : 'Open On-Spot Registration?'}
+                </p>
+                <p style={{ fontSize: 12, color: '#64748B', margin: '3px 0 0' }}>This affects the on-spot walk-in page.</p>
+              </div>
+            </div>
+            <p style={{ fontSize: 13, color: '#94a3b8', marginBottom: 20, lineHeight: 1.6 }}>
+              {onspotOpen
+                ? 'Closing will show a "Registration Closed" message on the on-spot walk-in page.'
+                : 'Opening will allow walk-in attendees to register on-spot.'}
+            </p>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button onClick={() => setOnspotModal(false)} disabled={onspotToggling}
+                style={{ flex: 1, padding: '10px', borderRadius: 8, background: 'rgba(255,255,255,0.04)', border: '1px solid #1a1a2e', color: '#94a3b8', fontSize: 12, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', cursor: 'pointer', outline: 'none' }}>
+                Cancel
+              </button>
+              <button onClick={handleToggleOnspot} disabled={onspotToggling}
+                style={{ flex: 1, padding: '10px', borderRadius: 8, fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', cursor: onspotToggling ? 'not-allowed' : 'pointer', outline: 'none', opacity: onspotToggling ? 0.6 : 1, transition: 'all 0.2s', background: onspotOpen ? 'rgba(239,68,68,0.15)' : 'rgba(16,185,129,0.15)', border: onspotOpen ? '1px solid rgba(239,68,68,0.3)' : '1px solid rgba(16,185,129,0.3)', color: onspotOpen ? '#f87171' : '#10B981' }}>
+                {onspotToggling ? 'Saving…' : onspotOpen ? 'Close It' : 'Open It'}
               </button>
             </div>
           </div>
