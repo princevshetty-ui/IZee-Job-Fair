@@ -37,3 +37,9 @@ backend/assets/fonts/*.ttf
 
 # Memory files (AI context — keep tracked)
 # MEMORY.md files are intentionally tracked for AI continuity
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+!.env.example
