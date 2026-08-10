@@ -48,33 +48,49 @@ const VolunteerRegisterPage = () => {
   }
 
   return (
-    <div className="min-h-screen text-white overflow-x-hidden" style={{ backgroundColor: '#020208' }}>
+    <div className="min-h-screen overflow-x-hidden lp2-grain" style={{ backgroundColor: '#15120f' }}>
+      {/* Ambient background */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+        <div className="absolute rounded-full blur-[200px]"
+          style={{ width: 700, height: 700, background: 'radial-gradient(circle, rgba(161,31,38,0.06) 0%, transparent 70%)', top: '20%', left: '50%', transform: 'translateX(-50%)' }} />
         <div className="absolute rounded-full blur-[150px]"
-          style={{ width: 600, height: 600, background: 'radial-gradient(circle, rgba(139,92,246,0.07) 0%, transparent 70%)', top: '20%', left: '50%', transform: 'translateX(-50%)' }} />
-        <div style={{ position: 'absolute', inset: 0, backgroundImage: 'linear-gradient(rgba(99,102,241,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(99,102,241,0.04) 1px, transparent 1px)', backgroundSize: '80px 80px', maskImage: 'radial-gradient(ellipse 90% 70% at 50% 40%, black 10%, transparent 100%)', WebkitMaskImage: 'radial-gradient(ellipse 90% 70% at 50% 40%, black 10%, transparent 100%)' }} />
+          style={{ width: 400, height: 400, background: 'radial-gradient(circle, rgba(208,176,112,0.04) 0%, transparent 70%)', bottom: '15%', right: '10%' }} />
+        <div style={{ position: 'absolute', inset: 0, backgroundImage: 'linear-gradient(rgba(208,176,112,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(208,176,112,0.03) 1px, transparent 1px)', backgroundSize: '80px 80px', maskImage: 'radial-gradient(ellipse 80% 60% at 50% 30%, black 10%, transparent 100%)', WebkitMaskImage: 'radial-gradient(ellipse 80% 60% at 50% 30%, black 10%, transparent 100%)' }} />
       </div>
-      <div className="relative z-10">
-        <div className="container mx-auto px-4 py-12">
+
+      <div className="relative z-10 py-16 px-4">
+        <div className="container mx-auto" style={{ maxWidth: '620px' }}>
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
+            transition={{ duration: 0.9 }}
             className="text-center mb-10"
           >
-            <p className="text-[10px] uppercase tracking-[0.28em] font-semibold mb-3" style={{ color: 'rgba(139,92,246,0.5)' }}>
+            <p className="flex items-center justify-center gap-3 text-[10px] uppercase tracking-[0.28em] font-semibold mb-4" style={{ color: '#d0b070' }}>
+              <span className="h-px w-8 bg-current" />
               Staff & Volunteers
+              <span className="h-px w-8 bg-current" />
             </p>
-            <h1 className="text-3xl md:text-5xl font-bold text-white tracking-tight font-heading-art mb-3">Volunteer Registration</h1>
-            <p className="text-sm" style={{ color: '#475569' }}>Register to volunteer at the IZEE Job Fair 2026</p>
+            <h1
+              className="mb-3"
+              style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 'clamp(2.5rem,8vw,4rem)', color: '#f5f1ed', lineHeight: 1.05, fontWeight: 400 }}
+            >
+              Volunteer <span style={{ fontStyle: 'italic', color: '#d0b070' }}>Registration</span>
+            </h1>
+            <p className="text-sm" style={{ color: '#8d7f76' }}>Register to volunteer at the IZEE Job Fair 2027</p>
           </motion.div>
 
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.1 }}
-            className="max-w-xl mx-auto rounded-2xl p-6 md:p-8"
-            style={{ background: '#0D0D1A', border: '1px solid #1a1a2e' }}
+            transition={{ duration: 0.9, delay: 0.1 }}
+            style={{
+              background: 'rgba(21,18,15,0.85)',
+              border: '1px solid rgba(208,176,112,0.18)',
+              boxShadow: '0 0 80px rgba(161,31,38,0.06), 0 1px 0 rgba(208,176,112,0.08) inset',
+              backdropFilter: 'blur(12px)',
+              padding: '32px',
+            }}
           >
             {success ? (
               <motion.div
@@ -82,14 +98,16 @@ const VolunteerRegisterPage = () => {
                 animate={{ opacity: 1, scale: 1 }}
                 className="text-center py-6"
               >
-                <div className="w-16 h-16 mx-auto mb-5 rounded-full flex items-center justify-center"
-                  style={{ background: 'linear-gradient(135deg, #10B981, #0d9488)', boxShadow: '0 0 30px rgba(16,185,129,0.3)' }}>
+                <div className="w-16 h-16 mx-auto mb-5 flex items-center justify-center"
+                  style={{ background: '#a11f26', border: '1px solid rgba(208,176,112,0.3)' }}>
                   <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <h2 className="text-xl font-bold text-white mb-2">Registration Successful</h2>
-                <p className="text-sm" style={{ color: '#475569' }}>You've been registered as a volunteer.</p>
+                <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '2rem', color: '#f5f1ed', fontWeight: 400 }} className="mb-2">
+                  Registration <span style={{ fontStyle: 'italic', color: '#d0b070' }}>Successful</span>
+                </h2>
+                <p className="text-sm" style={{ color: '#8d7f76' }}>You've been registered as a volunteer.</p>
               </motion.div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
@@ -102,16 +120,15 @@ const VolunteerRegisterPage = () => {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="w-full py-3.5 rounded-xl font-semibold text-sm tracking-[0.06em] uppercase text-white transition-all duration-200 disabled:opacity-50 mt-2"
-                  style={{ background: 'linear-gradient(135deg, #6366F1, #8B5CF6)', boxShadow: '0 4px 20px rgba(99,102,241,0.3)' }}
-                  onMouseEnter={e => { if (!submitting) { e.currentTarget.style.opacity = '0.9'; e.currentTarget.style.transform = 'translateY(-1px)' } }}
-                  onMouseLeave={e => { e.currentTarget.style.opacity = '1'; e.currentTarget.style.transform = 'translateY(0)' }}
+                  className="w-full py-3.5 font-semibold text-sm tracking-[0.12em] uppercase transition-all duration-300 disabled:opacity-50 mt-2"
+                  style={{ background: '#a11f26', color: '#f5f1ed', border: '1px solid rgba(208,176,112,0.25)' }}
+                  onMouseEnter={e => { if (!submitting) { e.currentTarget.style.background = '#d0b070'; e.currentTarget.style.color = '#15120f' } }}
+                  onMouseLeave={e => { e.currentTarget.style.background = '#a11f26'; e.currentTarget.style.color = '#f5f1ed' }}
                 >
                   {submitting ? 'Submitting…' : 'Register as Volunteer'}
                 </button>
               </form>
             )}
-            <p className="text-center mt-5 text-xs" style={{ color: '#334155' }}>Hidden registration link for volunteers only</p>
           </motion.div>
         </div>
       </div>

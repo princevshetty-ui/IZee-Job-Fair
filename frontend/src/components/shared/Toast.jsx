@@ -30,9 +30,9 @@ const ICONS = {
 }
 
 const STYLES = {
-  success: { bg: 'rgba(16,185,129,0.1)', border: 'rgba(16,185,129,0.25)', color: '#10B981' },
-  error: { bg: 'rgba(239,68,68,0.1)', border: 'rgba(239,68,68,0.25)', color: '#EF4444' },
-  info: { bg: 'rgba(99,102,241,0.1)', border: 'rgba(99,102,241,0.25)', color: '#6366F1' }
+  success: { bg: 'rgba(21,18,15,0.95)', border: 'rgba(208,176,112,0.4)', color: '#d0b070' },
+  error: { bg: 'rgba(21,18,15,0.95)', border: 'rgba(161,31,38,0.5)', color: '#a11f26' },
+  info: { bg: 'rgba(21,18,15,0.95)', border: 'rgba(208,176,112,0.25)', color: '#8d7f76' }
 }
 
 const Toast = ({ message, type = 'info', duration = 3500, onClose }) => {
@@ -49,17 +49,18 @@ const Toast = ({ message, type = 'info', duration = 3500, onClose }) => {
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: -16, scale: 0.96 }}
       transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-      className="fixed top-5 right-5 z-[100] flex items-center gap-3 px-5 py-3.5 rounded-xl text-sm font-medium max-w-sm cursor-pointer"
+      className="fixed top-5 right-5 z-[100] flex items-center gap-3 px-5 py-3.5 text-sm font-medium max-w-sm cursor-pointer"
       style={{
-        background: '#0D0D1A',
+        background: s.bg,
         border: `1px solid ${s.border}`,
         color: s.color,
-        boxShadow: `0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px ${s.border}`
+        backdropFilter: 'blur(16px)',
+        boxShadow: `0 8px 32px rgba(0,0,0,0.6), 0 0 0 1px ${s.border}`
       }}
       onClick={onClose}
     >
       {ICONS[type] || ICONS.info}
-      <span style={{ color: '#F8FAFC' }}>{normalizeMessage(message)}</span>
+      <span style={{ color: '#f5f1ed' }}>{normalizeMessage(message)}</span>
     </motion.div>
   )
 }

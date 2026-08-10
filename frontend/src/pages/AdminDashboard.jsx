@@ -19,28 +19,28 @@ const TABS = [
 
 const METRIC_CFGS = {
   pre: [
-    { key: 'total_pre_registered', label: 'Total Pre-Reg', color: '#818CF8', dot: '#6366F1', glow: 'rgba(99,102,241,0.15)' },
-    { key: 'pending', label: 'Pending', color: '#fbbf24', dot: '#F59E0B', glow: 'rgba(245,158,11,0.15)' },
-    { key: 'approved', label: 'Approved', color: '#34d399', dot: '#10B981', glow: 'rgba(16,185,129,0.15)' },
-    { key: 'rejected', label: 'Rejected', color: '#f87171', dot: '#EF4444', glow: 'rgba(239,68,68,0.15)' },
-    { key: 'approved', label: 'Passes Sent', color: '#a78bfa', dot: '#8B5CF6', glow: 'rgba(139,92,246,0.15)' },
+    { key: 'total_pre_registered', label: 'Total Pre-Reg', color: '#d0b070', dot: '#d0b070', glow: 'rgba(208,176,112,0.15)' },
+    { key: 'pending', label: 'Pending', color: '#e5c87a', dot: '#e5c87a', glow: 'rgba(229,200,122,0.15)' },
+    { key: 'approved', label: 'Approved', color: '#b8a06a', dot: '#b8a06a', glow: 'rgba(184,160,106,0.15)' },
+    { key: 'rejected', label: 'Rejected', color: '#a11f26', dot: '#a11f26', glow: 'rgba(161,31,38,0.15)' },
+    { key: 'approved', label: 'Passes Sent', color: '#c9bfb5', dot: '#c9bfb5', glow: 'rgba(201,191,181,0.15)' },
   ],
   onspot: [
-    { key: 'total_onspot', label: 'Total On-Spot', color: '#38bdf8', dot: '#0ea5e9', glow: 'rgba(14,165,233,0.15)' },
-    { key: 'onspot_students', label: 'Students', color: '#34d399', dot: '#10B981', glow: 'rgba(16,185,129,0.15)' },
-    { key: 'onspot_freshers', label: 'Freshers', color: '#a78bfa', dot: '#8B5CF6', glow: 'rgba(139,92,246,0.15)' },
-    { key: 'onspot_professionals', label: 'Professionals', color: '#fbbf24', dot: '#F59E0B', glow: 'rgba(245,158,11,0.15)' },
+    { key: 'total_onspot', label: 'Total On-Spot', color: '#d0b070', dot: '#d0b070', glow: 'rgba(208,176,112,0.15)' },
+    { key: 'onspot_students', label: 'Students', color: '#b8a06a', dot: '#b8a06a', glow: 'rgba(184,160,106,0.15)' },
+    { key: 'onspot_freshers', label: 'Freshers', color: '#e5c87a', dot: '#e5c87a', glow: 'rgba(229,200,122,0.15)' },
+    { key: 'onspot_professionals', label: 'Professionals', color: '#c9bfb5', dot: '#c9bfb5', glow: 'rgba(201,191,181,0.15)' },
   ],
   volunteers: [
-    { key: 'total_volunteers', label: 'Total Volunteers', color: '#34d399', dot: '#10B981', glow: 'rgba(16,185,129,0.15)' },
+    { key: 'total_volunteers', label: 'Total Volunteers', color: '#d0b070', dot: '#d0b070', glow: 'rgba(208,176,112,0.15)' },
   ],
   attendance: [
-    { key: 'total_validated', label: 'Total Validated', color: '#2dd4bf', dot: '#14b8a6', glow: 'rgba(20,184,166,0.15)' },
-    { key: 'pre_attended', label: 'Pre-Reg', color: '#818CF8', dot: '#6366F1', glow: 'rgba(99,102,241,0.15)' },
-    { key: 'onspot_attended', label: 'On-Spot', color: '#38bdf8', dot: '#0ea5e9', glow: 'rgba(14,165,233,0.15)' },
-    { key: 'students_attended', label: 'Students', color: '#34d399', dot: '#10B981', glow: 'rgba(16,185,129,0.15)' },
-    { key: 'freshers_attended', label: 'Freshers', color: '#a78bfa', dot: '#8B5CF6', glow: 'rgba(139,92,246,0.15)' },
-    { key: 'professionals_attended', label: 'Professionals', color: '#fbbf24', dot: '#F59E0B', glow: 'rgba(245,158,11,0.15)' },
+    { key: 'total_validated', label: 'Total Validated', color: '#d0b070', dot: '#d0b070', glow: 'rgba(208,176,112,0.15)' },
+    { key: 'pre_attended', label: 'Pre-Reg', color: '#e5c87a', dot: '#e5c87a', glow: 'rgba(229,200,122,0.15)' },
+    { key: 'onspot_attended', label: 'On-Spot', color: '#b8a06a', dot: '#b8a06a', glow: 'rgba(184,160,106,0.15)' },
+    { key: 'students_attended', label: 'Students', color: '#c9bfb5', dot: '#c9bfb5', glow: 'rgba(201,191,181,0.15)' },
+    { key: 'freshers_attended', label: 'Freshers', color: '#8d7f76', dot: '#8d7f76', glow: 'rgba(141,127,118,0.15)' },
+    { key: 'professionals_attended', label: 'Professionals', color: '#a11f26', dot: '#a11f26', glow: 'rgba(161,31,38,0.15)' },
   ],
   import: [],
 }
@@ -249,18 +249,18 @@ const AdminDashboard = () => {
   )
 
   return (
-    <div className="admin-shell text-white min-h-screen">
+    <div className="admin-shell min-h-screen lp2-grain" style={{ backgroundColor: '#15120f', color: '#f5f1ed' }}>
 
       {/* ── Desktop Sidebar ── */}
       <aside
         className="hidden md:flex flex-col fixed top-0 left-0 h-full z-40"
-        style={{ width: 220, background: '#0A0A0F', borderRight: '1px solid #1a1a2e' }}
+        style={{ width: 220, background: '#100e0b', borderRight: '1px solid rgba(208,176,112,0.12)' }}
       >
         {/* Logo */}
-        <div style={{ padding: '22px 20px 18px', borderBottom: '1px solid #1a1a2e' }}>
-          <img src={collegeLogo} alt="IZee" style={{ height: 38, marginBottom: 10, filter: 'drop-shadow(0 0 8px rgba(99,102,241,0.2))' }} />
-          <p style={{ fontSize: 9, textTransform: 'uppercase', letterSpacing: '0.22em', fontWeight: 600, color: 'rgba(99,102,241,0.6)', margin: 0 }}>IZEE Job Fair 2026</p>
-          <p style={{ fontSize: 9, textTransform: 'uppercase', letterSpacing: '0.16em', color: '#334155', margin: '3px 0 0' }}>Admin Dashboard</p>
+        <div style={{ padding: '22px 20px 18px', borderBottom: '1px solid rgba(208,176,112,0.1)' }}>
+          <img src={collegeLogo} alt="IZee" style={{ height: 38, marginBottom: 10 }} />
+          <p style={{ fontSize: 9, textTransform: 'uppercase', letterSpacing: '0.22em', fontWeight: 600, color: 'rgba(208,176,112,0.6)', margin: 0 }}>IZEE Job Fair 2026</p>
+          <p style={{ fontSize: 9, textTransform: 'uppercase', letterSpacing: '0.16em', color: '#5a4f48', margin: '3px 0 0' }}>Admin Dashboard</p>
         </div>
 
         {/* Nav Items */}
@@ -272,17 +272,17 @@ const AdminDashboard = () => {
               style={{
                 display: 'flex', alignItems: 'center', gap: 10,
                 width: '100%', padding: '11px 17px',
-                borderLeft: activeTab === tab.id ? '3px solid #6366F1' : '3px solid transparent',
-                background: activeTab === tab.id ? 'rgba(99,102,241,0.08)' : 'transparent',
-                color: activeTab === tab.id ? '#e2e8f0' : '#64748B',
+                borderLeft: activeTab === tab.id ? '3px solid #d0b070' : '3px solid transparent',
+                background: activeTab === tab.id ? 'rgba(208,176,112,0.07)' : 'transparent',
+                color: activeTab === tab.id ? '#f5f1ed' : '#5a4f48',
                 fontSize: 12, fontWeight: activeTab === tab.id ? 600 : 400,
                 cursor: 'pointer', border: 'none', textAlign: 'left',
                 transition: 'all 0.15s ease', outline: 'none',
                 borderLeftWidth: 3, borderLeftStyle: 'solid',
-                borderLeftColor: activeTab === tab.id ? '#6366F1' : 'transparent',
+                borderLeftColor: activeTab === tab.id ? '#d0b070' : 'transparent',
               }}
-              onMouseEnter={e => { if (activeTab !== tab.id) e.currentTarget.style.color = '#94a3b8' }}
-              onMouseLeave={e => { if (activeTab !== tab.id) e.currentTarget.style.color = '#64748B' }}
+              onMouseEnter={e => { if (activeTab !== tab.id) e.currentTarget.style.color = '#8d7f76' }}
+              onMouseLeave={e => { if (activeTab !== tab.id) e.currentTarget.style.color = '#5a4f48' }}
             >
               {tab.icon}
               {tab.label}
@@ -291,68 +291,68 @@ const AdminDashboard = () => {
         </nav>
 
         {/* Registration Status Toggles */}
-        <div style={{ padding: '14px 20px', borderTop: '1px solid #1a1a2e' }}>
-          <p style={{ fontSize: 9, textTransform: 'uppercase', letterSpacing: '0.2em', color: '#475569', margin: '0 0 6px', fontWeight: 600 }}>
+        <div style={{ padding: '14px 20px', borderTop: '1px solid rgba(208,176,112,0.1)' }}>
+          <p style={{ fontSize: 9, textTransform: 'uppercase', letterSpacing: '0.2em', color: '#5a4f48', margin: '0 0 6px', fontWeight: 600 }}>
             Pre-Registration
           </p>
           <button
             onClick={() => setRegModal(true)}
             style={{
-              width: '100%', padding: '8px 12px', borderRadius: 8, cursor: 'pointer',
+              width: '100%', padding: '8px 12px', cursor: 'pointer',
               display: 'flex', alignItems: 'center', gap: 8, fontSize: 11,
               fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em',
               transition: 'all 0.2s', marginBottom: 8,
-              background: regOpen ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.08)',
-              border: regOpen ? '1px solid rgba(16,185,129,0.3)' : '1px solid rgba(239,68,68,0.25)',
-              color: regOpen ? '#10B981' : '#f87171',
+              background: regOpen ? 'rgba(184,160,106,0.08)' : 'rgba(161,31,38,0.08)',
+              border: regOpen ? '1px solid rgba(208,176,112,0.3)' : '1px solid rgba(161,31,38,0.3)',
+              color: regOpen ? '#d0b070' : '#a11f26',
               outline: 'none',
             }}
           >
             <span style={{
               width: 6, height: 6, borderRadius: '50%', flexShrink: 0, display: 'inline-block',
-              background: regOpen ? '#10B981' : '#EF4444',
-              boxShadow: `0 0 6px ${regOpen ? '#10B981' : '#EF4444'}`,
+              background: regOpen ? '#d0b070' : '#a11f26',
+              boxShadow: `0 0 6px ${regOpen ? '#d0b070' : '#a11f26'}`,
             }} />
             {regOpen ? 'OPEN' : 'CLOSED'}
           </button>
-          <p style={{ fontSize: 9, textTransform: 'uppercase', letterSpacing: '0.2em', color: '#475569', margin: '0 0 6px', fontWeight: 600 }}>
+          <p style={{ fontSize: 9, textTransform: 'uppercase', letterSpacing: '0.2em', color: '#5a4f48', margin: '0 0 6px', fontWeight: 600 }}>
             On-Spot
           </p>
           <button
             onClick={() => setOnspotModal(true)}
             style={{
-              width: '100%', padding: '8px 12px', borderRadius: 8, cursor: 'pointer',
+              width: '100%', padding: '8px 12px', cursor: 'pointer',
               display: 'flex', alignItems: 'center', gap: 8, fontSize: 11,
               fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em',
               transition: 'all 0.2s',
-              background: onspotOpen ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.08)',
-              border: onspotOpen ? '1px solid rgba(16,185,129,0.3)' : '1px solid rgba(239,68,68,0.25)',
-              color: onspotOpen ? '#10B981' : '#f87171',
+              background: onspotOpen ? 'rgba(184,160,106,0.08)' : 'rgba(161,31,38,0.08)',
+              border: onspotOpen ? '1px solid rgba(208,176,112,0.3)' : '1px solid rgba(161,31,38,0.3)',
+              color: onspotOpen ? '#d0b070' : '#a11f26',
               outline: 'none',
             }}
           >
             <span style={{
               width: 6, height: 6, borderRadius: '50%', flexShrink: 0, display: 'inline-block',
-              background: onspotOpen ? '#10B981' : '#EF4444',
-              boxShadow: `0 0 6px ${onspotOpen ? '#10B981' : '#EF4444'}`,
+              background: onspotOpen ? '#d0b070' : '#a11f26',
+              boxShadow: `0 0 6px ${onspotOpen ? '#d0b070' : '#a11f26'}`,
             }} />
             {onspotOpen ? 'OPEN' : 'CLOSED'}
           </button>
         </div>
 
         {/* Refresh + Logout */}
-        <div style={{ padding: '14px 20px', borderTop: '1px solid #1a1a2e', display: 'flex', gap: 8 }}>
+        <div style={{ padding: '14px 20px', borderTop: '1px solid rgba(208,176,112,0.1)', display: 'flex', gap: 8 }}>
           <button
             onClick={handleRefresh}
             title="Refresh data"
             style={{
               flex: 1, padding: '8px 4px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
               fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 500,
-              background: 'rgba(255,255,255,0.03)', border: '1px solid #1a1a2e', borderRadius: 8,
-              color: '#64748B', cursor: 'pointer', outline: 'none', transition: 'all 0.2s',
+              background: 'rgba(208,176,112,0.04)', border: '1px solid rgba(208,176,112,0.15)',
+              color: '#5a4f48', cursor: 'pointer', outline: 'none', transition: 'all 0.2s',
             }}
-            onMouseEnter={e => { e.currentTarget.style.color = '#94a3b8'; e.currentTarget.style.borderColor = 'rgba(99,102,241,0.3)' }}
-            onMouseLeave={e => { e.currentTarget.style.color = '#64748B'; e.currentTarget.style.borderColor = '#1a1a2e' }}
+            onMouseEnter={e => { e.currentTarget.style.color = '#8d7f76'; e.currentTarget.style.borderColor = 'rgba(208,176,112,0.35)' }}
+            onMouseLeave={e => { e.currentTarget.style.color = '#5a4f48'; e.currentTarget.style.borderColor = 'rgba(208,176,112,0.15)' }}
           >
             <RefreshIcon /> Refresh
           </button>
@@ -362,11 +362,11 @@ const AdminDashboard = () => {
             style={{
               flex: 1, padding: '8px 4px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
               fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 500,
-              background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: 8,
-              color: '#f87171', cursor: 'pointer', outline: 'none', transition: 'all 0.2s',
+              background: 'rgba(161,31,38,0.08)', border: '1px solid rgba(161,31,38,0.25)',
+              color: '#a11f26', cursor: 'pointer', outline: 'none', transition: 'all 0.2s',
             }}
-            onMouseEnter={e => e.currentTarget.style.background = 'rgba(239,68,68,0.14)'}
-            onMouseLeave={e => e.currentTarget.style.background = 'rgba(239,68,68,0.08)'}
+            onMouseEnter={e => e.currentTarget.style.background = 'rgba(161,31,38,0.14)'}
+            onMouseLeave={e => e.currentTarget.style.background = 'rgba(161,31,38,0.08)'}
           >
             <LogoutIcon /> Logout
           </button>
@@ -376,7 +376,7 @@ const AdminDashboard = () => {
       {/* ── Mobile Top Strip ── */}
       <div
         className="flex md:hidden sticky top-0 z-40 items-center"
-        style={{ background: '#0A0A0F', borderBottom: '1px solid #1a1a2e', minHeight: 48 }}
+        style={{ background: '#100e0b', borderBottom: '1px solid rgba(208,176,112,0.12)', minHeight: 48 }}
       >
         {TABS.map(tab => (
           <button
@@ -385,11 +385,11 @@ const AdminDashboard = () => {
             title={tab.label}
             style={{
               flex: 1, padding: '13px 4px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-              borderBottom: activeTab === tab.id ? '2px solid #6366F1' : '2px solid transparent',
-              color: activeTab === tab.id ? '#818CF8' : '#475569',
+              borderBottom: activeTab === tab.id ? '2px solid #d0b070' : '2px solid transparent',
+              color: activeTab === tab.id ? '#d0b070' : '#5a4f48',
               background: 'transparent', cursor: 'pointer', border: 'none',
               borderBottomWidth: 2, borderBottomStyle: 'solid',
-              borderBottomColor: activeTab === tab.id ? '#6366F1' : 'transparent',
+              borderBottomColor: activeTab === tab.id ? '#d0b070' : 'transparent',
               outline: 'none',
             }}
           >
@@ -398,13 +398,13 @@ const AdminDashboard = () => {
         ))}
         <button
           onClick={handleRefresh} title="Refresh"
-          style={{ padding: '13px 10px', color: '#475569', background: 'transparent', border: 'none', cursor: 'pointer', outline: 'none' }}
+          style={{ padding: '13px 10px', color: '#5a4f48', background: 'transparent', border: 'none', cursor: 'pointer', outline: 'none' }}
         >
           <RefreshIcon />
         </button>
         <button
           onClick={handleLogout} title="Logout"
-          style={{ padding: '13px 10px', color: '#f87171', background: 'transparent', border: 'none', cursor: 'pointer', outline: 'none' }}
+          style={{ padding: '13px 10px', color: '#a11f26', background: 'transparent', border: 'none', cursor: 'pointer', outline: 'none' }}
         >
           <LogoutIcon />
         </button>
@@ -420,26 +420,26 @@ const AdminDashboard = () => {
               <div
                 key={c.label}
                 style={{
-                  background: '#0D0D1A', border: '1px solid #1a1a2e', borderRadius: 12,
+                  background: 'rgba(21,18,15,0.8)', border: '1px solid rgba(208,176,112,0.15)',
                   padding: 20, textAlign: 'center', transition: 'all 0.3s ease',
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 12 }}>
-                  <span style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: c.dot, boxShadow: `0 0 6px ${c.dot}`, display: 'inline-block' }} />
-                  <p style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.18em', fontWeight: 600, color: '#475569', margin: 0 }}>{c.label}</p>
+                  <span style={{ width: 5, height: 5, backgroundColor: c.dot, boxShadow: `0 0 6px ${c.dot}`, display: 'inline-block', transform: 'rotate(45deg)' }} />
+                  <p style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.18em', fontWeight: 600, color: '#5a4f48', margin: 0 }}>{c.label}</p>
                 </div>
-                <div style={{ fontSize: 28, fontWeight: 700, color: c.color }}>{(c.value || 0).toLocaleString()}</div>
+                <div style={{ fontSize: 28, fontWeight: 400, color: c.color, fontFamily: "'Cormorant Garamond', Georgia, serif" }}>{(c.value || 0).toLocaleString()}</div>
               </div>
             )) : (
-              <div style={{ gridColumn: '1/-1', height: 88, background: '#0D0D1A', border: '1px solid #1a1a2e', borderRadius: 12 }} />
+              <div style={{ gridColumn: '1/-1', height: 88, background: 'rgba(21,18,15,0.8)', border: '1px solid rgba(208,176,112,0.12)' }} />
             )}
           </div>
 
           {/* Tab Content */}
           {loading ? (
-            <div style={{ background: '#0D0D1A', border: '1px solid #1a1a2e', borderRadius: 12, padding: 24 }}>
+            <div style={{ background: 'rgba(21,18,15,0.8)', border: '1px solid rgba(208,176,112,0.12)', padding: 24 }}>
               {Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} style={{ height: 40, background: '#1a1a2e', borderRadius: 8, marginBottom: 12, animation: 'pulse 2s infinite' }} />
+                <div key={i} style={{ height: 40, background: 'rgba(208,176,112,0.05)', marginBottom: 12, animation: 'pulse 2s infinite' }} />
               ))}
             </div>
           ) : (
@@ -568,22 +568,22 @@ const AdminDashboard = () => {
 
       {/* ── Registration Toggle Confirmation Modal ── */}
       {regModal && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 60, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)' }}>
-          <div style={{ background: '#0D0D1A', border: '1px solid #1a1a2e', borderRadius: 16, padding: 28, maxWidth: 380, width: '100%', boxShadow: '0 24px 60px rgba(0,0,0,0.6)' }}>
+        <div style={{ position: 'fixed', inset: 0, zIndex: 60, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(6px)' }}>
+          <div style={{ background: '#15120f', border: '1px solid rgba(208,176,112,0.2)', padding: 28, maxWidth: 380, width: '100%', boxShadow: '0 24px 60px rgba(0,0,0,0.7)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
-              <div style={{ width: 40, height: 40, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, background: regOpen ? 'rgba(239,68,68,0.1)' : 'rgba(16,185,129,0.1)', border: regOpen ? '1px solid rgba(239,68,68,0.25)' : '1px solid rgba(16,185,129,0.25)' }}>
-                <svg className="w-5 h-5" style={{ color: regOpen ? '#f87171' : '#10B981' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div style={{ width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, background: regOpen ? 'rgba(161,31,38,0.1)' : 'rgba(208,176,112,0.08)', border: regOpen ? '1px solid rgba(161,31,38,0.3)' : '1px solid rgba(208,176,112,0.25)' }}>
+                <svg className="w-5 h-5" style={{ color: regOpen ? '#a11f26' : '#d0b070' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={regOpen ? 'M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z' : 'M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z'} />
                 </svg>
               </div>
               <div>
-                <p style={{ fontSize: 14, fontWeight: 600, color: 'white', margin: 0 }}>
+                <p style={{ fontSize: 14, fontWeight: 600, color: '#f5f1ed', margin: 0 }}>
                   {regOpen ? 'Close Registration?' : 'Open Registration?'}
                 </p>
-                <p style={{ fontSize: 12, color: '#64748B', margin: '3px 0 0' }}>This affects the public registration page.</p>
+                <p style={{ fontSize: 12, color: '#5a4f48', margin: '3px 0 0' }}>This affects the public registration page.</p>
               </div>
             </div>
-            <p style={{ fontSize: 13, color: '#94a3b8', marginBottom: 20, lineHeight: 1.6 }}>
+            <p style={{ fontSize: 13, color: '#8d7f76', marginBottom: 20, lineHeight: 1.6 }}>
               {regOpen
                 ? 'Closing registration will show a "Registration is currently closed" message to anyone visiting the register page.'
                 : 'Opening registration will allow new attendees to submit their pre-registration form.'}
@@ -592,7 +592,7 @@ const AdminDashboard = () => {
               <button
                 onClick={() => setRegModal(false)}
                 disabled={regToggling}
-                style={{ flex: 1, padding: '10px', borderRadius: 8, background: 'rgba(255,255,255,0.04)', border: '1px solid #1a1a2e', color: '#94a3b8', fontSize: 12, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', cursor: 'pointer', outline: 'none' }}
+                style={{ flex: 1, padding: '10px', background: 'transparent', border: '1px solid rgba(208,176,112,0.2)', color: '#8d7f76', fontSize: 12, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', cursor: 'pointer', outline: 'none' }}
               >
                 Cancel
               </button>
@@ -600,12 +600,12 @@ const AdminDashboard = () => {
                 onClick={handleToggleReg}
                 disabled={regToggling}
                 style={{
-                  flex: 1, padding: '10px', borderRadius: 8, fontSize: 12, fontWeight: 700,
+                  flex: 1, padding: '10px', fontSize: 12, fontWeight: 700,
                   textTransform: 'uppercase', letterSpacing: '0.08em', cursor: regToggling ? 'not-allowed' : 'pointer', outline: 'none',
                   opacity: regToggling ? 0.6 : 1, transition: 'all 0.2s',
-                  background: regOpen ? 'rgba(239,68,68,0.15)' : 'rgba(16,185,129,0.15)',
-                  border: regOpen ? '1px solid rgba(239,68,68,0.3)' : '1px solid rgba(16,185,129,0.3)',
-                  color: regOpen ? '#f87171' : '#10B981',
+                  background: regOpen ? '#a11f26' : 'rgba(208,176,112,0.12)',
+                  border: regOpen ? '1px solid rgba(208,176,112,0.3)' : '1px solid rgba(208,176,112,0.35)',
+                  color: regOpen ? '#f5f1ed' : '#d0b070',
                 }}
               >
                 {regToggling ? 'Saving…' : regOpen ? 'Close It' : 'Open It'}
@@ -617,33 +617,33 @@ const AdminDashboard = () => {
 
       {/* ── On-Spot Toggle Confirmation Modal ── */}
       {onspotModal && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 60, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)' }}>
-          <div style={{ background: '#0D0D1A', border: '1px solid #1a1a2e', borderRadius: 16, padding: 28, maxWidth: 380, width: '100%', boxShadow: '0 24px 60px rgba(0,0,0,0.6)' }}>
+        <div style={{ position: 'fixed', inset: 0, zIndex: 60, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(6px)' }}>
+          <div style={{ background: '#15120f', border: '1px solid rgba(208,176,112,0.2)', padding: 28, maxWidth: 380, width: '100%', boxShadow: '0 24px 60px rgba(0,0,0,0.7)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
-              <div style={{ width: 40, height: 40, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, background: onspotOpen ? 'rgba(239,68,68,0.1)' : 'rgba(16,185,129,0.1)', border: onspotOpen ? '1px solid rgba(239,68,68,0.25)' : '1px solid rgba(16,185,129,0.25)' }}>
-                <svg className="w-5 h-5" style={{ color: onspotOpen ? '#f87171' : '#10B981' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div style={{ width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, background: onspotOpen ? 'rgba(161,31,38,0.1)' : 'rgba(208,176,112,0.08)', border: onspotOpen ? '1px solid rgba(161,31,38,0.3)' : '1px solid rgba(208,176,112,0.25)' }}>
+                <svg className="w-5 h-5" style={{ color: onspotOpen ? '#a11f26' : '#d0b070' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={onspotOpen ? 'M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z' : 'M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z'} />
                 </svg>
               </div>
               <div>
-                <p style={{ fontSize: 14, fontWeight: 600, color: 'white', margin: 0 }}>
+                <p style={{ fontSize: 14, fontWeight: 600, color: '#f5f1ed', margin: 0 }}>
                   {onspotOpen ? 'Close On-Spot Registration?' : 'Open On-Spot Registration?'}
                 </p>
-                <p style={{ fontSize: 12, color: '#64748B', margin: '3px 0 0' }}>This affects the on-spot walk-in page.</p>
+                <p style={{ fontSize: 12, color: '#5a4f48', margin: '3px 0 0' }}>This affects the on-spot walk-in page.</p>
               </div>
             </div>
-            <p style={{ fontSize: 13, color: '#94a3b8', marginBottom: 20, lineHeight: 1.6 }}>
+            <p style={{ fontSize: 13, color: '#8d7f76', marginBottom: 20, lineHeight: 1.6 }}>
               {onspotOpen
                 ? 'Closing will show a "Registration Closed" message on the on-spot walk-in page.'
                 : 'Opening will allow walk-in attendees to register on-spot.'}
             </p>
             <div style={{ display: 'flex', gap: 10 }}>
               <button onClick={() => setOnspotModal(false)} disabled={onspotToggling}
-                style={{ flex: 1, padding: '10px', borderRadius: 8, background: 'rgba(255,255,255,0.04)', border: '1px solid #1a1a2e', color: '#94a3b8', fontSize: 12, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', cursor: 'pointer', outline: 'none' }}>
+                style={{ flex: 1, padding: '10px', background: 'transparent', border: '1px solid rgba(208,176,112,0.2)', color: '#8d7f76', fontSize: 12, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', cursor: 'pointer', outline: 'none' }}>
                 Cancel
               </button>
               <button onClick={handleToggleOnspot} disabled={onspotToggling}
-                style={{ flex: 1, padding: '10px', borderRadius: 8, fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', cursor: onspotToggling ? 'not-allowed' : 'pointer', outline: 'none', opacity: onspotToggling ? 0.6 : 1, transition: 'all 0.2s', background: onspotOpen ? 'rgba(239,68,68,0.15)' : 'rgba(16,185,129,0.15)', border: onspotOpen ? '1px solid rgba(239,68,68,0.3)' : '1px solid rgba(16,185,129,0.3)', color: onspotOpen ? '#f87171' : '#10B981' }}>
+                style={{ flex: 1, padding: '10px', fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', cursor: onspotToggling ? 'not-allowed' : 'pointer', outline: 'none', opacity: onspotToggling ? 0.6 : 1, transition: 'all 0.2s', background: onspotOpen ? '#a11f26' : 'rgba(208,176,112,0.12)', border: onspotOpen ? '1px solid rgba(208,176,112,0.3)' : '1px solid rgba(208,176,112,0.35)', color: onspotOpen ? '#f5f1ed' : '#d0b070' }}>
                 {onspotToggling ? 'Saving…' : onspotOpen ? 'Close It' : 'Open It'}
               </button>
             </div>

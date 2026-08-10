@@ -46,50 +46,52 @@ async def send_pass_email(email: str, name: str, sid: str, pass_image_b64: str, 
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <title>Job Fair 2026 Pass</title>
 </head>
-<body style="margin:0;padding:0;background:#060a14;font-family:Arial,Helvetica,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#060a14;">
+<body style="margin:0;padding:0;background:#15120f;font-family:Georgia,'Times New Roman',serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#15120f;">
     <tr>
       <td align="center" style="padding:40px 16px;">
         <table width="600" cellpadding="0" cellspacing="0" border="0"
-               style="max-width:600px;width:100%;border-radius:16px;overflow:hidden;box-shadow:0 4px 40px rgba(0,0,0,0.6);">
+               style="max-width:600px;width:100%;overflow:hidden;box-shadow:0 4px 60px rgba(0,0,0,0.7);">
 
           <!-- HEADER -->
           <tr>
-            <td style="background:linear-gradient(135deg,#071020,#0c1f3f);padding:32px 36px 28px;text-align:center;border-bottom:2px solid #00CFFF;">
-              <p style="color:#00CFFF;font-size:32px;font-weight:900;letter-spacing:6px;margin:0;line-height:1;">IZEE</p>
-              <p style="color:#94a3b8;font-size:11px;letter-spacing:4px;text-transform:uppercase;margin:6px 0 0;">Business School</p>
-              <div style="width:48px;height:2px;background:#00CFFF;margin:14px auto 0;border-radius:2px;"></div>
+            <td style="background:#a11f26;padding:32px 36px 28px;text-align:center;border-bottom:1px solid rgba(208,176,112,0.4);">
+              <p style="color:#f5f1ed;font-size:11px;font-family:Arial,Helvetica,sans-serif;letter-spacing:5px;text-transform:uppercase;margin:0 0 10px;opacity:0.7;">IZEE Business School presents</p>
+              <p style="color:#d0b070;font-size:42px;font-weight:400;letter-spacing:2px;margin:0;line-height:1;font-family:Georgia,'Times New Roman',serif;font-style:italic;">Job Fair</p>
+              <p style="color:#f5f1ed;font-size:13px;letter-spacing:6px;text-transform:uppercase;margin:6px 0 0;font-family:Arial,Helvetica,sans-serif;font-weight:600;">2026</p>
+              <div style="width:40px;height:1px;background:#d0b070;margin:16px auto 0;opacity:0.6;"></div>
             </td>
           </tr>
 
           <!-- BODY -->
           <tr>
-            <td style="background:#0d1320;padding:36px 36px 28px;">
+            <td style="background:#1c1814;padding:36px 36px 28px;">
 
-              <h2 style="color:#ffffff;font-size:22px;font-weight:700;margin:0 0 6px;">Your Job Fair 2026 Pass is Ready!</h2>
-              <p style="color:#94a3b8;font-size:14px;margin:0 0 28px;">Hi <strong style="color:#e2e8f0;">{name}</strong>, congratulations on your registration.</p>
+              <p style="color:#8d7f76;font-size:10px;text-transform:uppercase;letter-spacing:4px;font-family:Arial,Helvetica,sans-serif;font-weight:600;margin:0 0 16px;">Your Pass is Ready</p>
+              <h2 style="color:#f5f1ed;font-size:26px;font-weight:400;margin:0 0 6px;font-family:Georgia,serif;font-style:italic;">Welcome, <span style="color:#d0b070;">{name}</span></h2>
+              <p style="color:#8d7f76;font-size:14px;margin:0 0 28px;font-family:Arial,Helvetica,sans-serif;">Congratulations on completing your registration for IZEE Job Fair 2026.</p>
 
               <!-- SID box -->
               <table width="100%" cellpadding="0" cellspacing="0" border="0"
-                     style="background:#060a14;border:1px solid rgba(0,207,255,0.3);border-radius:12px;margin-bottom:24px;">
+                     style="background:#15120f;border:1px solid rgba(208,176,112,0.25);margin-bottom:24px;">
                 <tr>
-                  <td style="padding:20px;text-align:center;">
-                    <p style="color:#94a3b8;font-size:11px;text-transform:uppercase;letter-spacing:3px;margin:0 0 8px;">Your Pass ID</p>
-                    <p style="color:#00CFFF;font-size:26px;font-family:monospace;font-weight:bold;letter-spacing:4px;margin:0;">{sid}</p>
+                  <td style="padding:22px;text-align:center;">
+                    <p style="color:#8d7f76;font-size:10px;text-transform:uppercase;letter-spacing:4px;margin:0 0 10px;font-family:Arial,Helvetica,sans-serif;font-weight:600;">Your Pass ID</p>
+                    <p style="color:#d0b070;font-size:28px;font-family:Courier,monospace;font-weight:bold;letter-spacing:5px;margin:0;">{sid}</p>
                   </td>
                 </tr>
               </table>
 
               <!-- Event details -->
               <table width="100%" cellpadding="0" cellspacing="0" border="0"
-                     style="background:#060a14;border-radius:12px;margin-bottom:24px;">
+                     style="background:#15120f;border:1px solid rgba(208,176,112,0.15);margin-bottom:24px;">
                 <tr>
-                  <td style="padding:20px;">
-                    <p style="color:#00CFFF;font-size:12px;text-transform:uppercase;letter-spacing:3px;font-weight:700;margin:0 0 14px;">Event Details</p>
+                  <td style="padding:22px;">
+                    <p style="color:#d0b070;font-size:10px;text-transform:uppercase;letter-spacing:4px;font-weight:600;margin:0 0 16px;font-family:Arial,Helvetica,sans-serif;">Event Details</p>
                     <table width="100%" cellpadding="0" cellspacing="0" border="0">
-                      <tr><td style="padding:4px 0;font-size:13px;color:#94a3b8;"><strong style="color:#e2e8f0;">Date:</strong>&nbsp; 8th May 2026</td></tr>
-                      <tr><td style="padding:4px 0;font-size:13px;color:#94a3b8;"><strong style="color:#e2e8f0;">Venue:</strong>&nbsp; IZee Business School, Jigani, Bangalore &nbsp;<a href="https://maps.app.goo.gl/DfyZRwqNwGZ6vSd28" style="color:#00CFFF;text-decoration:underline;">View on Google Maps</a></td></tr>
-                      <tr><td style="padding:4px 0;font-size:13px;color:#94a3b8;"><strong style="color:#e2e8f0;">Registration Type:</strong>&nbsp; {reg_type}</td></tr>
+                      <tr><td style="padding:5px 0;font-size:13px;color:#8d7f76;font-family:Arial,Helvetica,sans-serif;"><span style="color:#c9bfb5;font-weight:600;">&#9670;&nbsp; Date:</span>&nbsp; 8th May 2026</td></tr>
+                      <tr><td style="padding:5px 0;font-size:13px;color:#8d7f76;font-family:Arial,Helvetica,sans-serif;"><span style="color:#c9bfb5;font-weight:600;">&#9670;&nbsp; Venue:</span>&nbsp; IZee Business School, Jigani, Bangalore &nbsp;<a href="https://maps.app.goo.gl/DfyZRwqNwGZ6vSd28" style="color:#d0b070;text-decoration:underline;">View on Google Maps</a></td></tr>
+                      <tr><td style="padding:5px 0;font-size:13px;color:#8d7f76;font-family:Arial,Helvetica,sans-serif;"><span style="color:#c9bfb5;font-weight:600;">&#9670;&nbsp; Registration Type:</span>&nbsp; {reg_type}</td></tr>
                     </table>
                   </td>
                 </tr>
@@ -97,15 +99,15 @@ async def send_pass_email(email: str, name: str, sid: str, pass_image_b64: str, 
 
               <!-- What to bring -->
               <table width="100%" cellpadding="0" cellspacing="0" border="0"
-                     style="background:#060a14;border-radius:12px;margin-bottom:24px;">
+                     style="background:#15120f;border:1px solid rgba(208,176,112,0.15);margin-bottom:24px;">
                 <tr>
-                  <td style="padding:20px;">
-                    <p style="color:#e2e8f0;font-size:13px;font-weight:700;margin:0 0 12px;">What to bring:</p>
+                  <td style="padding:22px;">
+                    <p style="color:#f5f1ed;font-size:13px;font-weight:600;margin:0 0 14px;font-family:Arial,Helvetica,sans-serif;">What to bring:</p>
                     <table cellpadding="0" cellspacing="0" border="0">
-                      <tr><td style="padding:4px 0;font-size:13px;color:#94a3b8;">&#8226;&nbsp; Updated resume (10 copies recommended)</td></tr>
-                      <tr><td style="padding:4px 0;font-size:13px;color:#94a3b8;">&#8226;&nbsp; Passport-sized photographs</td></tr>
-                      <tr><td style="padding:4px 0;font-size:13px;color:#94a3b8;">&#8226;&nbsp; Valid government-issued ID proof (Aadhaar / PAN / Passport)</td></tr>
-                      <tr><td style="padding:4px 0;font-size:13px;color:#94a3b8;">&#8226;&nbsp; Academic Certification Copies</td></tr>
+                      <tr><td style="padding:4px 0;font-size:13px;color:#8d7f76;font-family:Arial,Helvetica,sans-serif;"><span style="color:#a11f26;">&#9670;</span>&nbsp; Updated resume (10 copies recommended)</td></tr>
+                      <tr><td style="padding:4px 0;font-size:13px;color:#8d7f76;font-family:Arial,Helvetica,sans-serif;"><span style="color:#a11f26;">&#9670;</span>&nbsp; Passport-sized photographs</td></tr>
+                      <tr><td style="padding:4px 0;font-size:13px;color:#8d7f76;font-family:Arial,Helvetica,sans-serif;"><span style="color:#a11f26;">&#9670;</span>&nbsp; Valid government-issued ID proof (Aadhaar / PAN / Passport)</td></tr>
+                      <tr><td style="padding:4px 0;font-size:13px;color:#8d7f76;font-family:Arial,Helvetica,sans-serif;"><span style="color:#a11f26;">&#9670;</span>&nbsp; Academic Certification Copies</td></tr>
                     </table>
                   </td>
                 </tr>
@@ -113,14 +115,14 @@ async def send_pass_email(email: str, name: str, sid: str, pass_image_b64: str, 
 
               <!-- Important notes -->
               <table width="100%" cellpadding="0" cellspacing="0" border="0"
-                     style="background:#060a14;border-radius:12px;margin-bottom:24px;">
+                     style="background:#15120f;border:1px solid rgba(208,176,112,0.15);margin-bottom:24px;">
                 <tr>
-                  <td style="padding:20px;">
-                    <p style="color:#e2e8f0;font-size:13px;font-weight:700;margin:0 0 12px;">Important notes:</p>
+                  <td style="padding:22px;">
+                    <p style="color:#f5f1ed;font-size:13px;font-weight:600;margin:0 0 14px;font-family:Arial,Helvetica,sans-serif;">Important notes:</p>
                     <table cellpadding="0" cellspacing="0" border="0">
-                      <tr><td style="padding:4px 0;font-size:13px;color:#94a3b8;">&#8226;&nbsp; Arrive <strong style="color:#e2e8f0;">30 minutes early</strong></td></tr>
-                      <tr><td style="padding:4px 0;font-size:13px;color:#94a3b8;">&#8226;&nbsp; This pass is <strong style="color:#e2e8f0;">mandatory for entry</strong></td></tr>
-                      <tr><td style="padding:4px 0;font-size:13px;color:#94a3b8;">&#8226;&nbsp; Scan the QR code at the gate for verification</td></tr>
+                      <tr><td style="padding:4px 0;font-size:13px;color:#8d7f76;font-family:Arial,Helvetica,sans-serif;"><span style="color:#a11f26;">&#9670;</span>&nbsp; Arrive <strong style="color:#c9bfb5;">30 minutes early</strong></td></tr>
+                      <tr><td style="padding:4px 0;font-size:13px;color:#8d7f76;font-family:Arial,Helvetica,sans-serif;"><span style="color:#a11f26;">&#9670;</span>&nbsp; This pass is <strong style="color:#c9bfb5;">mandatory for entry</strong></td></tr>
+                      <tr><td style="padding:4px 0;font-size:13px;color:#8d7f76;font-family:Arial,Helvetica,sans-serif;"><span style="color:#a11f26;">&#9670;</span>&nbsp; Scan the QR code at the gate for verification</td></tr>
                     </table>
                   </td>
                 </tr>
@@ -128,24 +130,25 @@ async def send_pass_email(email: str, name: str, sid: str, pass_image_b64: str, 
 
               <!-- Spam warning -->
               <table width="100%" cellpadding="0" cellspacing="0" border="0"
-                     style="background:#1a1200;border:1px solid #f59e0b;border-radius:8px;margin-bottom:24px;">
+                     style="background:rgba(208,176,112,0.06);border:1px solid rgba(208,176,112,0.35);margin-bottom:24px;">
                 <tr>
-                  <td style="padding:14px 18px;font-size:13px;color:#fbbf24;">
+                  <td style="padding:14px 18px;font-size:13px;color:#d0b070;font-family:Arial,Helvetica,sans-serif;">
                     &#9888;&#65039; <strong>Check your spam/junk folder</strong> if you don't see this email. Add our sender address to your contacts to ensure delivery.
                   </td>
                 </tr>
               </table>
 
-              <p style="color:#64748b;font-size:13px;margin:0 0 6px;">Your pass image is attached to this email. Present it at the gate for entry.</p>
-              <p style="color:#64748b;font-size:13px;margin:0;">Looking forward to seeing you at the event!</p>
+              <p style="color:#5a4f48;font-size:13px;margin:0 0 6px;font-family:Arial,Helvetica,sans-serif;">Your pass image is attached to this email. Present it at the gate for entry.</p>
+              <p style="color:#5a4f48;font-size:13px;margin:0;font-family:Arial,Helvetica,sans-serif;">Looking forward to seeing you at the event!</p>
 
             </td>
           </tr>
 
           <!-- FOOTER -->
           <tr>
-            <td style="background:#07090f;padding:18px 36px;text-align:center;border-top:1px solid rgba(255,255,255,0.05);">
-              <p style="color:#334155;font-size:12px;margin:0;">IZee Business School, Jigani, Bangalore &nbsp;|&nbsp; Job Fair 2026</p>
+            <td style="background:#15120f;padding:20px 36px;text-align:center;border-top:1px solid rgba(208,176,112,0.12);">
+              <p style="color:#5a4f48;font-size:11px;margin:0;font-family:Arial,Helvetica,sans-serif;letter-spacing:2px;text-transform:uppercase;">IZee Business School &nbsp;|&nbsp; Jigani, Bangalore &nbsp;|&nbsp; Job Fair 2026</p>
+              <p style="color:rgba(208,176,112,0.3);font-size:10px;margin:6px 0 0;font-family:Georgia,serif;font-style:italic;">Ambition &bull; Access &bull; Opportunity</p>
             </td>
           </tr>
 

@@ -156,13 +156,13 @@ const RegistrationForm = ({ onSubmit, submitting = false }) => {
           <div key={s.key} className="flex items-center">
             <div className="flex flex-col items-center gap-1.5">
               <div
-                className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-400 relative"
+                className="w-9 h-9 flex items-center justify-center text-xs font-bold transition-all duration-400 relative"
                 style={
                   i < currentStep
-                    ? { background: 'linear-gradient(135deg, #10B981, #0d9488)', color: 'white', boxShadow: '0 0 16px rgba(16,185,129,0.35)' }
+                    ? { background: '#a11f26', color: '#f5f1ed', border: '1px solid rgba(208,176,112,0.4)', boxShadow: '0 0 16px rgba(161,31,38,0.3)' }
                     : i === currentStep
-                    ? { background: 'linear-gradient(135deg, #6366F1, #8B5CF6)', color: 'white', boxShadow: '0 0 20px rgba(99,102,241,0.45)' }
-                    : { background: '#080810', border: '1px solid #1a1a2e', color: '#475569' }
+                    ? { background: 'transparent', color: '#d0b070', border: '1px solid #d0b070', boxShadow: '0 0 12px rgba(208,176,112,0.2)' }
+                    : { background: 'transparent', border: '1px solid rgba(208,176,112,0.2)', color: '#5a4f48' }
                 }
               >
                 {i < currentStep ? (
@@ -173,16 +173,16 @@ const RegistrationForm = ({ onSubmit, submitting = false }) => {
                   <span>{i + 1}</span>
                 )}
               </div>
-              <span className="text-[10px] font-medium hidden sm:block transition-colors duration-300"
-                style={{ color: i === currentStep ? '#a5b4fc' : i < currentStep ? '#6ee7b7' : '#334155' }}>
+              <span className="text-[10px] font-semibold uppercase tracking-[0.12em] hidden sm:block transition-colors duration-300"
+                style={{ color: i === currentStep ? '#d0b070' : i < currentStep ? '#a11f26' : '#5a4f48' }}>
                 {STEP_LABELS[s.key]}
               </span>
             </div>
 
             {i < steps.length - 1 && (
               <div
-                className="w-12 md:w-20 h-px mx-1 mb-5 rounded-full transition-all duration-500"
-                style={{ background: i < currentStep ? 'linear-gradient(90deg, #10B981, #0d9488)' : '#1a1a2e' }}
+                className="w-12 md:w-20 h-px mx-1 mb-5 transition-all duration-500"
+                style={{ background: i < currentStep ? '#a11f26' : 'rgba(208,176,112,0.15)' }}
               />
             )}
           </div>
@@ -207,8 +207,8 @@ const RegistrationForm = ({ onSubmit, submitting = false }) => {
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          className="rounded-xl p-5"
-          style={{ background: '#080810', border: '1px solid #1a1a2e' }}
+          className="p-5"
+          style={{ background: 'rgba(161,31,38,0.05)', border: '1px solid rgba(208,176,112,0.18)' }}
         >
           <div className="flex items-start gap-3">
             <input
@@ -216,18 +216,18 @@ const RegistrationForm = ({ onSubmit, submitting = false }) => {
               id="compliance"
               checked={complianceAccepted}
               onChange={(e) => setComplianceAccepted(e.target.checked)}
-              className="form-checkbox mt-0.5"
+              className="lp2-form-checkbox mt-0.5"
             />
-            <label htmlFor="compliance" className="text-sm leading-relaxed cursor-pointer select-none" style={{ color: '#94A3B8' }}>
-              I confirm that I will bring <strong className="text-white">10 sets of updated CVs</strong>,{' '}
-              <strong className="text-white">10 passport-size photographs</strong>, and a{' '}
-              <strong className="text-white">valid government-issued ID proof</strong>. I understand that this is
-              a large-scale recruitment event with participation from <strong className="text-white">80+ companies</strong>{' '}
+            <label htmlFor="compliance" className="text-sm leading-relaxed cursor-pointer select-none" style={{ color: '#8d7f76' }}>
+              I confirm that I will bring <strong style={{ color: '#f5f1ed' }}>10 sets of updated CVs</strong>,{' '}
+              <strong style={{ color: '#f5f1ed' }}>10 passport-size photographs</strong>, and a{' '}
+              <strong style={{ color: '#f5f1ed' }}>valid government-issued ID proof</strong>. I understand that this is
+              a large-scale recruitment event with participation from <strong style={{ color: '#d0b070' }}>80+ companies</strong>{' '}
               and I must come fully prepared.
             </label>
           </div>
           {errors.compliance && (
-            <motion.p initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} className="text-xs mt-2" style={{ color: '#EF4444' }}>
+            <motion.p initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} className="text-xs mt-2" style={{ color: '#a11f26' }}>
               {errors.compliance}
             </motion.p>
           )}
@@ -240,12 +240,14 @@ const RegistrationForm = ({ onSubmit, submitting = false }) => {
           type="button"
           onClick={handleBack}
           disabled={currentStep === 0}
-          className="flex-1 py-3.5 rounded-xl text-sm font-semibold tracking-[0.05em] transition-all duration-200 disabled:opacity-30"
+          className="flex-1 py-3.5 text-sm font-semibold tracking-[0.1em] uppercase transition-all duration-300 disabled:opacity-30"
           style={{
-            background: '#080810',
-            border: '1px solid #1a1a2e',
-            color: '#94A3B8',
+            background: 'transparent',
+            border: '1px solid rgba(208,176,112,0.25)',
+            color: '#8d7f76',
           }}
+          onMouseEnter={e => { if (currentStep !== 0) { e.currentTarget.style.borderColor = 'rgba(208,176,112,0.5)'; e.currentTarget.style.color = '#d0b070' } }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(208,176,112,0.25)'; e.currentTarget.style.color = '#8d7f76' }}
         >
           Back
         </button>
@@ -254,10 +256,10 @@ const RegistrationForm = ({ onSubmit, submitting = false }) => {
           <button
             type="button"
             onClick={handleNext}
-            className="flex-[2] py-3.5 rounded-xl text-sm font-semibold tracking-[0.06em] uppercase text-white transition-all duration-200"
-            style={{ background: 'linear-gradient(135deg, #6366F1, #8B5CF6)', boxShadow: '0 4px 20px rgba(99,102,241,0.3)' }}
-            onMouseEnter={e => { e.currentTarget.style.opacity = '0.9'; e.currentTarget.style.transform = 'translateY(-1px)' }}
-            onMouseLeave={e => { e.currentTarget.style.opacity = '1'; e.currentTarget.style.transform = 'translateY(0)' }}
+            className="flex-[2] py-3.5 text-sm font-semibold tracking-[0.12em] uppercase transition-all duration-300"
+            style={{ background: '#a11f26', color: '#f5f1ed', border: '1px solid rgba(208,176,112,0.25)' }}
+            onMouseEnter={e => { e.currentTarget.style.background = '#d0b070'; e.currentTarget.style.color = '#15120f' }}
+            onMouseLeave={e => { e.currentTarget.style.background = '#a11f26'; e.currentTarget.style.color = '#f5f1ed' }}
           >
             Continue
           </button>
@@ -265,10 +267,10 @@ const RegistrationForm = ({ onSubmit, submitting = false }) => {
           <button
             type="submit"
             disabled={submitting}
-            className="flex-[2] py-3.5 rounded-xl text-sm font-semibold tracking-[0.06em] uppercase text-white transition-all duration-200 disabled:opacity-50"
-            style={{ background: 'linear-gradient(135deg, #10B981, #0d9488)', boxShadow: '0 4px 20px rgba(16,185,129,0.3)' }}
-            onMouseEnter={e => { if (!submitting) { e.currentTarget.style.opacity = '0.9'; e.currentTarget.style.transform = 'translateY(-1px)' } }}
-            onMouseLeave={e => { e.currentTarget.style.opacity = '1'; e.currentTarget.style.transform = 'translateY(0)' }}
+            className="flex-[2] py-3.5 text-sm font-semibold tracking-[0.12em] uppercase transition-all duration-300 disabled:opacity-50"
+            style={{ background: '#a11f26', color: '#f5f1ed', border: '1px solid rgba(208,176,112,0.25)' }}
+            onMouseEnter={e => { if (!submitting) { e.currentTarget.style.background = '#d0b070'; e.currentTarget.style.color = '#15120f' } }}
+            onMouseLeave={e => { e.currentTarget.style.background = '#a11f26'; e.currentTarget.style.color = '#f5f1ed' }}
           >
             {submitting ? (
               <span className="flex items-center justify-center gap-2">

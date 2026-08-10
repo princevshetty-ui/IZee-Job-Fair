@@ -9,8 +9,8 @@ const PersonalInfoStep = ({ formData, setFormData, errors }) => {
 
   return (
     <div>
-      <h2 className="text-2xl font-light text-white mb-2 font-heading-art tracking-tight">Personal Information</h2>
-      <p className="text-slate-400 text-sm mb-8">Please fill in your personal details to get started</p>
+      <h2 className="text-2xl font-light mb-2 font-heading-art tracking-tight" style={{ color: '#f5f1ed' }}>Personal Information</h2>
+      <p className="text-sm mb-8" style={{ color: '#8d7f76' }}>Please fill in your personal details to get started</p>
 
       <FormField
         label="Full Name"

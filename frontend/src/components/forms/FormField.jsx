@@ -14,8 +14,8 @@ const FormField = ({
 }) => {
   return (
     <div className="mb-4">
-      <label className="block text-xs font-semibold uppercase tracking-[0.12em] mb-2" style={{ color: '#475569' }}>
-        {label}{required && <span className="ml-1" style={{ color: '#6366F1' }}>*</span>}
+      <label className="block text-[10px] font-semibold uppercase tracking-[0.2em] mb-2" style={{ color: '#8d7f76' }}>
+        {label}{required && <span className="ml-1" style={{ color: '#d0b070' }}>*</span>}
       </label>
 
       {type === "select" ? (
@@ -23,7 +23,7 @@ const FormField = ({
           name={name}
           value={value || ""}
           onChange={onChange}
-          className="form-select"
+          className="lp2-form-select"
           {...props}
         >
           <option value="">Select {label.toLowerCase()}</option>
@@ -40,11 +40,11 @@ const FormField = ({
             name={name}
             checked={!!value}
             onChange={onChange}
-            className="form-checkbox mt-0.5"
+            className="lp2-form-checkbox mt-0.5"
             {...props}
           />
           {label && (
-            <label className="text-sm leading-relaxed cursor-pointer select-none" style={{ color: '#94A3B8' }}>
+            <label className="text-sm leading-relaxed cursor-pointer select-none" style={{ color: '#c9bfb5' }}>
               {label}
             </label>
           )}
@@ -56,7 +56,7 @@ const FormField = ({
           value={value || ""}
           onChange={onChange}
           placeholder={placeholder}
-          className="form-input"
+          className="lp2-form-input"
           {...props}
         />
       )}
@@ -69,7 +69,7 @@ const FormField = ({
             exit={{ opacity: 0, y: -4 }}
             transition={{ duration: 0.2 }}
             className="text-xs mt-1.5 flex items-center gap-1.5"
-            style={{ color: '#EF4444' }}
+            style={{ color: '#a11f26' }}
           >
             <svg className="w-3 h-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
