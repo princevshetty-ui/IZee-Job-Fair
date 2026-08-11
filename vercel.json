@@ -1,14 +1,11 @@
 {
   "services": {
     "backend": {
-      "root": "backend",
-      "mountPath": "/api"
+      "root": "backend"
     },
     "frontend": {
       "root": "frontend",
-      "mountPath": "/",
-      "framework": "vite",
-      "buildCommand": "npm install && npm run build"
+      "framework": "vite"
     }
   }
 }
