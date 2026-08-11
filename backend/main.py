@@ -17,10 +17,11 @@ _origins = [
     "http://localhost:5175",
     os.getenv("FRONTEND_URL", ""),
     os.getenv("RAILWAY_FRONTEND_URL", ""),
+    "*"
 ]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[url for url in _origins if url],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -33,9 +34,14 @@ app.include_router(scan.router, prefix="/api")
 app.include_router(admin.router, prefix="/api")
 app.include_router(volunteer.router, prefix="/api")
 
-# Health check endpoint
+# Root & Health check endpoints
+@app.get("/")
+async def root():
+    return {"message": "Job Fair 2026 API is running", "docs": "/docs"}
+
 @app.get("/health")
 async def health_check():
     return {"status": "ok"}
+
 
 # Include other routers as needed
