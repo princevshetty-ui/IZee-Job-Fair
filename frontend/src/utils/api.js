@@ -1,7 +1,8 @@
-const API_URL = import.meta.env.VITE_API_URL || ''
+export const getApiUrl = () => import.meta.env.VITE_API_URL || 'https://i-zee.vercel.app'
+const API_URL = getApiUrl()
 
 export const apiCall = async (endpoint, options = {}) => {
-  const url = `${API_URL}${endpoint}`
+  const url = `${getApiUrl()}${endpoint}`
   
   // Set default headers
   const headers = {

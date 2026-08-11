@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import RegistrationForm from '../components/forms/RegistrationForm'
 import Toast from '../components/shared/Toast'
-import { apiCall } from '../utils/api'
+import { apiCall, getApiUrl } from '../utils/api'
 import collegeLogo from '../assets/images/college-logo.png'
 
 const RegisterPage = () => {
@@ -14,8 +14,9 @@ const RegisterPage = () => {
   const [regChecked, setRegChecked] = useState(false)
 
   useEffect(() => {
-    const API = import.meta.env.VITE_API_URL || ''
+    const API = getApiUrl()
     fetch(`${API}/api/admin/registration-status`)
+
       .then(r => r.ok ? r.json() : null)
       .then(d => { if (d && d.open === false) setRegOpen(false) })
       .catch(() => {})
